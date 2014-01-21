@@ -275,16 +275,8 @@ is_router_reachable() {
 
     if [ ! "${routersubnet}" = "${mysubnet}" ]; then
         ip -4 route add ${router}/32 dev ${interface}
-        if [ $? -eq 0 ]; then
-            if ping -q -c1 -w2 -I ${interface} ${router}; then
-                return 0
-            else
-                logmessage "DHCP router ${router} is unreachable on DHCP subnet ${mysubnet} router subnet ${routersubnet}"
-                ip route del ${router}/32 dev ${interface}
-                return 1
-            fi
-        else
-            logmessage "failed to create host router for unreachable router ${router} not on subnet ${mysubnet}"
+        if [ "$?" -ne 0 ]; then
+            logmessage "failed to create host route for ${router}"
             return 1
         fi
     fi
