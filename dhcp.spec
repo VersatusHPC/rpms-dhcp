@@ -9,7 +9,7 @@
 
 
 #%%global patchver P2
-%global prever a1
+%global prever b1
 
 #%%global VERSION %{version}-%{patchver}
 #%%global VERSION %{version}
@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  0.3.%{prever}%{?dist}
+Release:  0.4.%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -69,16 +69,15 @@ Patch29:  dhcp-dhclient-decline-onetry.patch
 Patch30:  dhcp-log_perror.patch
 Patch31:  dhcp-getifaddrs.patch
 Patch32:  dhcp-omapi-leak.patch
-Patch33:  dhcp-rfc5970-dhcpv6-options-for-network-boot.patch
-Patch34:  dhcp-failOverPeer.patch
-Patch35:  dhcp-interval.patch
-Patch36:  dhcp-conflex-do-forward-updates.patch
-Patch37:  dhcp-dupl-key.patch
-Patch38:  dhcp-range6.patch
-Patch39:  dhcp-next-server.patch
-Patch40:  dhcp-no-subnet-error2info.patch
-Patch41:  dhcp-ffff-checksum.patch
-Patch42:  dhcp-430a1.patch
+Patch33:  dhcp-failOverPeer.patch
+Patch34:  dhcp-interval.patch
+Patch35:  dhcp-conflex-do-forward-updates.patch
+Patch36:  dhcp-dupl-key.patch
+Patch37:  dhcp-range6.patch
+Patch38:  dhcp-next-server.patch
+Patch39:  dhcp-no-subnet-error2info.patch
+Patch40:  dhcp-ffff-checksum.patch
+
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -308,43 +307,36 @@ rm -rf includes/isc-dhcp
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #33990])
 %patch32 -p1 -b .leak
 
-# RFC5970 - DHCPv6 Options for Network Boot (#798735)
-%patch33 -p1 -b .rfc5970
-
 # Dhcpd does not correctly follow DhcpFailOverPeerDN (#838400)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30402])
-%patch34 -p1 -b .failOverPeer
+%patch33 -p1 -b .failOverPeer
 
 # isc_time_nowplusinterval() is not safe with 64-bit time_t (#662254, #789601)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28038])
-%patch35 -p1 -b .interval
+%patch34 -p1 -b .interval
 
 # do-forward-updates statement wasn't recognized (#863646)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #31328])
-%patch36 -p1 -b .forward-updates
+%patch35 -p1 -b .forward-updates
 
 # multiple key statements in zone definition causes inappropriate error (#873794)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #31892])
-%patch37 -p1 -b .dupl-key
+%patch36 -p1 -b .dupl-key
 
 # Make sure range6 is correct for subnet6 where it's declared (#902966)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #32453])
-%patch38 -p1 -b .range6
+%patch37 -p1 -b .range6
 
 # Expose next-server DHCPv4 option to dhclient script
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #33098])
-%patch39 -p1 -b .next-server
+%patch38 -p1 -b .next-server
 
 # 'No subnet declaration for <iface>' should be info, not error.
-%patch40 -p1 -b .error2info
+%patch39 -p1 -b .error2info
 
 # dhcpd rejects the udp packet with checksum=0xffff (#1015997)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #25587])
-%patch41 -p1 -b .ffff
-
-# make 4.3.0a1 build with LDAP support
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #35159])
-%patch42 -p1 -b .430a1
+%patch40 -p1 -b .ffff
 
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
@@ -361,6 +353,8 @@ for page in server/dhcpd.conf.5 server/dhcpd.leases.5 server/dhcpd.8 ; do
                 -e 's|DBDIR|%{_localstatedir}/lib/dhcpd|g' \
                 -e 's|ETCDIR|%{dhcpconfdir}|g' $page
 done
+
+%{__sed} -i -e 's|/var/db/|%{_localstatedir}/lib/dhcpd/|g' contrib/dhcp-lease-list.pl
 
 %build
 #libtoolize --copy --force
@@ -566,7 +560,7 @@ done
 
 %files
 %doc server/dhcpd.conf.example server/dhcpd6.conf.example
-%doc contrib/ldap/
+%doc contrib/ldap/ contrib/dhcp-lease-list.pl
 %attr(0750,root,root) %dir %{dhcpconfdir}
 %attr(0755,dhcpd,dhcpd) %dir %{_localstatedir}/lib/dhcpd
 %attr(0644,dhcpd,dhcpd) %verify(mode) %config(noreplace) %{_localstatedir}/lib/dhcpd/dhcpd.leases
@@ -630,6 +624,11 @@ done
 
 
 %changelog
+* Tue Jan 21 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-0.4.b1
+- 4.3.0b1
+- ship dhcp-lease-list.pl
+- dhclient-script: don't ping router (#1055181)
+
 * Mon Jan 13 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-0.3.a1
 - update address lifetimes on RENEW/RENEW6 (#1032809)
 
