@@ -1,7 +1,7 @@
-diff -up dhcp-4.2.4b1/common/parse.c.64-bit_lease_parse dhcp-4.2.4b1/common/parse.c
---- dhcp-4.2.4b1/common/parse.c.64-bit_lease_parse	2012-03-09 12:28:10.000000000 +0100
-+++ dhcp-4.2.4b1/common/parse.c	2012-04-16 17:30:55.867045149 +0200
-@@ -906,8 +906,8 @@ TIME
+diff -up dhcp-4.2.6b1/common/parse.c.64-bit_lease_parse dhcp-4.2.6b1/common/parse.c
+--- dhcp-4.2.6b1/common/parse.c.64-bit_lease_parse	2014-01-21 20:29:10.000000000 +0100
++++ dhcp-4.2.6b1/common/parse.c	2014-01-23 14:35:38.887313769 +0100
+@@ -938,8 +938,8 @@ TIME
  parse_date_core(cfile)
  	struct parse *cfile;
  {
@@ -12,16 +12,16 @@ diff -up dhcp-4.2.4b1/common/parse.c.64-bit_lease_parse dhcp-4.2.4b1/common/pars
  	const char *val;
  	enum dhcp_token token;
  	static int months[11] = { 31, 59, 90, 120, 151, 181,
-@@ -933,7 +933,7 @@ parse_date_core(cfile)
+@@ -965,7 +965,7 @@ parse_date_core(cfile)
  		}
  
- 		token = next_token(&val, NULL, cfile); /* consume number */
+ 		skip_token(&val, NULL, cfile); /* consume number */
 -		guess = atoi(val);
 +		guess = atol(val);
  
  		return((TIME)guess);
  	}
-@@ -961,7 +961,7 @@ parse_date_core(cfile)
+@@ -993,7 +993,7 @@ parse_date_core(cfile)
  	   somebody invents a time machine, I think we can safely disregard
  	   it.   This actually works around a stupid Y2K bug that was present
  	   in a very early beta release of dhcpd. */
@@ -30,55 +30,55 @@ diff -up dhcp-4.2.4b1/common/parse.c.64-bit_lease_parse dhcp-4.2.4b1/common/pars
  	if (year > 1900)
  		year -= 1900;
  
-@@ -985,7 +985,7 @@ parse_date_core(cfile)
+@@ -1017,7 +1017,7 @@ parse_date_core(cfile)
  		return((TIME)0);
  	}
- 	token = next_token(&val, NULL, cfile); /* consume month */	
+ 	skip_token(&val, NULL, cfile); /* consume month */	
 -	mon = atoi(val) - 1;
 +	mon = atol(val) - 1;
  
  	/* Slash separating month from day... */
  	token = peek_token(&val, NULL, cfile);
-@@ -1007,7 +1007,7 @@ parse_date_core(cfile)
+@@ -1039,7 +1039,7 @@ parse_date_core(cfile)
  		return((TIME)0);
  	}
- 	token = next_token(&val, NULL, cfile); /* consume day of month */
+ 	skip_token(&val, NULL, cfile); /* consume day of month */
 -	mday = atoi(val);
 +	mday = atol(val);
  
  	/* Hour... */
  	token = peek_token(&val, NULL, cfile);
-@@ -1018,7 +1018,7 @@ parse_date_core(cfile)
+@@ -1050,7 +1050,7 @@ parse_date_core(cfile)
  		return((TIME)0);
  	}
- 	token = next_token(&val, NULL, cfile); /* consume hour */
+ 	skip_token(&val, NULL, cfile); /* consume hour */
 -	hour = atoi(val);
 +	hour = atol(val);
  
  	/* Colon separating hour from minute... */
  	token = peek_token(&val, NULL, cfile);
-@@ -1040,7 +1040,7 @@ parse_date_core(cfile)
+@@ -1072,7 +1072,7 @@ parse_date_core(cfile)
  		return((TIME)0);
  	}
- 	token = next_token(&val, NULL, cfile); /* consume minute */
+ 	skip_token(&val, NULL, cfile); /* consume minute */
 -	min = atoi(val);
 +	min = atol(val);
  
  	/* Colon separating minute from second... */
  	token = peek_token(&val, NULL, cfile);
-@@ -1062,13 +1062,13 @@ parse_date_core(cfile)
+@@ -1094,13 +1094,13 @@ parse_date_core(cfile)
  		return((TIME)0);
  	}
- 	token = next_token(&val, NULL, cfile); /* consume second */
+ 	skip_token(&val, NULL, cfile); /* consume second */
 -	sec = atoi(val);
 +	sec = atol(val);
  
  	tzoff = 0;
  	token = peek_token(&val, NULL, cfile);
  	if (token == NUMBER) {
- 		token = next_token(&val, NULL, cfile); /* consume tzoff */
+ 		skip_token(&val, NULL, cfile); /* consume tzoff */
 -		tzoff = atoi(val);
 +		tzoff = atol(val);
  	} else if (token != SEMI) {
- 		token = next_token(&val, NULL, cfile);
+ 		skip_token(&val, NULL, cfile);
  		parse_warn(cfile,

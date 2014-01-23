@@ -1,8 +1,8 @@
-diff -up dhcp-4.2.0/client/dhclient.c.ifup dhcp-4.2.0/client/dhclient.c
---- dhcp-4.2.0/client/dhclient.c.ifup	2010-07-21 13:30:10.000000000 +0200
-+++ dhcp-4.2.0/client/dhclient.c	2010-07-21 13:37:03.000000000 +0200
-@@ -497,9 +497,81 @@ main(int argc, char **argv) {
- 					kill(oldpid, SIGTERM);
+diff -up dhcp-4.2.6b1/client/dhclient.c.ifup dhcp-4.2.6b1/client/dhclient.c
+--- dhcp-4.2.6b1/client/dhclient.c.ifup	2014-01-23 14:28:46.067107465 +0100
++++ dhcp-4.2.6b1/client/dhclient.c	2014-01-23 14:29:04.558847949 +0100
+@@ -522,9 +522,81 @@ main(int argc, char **argv) {
+ 				}
  			}
  			fclose(pidfd);
 +		} else {

@@ -1,6 +1,6 @@
-diff -up dhcp-4.2.2b1/client/dhclient.8.capability dhcp-4.2.2b1/client/dhclient.8
---- dhcp-4.2.2b1/client/dhclient.8.capability	2011-07-01 15:09:06.603784531 +0200
-+++ dhcp-4.2.2b1/client/dhclient.8	2011-07-01 15:09:06.663783913 +0200
+diff -up dhcp-4.2.6b1/client/dhclient.8.capability dhcp-4.2.6b1/client/dhclient.8
+--- dhcp-4.2.6b1/client/dhclient.8.capability	2014-01-23 14:37:45.340539027 +0100
++++ dhcp-4.2.6b1/client/dhclient.8	2014-01-23 14:37:45.402538157 +0100
 @@ -118,6 +118,9 @@ dhclient - Dynamic Host Configuration Pr
  .B -w
  ]
@@ -11,7 +11,7 @@ diff -up dhcp-4.2.2b1/client/dhclient.8.capability dhcp-4.2.2b1/client/dhclient.
  .B -B
  ]
  [
-@@ -296,6 +299,32 @@ has been added or removed, so that the c
+@@ -294,6 +297,32 @@ has been added or removed, so that the c
  address on that interface.
  
  .TP
@@ -44,9 +44,9 @@ diff -up dhcp-4.2.2b1/client/dhclient.8.capability dhcp-4.2.2b1/client/dhclient.
  .BI \-B
  Set the BOOTP broadcast flag in request packets so servers will always
  broadcast replies.
-diff -up dhcp-4.2.2b1/client/dhclient.c.capability dhcp-4.2.2b1/client/dhclient.c
---- dhcp-4.2.2b1/client/dhclient.c.capability	2011-07-01 15:09:06.644784107 +0200
-+++ dhcp-4.2.2b1/client/dhclient.c	2011-07-01 15:09:06.664783903 +0200
+diff -up dhcp-4.2.6b1/client/dhclient.c.capability dhcp-4.2.6b1/client/dhclient.c
+--- dhcp-4.2.6b1/client/dhclient.c.capability	2014-01-23 14:37:45.384538409 +0100
++++ dhcp-4.2.6b1/client/dhclient.c	2014-01-23 14:37:45.403538143 +0100
 @@ -39,6 +39,10 @@
  #include <limits.h>
  #include <dns/result.h>
@@ -99,10 +99,10 @@ diff -up dhcp-4.2.2b1/client/dhclient.c.capability dhcp-4.2.2b1/client/dhclient.
  	/* Set up the initial dhcp option universe. */
  	initialize_common_option_spaces();
  
-diff -up dhcp-4.2.2b1/client/dhclient-script.8.capability dhcp-4.2.2b1/client/dhclient-script.8
---- dhcp-4.2.2b1/client/dhclient-script.8.capability	2011-07-01 15:09:06.604784521 +0200
-+++ dhcp-4.2.2b1/client/dhclient-script.8	2011-07-01 15:09:06.666783883 +0200
-@@ -239,6 +239,16 @@ repeatedly initialized to the values pro
+diff -up dhcp-4.2.6b1/client/dhclient-script.8.capability dhcp-4.2.6b1/client/dhclient-script.8
+--- dhcp-4.2.6b1/client/dhclient-script.8.capability	2014-01-23 14:37:45.374538550 +0100
++++ dhcp-4.2.6b1/client/dhclient-script.8	2014-01-23 14:37:45.403538143 +0100
+@@ -246,6 +246,16 @@ repeatedly initialized to the values pro
  the other.   Assuming the information provided by both servers is
  valid, this shouldn't cause any real problems, but it could be
  confusing.
@@ -119,10 +119,10 @@ diff -up dhcp-4.2.2b1/client/dhclient-script.8.capability dhcp-4.2.2b1/client/dh
  .SH SEE ALSO
  dhclient(8), dhcpd(8), dhcrelay(8), dhclient.conf(5) and
  dhclient.leases(5).
-diff -up dhcp-4.2.2b1/client/Makefile.am.capability dhcp-4.2.2b1/client/Makefile.am
---- dhcp-4.2.2b1/client/Makefile.am.capability	2011-07-01 15:09:06.526785327 +0200
-+++ dhcp-4.2.2b1/client/Makefile.am	2011-07-01 15:09:06.667783873 +0200
-@@ -5,7 +5,7 @@ dhclient_SOURCES = clparse.c dhclient.c 
+diff -up dhcp-4.2.6b1/client/Makefile.am.capability dhcp-4.2.6b1/client/Makefile.am
+--- dhcp-4.2.6b1/client/Makefile.am.capability	2014-01-23 14:37:45.324539252 +0100
++++ dhcp-4.2.6b1/client/Makefile.am	2014-01-23 14:37:45.404538129 +0100
+@@ -5,7 +5,7 @@ dhclient_SOURCES = clparse.c dhclient.c
  		   scripts/netbsd scripts/nextstep scripts/openbsd \
  		   scripts/solaris scripts/openwrt
  dhclient_LDADD = ../common/libdhcp.a ../omapip/libomapi.a \
@@ -131,10 +131,10 @@ diff -up dhcp-4.2.2b1/client/Makefile.am.capability dhcp-4.2.2b1/client/Makefile
  man_MANS = dhclient.8 dhclient-script.8 dhclient.conf.5 dhclient.leases.5
  EXTRA_DIST = $(man_MANS)
  
-diff -up dhcp-4.2.2b1/configure.ac.capability dhcp-4.2.2b1/configure.ac
---- dhcp-4.2.2b1/configure.ac.capability	2011-07-01 15:09:06.527785317 +0200
-+++ dhcp-4.2.2b1/configure.ac	2011-07-01 15:09:06.667783873 +0200
-@@ -449,6 +449,41 @@ AC_TRY_LINK(
+diff -up dhcp-4.2.6b1/configure.ac.capability dhcp-4.2.6b1/configure.ac
+--- dhcp-4.2.6b1/configure.ac.capability	2014-01-23 14:37:45.332539139 +0100
++++ dhcp-4.2.6b1/configure.ac	2014-01-23 14:37:45.404538129 +0100
+@@ -524,6 +524,41 @@ AC_TRY_COMPILE([],[void foo() __attribut
  # Look for optional headers.
  AC_CHECK_HEADERS(sys/socket.h net/if_dl.h net/if6.h regex.h)
  
@@ -176,11 +176,11 @@ diff -up dhcp-4.2.2b1/configure.ac.capability dhcp-4.2.2b1/configure.ac
  # Solaris needs some libraries for functions
  AC_SEARCH_LIBS(socket, [socket])
  AC_SEARCH_LIBS(inet_ntoa, [nsl])
-diff -up dhcp-4.2.2b1/relay/dhcrelay.c.capability dhcp-4.2.2b1/relay/dhcrelay.c
---- dhcp-4.2.2b1/relay/dhcrelay.c.capability	2011-07-01 15:09:06.626784295 +0200
-+++ dhcp-4.2.2b1/relay/dhcrelay.c	2011-07-01 15:12:05.362223794 +0200
-@@ -36,6 +36,11 @@
- #include <syslog.h>
+diff -up dhcp-4.2.6b1/relay/dhcrelay.c.capability dhcp-4.2.6b1/relay/dhcrelay.c
+--- dhcp-4.2.6b1/relay/dhcrelay.c.capability	2014-01-23 14:37:45.386538381 +0100
++++ dhcp-4.2.6b1/relay/dhcrelay.c	2014-01-23 14:39:12.035320984 +0100
+@@ -37,6 +37,11 @@
+ #include <signal.h>
  #include <sys/time.h>
  
 +#ifdef HAVE_LIBCAP_NG
@@ -191,7 +191,7 @@ diff -up dhcp-4.2.2b1/relay/dhcrelay.c.capability dhcp-4.2.2b1/relay/dhcrelay.c
  TIME default_lease_time = 43200; /* 12 hours... */
  TIME max_lease_time = 86400; /* 24 hours... */
  struct tree_cache *global_options[256];
-@@ -356,6 +361,10 @@ main(int argc, char **argv) {
+@@ -363,6 +368,10 @@ main(int argc, char **argv) {
  			sl->next = upstreams;
  			upstreams = sl;
  #endif
@@ -202,7 +202,7 @@ diff -up dhcp-4.2.2b1/relay/dhcrelay.c.capability dhcp-4.2.2b1/relay/dhcrelay.c
  		} else if (!strcmp(argv[i], "-pf")) {
  			if (++i == argc)
  				usage();
-@@ -426,6 +435,17 @@ main(int argc, char **argv) {
+@@ -433,6 +442,17 @@ main(int argc, char **argv) {
  #endif
  	}
  
@@ -220,9 +220,9 @@ diff -up dhcp-4.2.2b1/relay/dhcrelay.c.capability dhcp-4.2.2b1/relay/dhcrelay.c
  	if (!quiet) {
  		log_info("%s %s", message, PACKAGE_VERSION);
  		log_info(copyright);
-@@ -573,6 +593,15 @@ main(int argc, char **argv) {
- 		dhcpv6_packet_handler = do_packet6;
- #endif
+@@ -582,6 +602,15 @@ main(int argc, char **argv) {
+ 	signal(SIGINT, dhcp_signal_handler);   /* control-c */
+ 	signal(SIGTERM, dhcp_signal_handler);  /* kill */
  
 +#ifdef HAVE_LIBCAP_NG
 +	/* Drop all capabilities */
@@ -236,9 +236,9 @@ diff -up dhcp-4.2.2b1/relay/dhcrelay.c.capability dhcp-4.2.2b1/relay/dhcrelay.c
  	/* Start dispatching packets and timeouts... */
  	dispatch();
  
-diff -up dhcp-4.2.2b1/relay/Makefile.am.capability dhcp-4.2.2b1/relay/Makefile.am
---- dhcp-4.2.2b1/relay/Makefile.am.capability	2011-07-01 15:09:06.546785121 +0200
-+++ dhcp-4.2.2b1/relay/Makefile.am	2011-07-01 15:09:06.670783841 +0200
+diff -up dhcp-4.2.6b1/relay/Makefile.am.capability dhcp-4.2.6b1/relay/Makefile.am
+--- dhcp-4.2.6b1/relay/Makefile.am.capability	2014-01-23 14:37:45.326539223 +0100
++++ dhcp-4.2.6b1/relay/Makefile.am	2014-01-23 14:37:45.405538115 +0100
 @@ -3,7 +3,7 @@ AM_CPPFLAGS = -DLOCALSTATEDIR='"@localst
  sbin_PROGRAMS = dhcrelay
  dhcrelay_SOURCES = dhcrelay.c

@@ -1,6 +1,6 @@
-diff -up dhcp-4.2.0/omapip/errwarn.c.errwarn dhcp-4.2.0/omapip/errwarn.c
---- dhcp-4.2.0/omapip/errwarn.c.errwarn	2009-07-23 20:52:21.000000000 +0200
-+++ dhcp-4.2.0/omapip/errwarn.c	2010-07-21 13:23:47.000000000 +0200
+diff -up dhcp-4.2.6b1/omapip/errwarn.c.errwarn dhcp-4.2.6b1/omapip/errwarn.c
+--- dhcp-4.2.6b1/omapip/errwarn.c.errwarn	2014-01-23 14:13:31.440914788 +0100
++++ dhcp-4.2.6b1/omapip/errwarn.c	2014-01-23 14:15:42.134089836 +0100
 @@ -76,20 +76,13 @@ void log_fatal (const char * fmt, ... )
  
  #if !defined (NOMINUM)
@@ -15,8 +15,8 @@ diff -up dhcp-4.2.0/omapip/errwarn.c.errwarn dhcp-4.2.0/omapip/errwarn.c
    log_error ("%s", "");
 -  log_error ("If you did get this software from ftp.isc.org and have not");
 -  log_error ("yet read the README, please read it before requesting help.");
--  log_error ("If you intend to request help from the dhcp-server@isc.org");
--  log_error ("mailing list, please read the section on the README about");
+-  log_error ("If you intend to request help from the dhcp-bugs at isc.org");
+-  log_error ("mailing list, please read the section on the REDDME about");
 -  log_error ("submitting bug reports and requests for help.");
 -  log_error ("%s", "");
 -  log_error ("Please do not under any circumstances send requests for");

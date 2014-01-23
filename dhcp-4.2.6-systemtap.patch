@@ -1,7 +1,7 @@
-diff -up dhcp-4.2.5b1/configure.ac.systemtap dhcp-4.2.5b1/configure.ac
---- dhcp-4.2.5b1/configure.ac.systemtap	2012-12-17 16:56:40.563881316 +0100
-+++ dhcp-4.2.5b1/configure.ac	2012-12-17 16:56:40.597880870 +0100
-@@ -554,6 +554,35 @@ else
+diff -up dhcp-4.2.6b1/configure.ac.systemtap dhcp-4.2.6b1/configure.ac
+--- dhcp-4.2.6b1/configure.ac.systemtap	2014-01-23 14:45:04.801357825 +0100
++++ dhcp-4.2.6b1/configure.ac	2014-01-23 14:45:04.844357220 +0100
+@@ -560,6 +560,35 @@ else
      AC_MSG_RESULT(no)
  fi
  
@@ -37,7 +37,7 @@ diff -up dhcp-4.2.5b1/configure.ac.systemtap dhcp-4.2.5b1/configure.ac
  # Solaris needs some libraries for functions
  AC_SEARCH_LIBS(socket, [socket])
  AC_SEARCH_LIBS(inet_ntoa, [nsl])
-@@ -701,6 +730,7 @@ AC_OUTPUT([
+@@ -715,6 +744,7 @@ AC_OUTPUT([
    tests/Makefile
    server/tests/Makefile
    doc/devel/doxyfile
@@ -45,10 +45,10 @@ diff -up dhcp-4.2.5b1/configure.ac.systemtap dhcp-4.2.5b1/configure.ac
  ])
  
  sh util/bindvar.sh
-diff -up dhcp-4.2.5b1/Makefile.am.systemtap dhcp-4.2.5b1/Makefile.am
---- dhcp-4.2.5b1/Makefile.am.systemtap	2012-12-17 16:56:40.461882654 +0100
-+++ dhcp-4.2.5b1/Makefile.am	2012-12-17 16:56:40.597880870 +0100
-@@ -30,5 +30,8 @@ endif
+diff -up dhcp-4.2.6b1/Makefile.am.systemtap dhcp-4.2.6b1/Makefile.am
+--- dhcp-4.2.6b1/Makefile.am.systemtap	2014-01-23 14:45:04.678359555 +0100
++++ dhcp-4.2.6b1/Makefile.am	2014-01-23 14:45:04.844357220 +0100
+@@ -32,5 +32,8 @@ endif
  
  SUBDIRS += includes tests common omapip client dhcpctl relay server
  
@@ -57,9 +57,9 @@ diff -up dhcp-4.2.5b1/Makefile.am.systemtap dhcp-4.2.5b1/Makefile.am
 +
  nobase_include_HEADERS = dhcpctl/dhcpctl.h
  
-diff -up dhcp-4.2.5b1/server/dhcp.c.systemtap dhcp-4.2.5b1/server/dhcp.c
---- dhcp-4.2.5b1/server/dhcp.c.systemtap	2012-12-17 16:56:40.483882364 +0100
-+++ dhcp-4.2.5b1/server/dhcp.c	2012-12-17 16:56:40.599880842 +0100
+diff -up dhcp-4.2.6b1/server/dhcp.c.systemtap dhcp-4.2.6b1/server/dhcp.c
+--- dhcp-4.2.6b1/server/dhcp.c.systemtap	2014-01-23 14:45:04.708359133 +0100
++++ dhcp-4.2.6b1/server/dhcp.c	2014-01-23 14:45:04.846357192 +0100
 @@ -36,7 +36,7 @@
  #include <errno.h>
  #include <limits.h>
@@ -176,7 +176,7 @@ diff -up dhcp-4.2.5b1/server/dhcp.c.systemtap dhcp-4.2.5b1/server/dhcp.c
  }
  
  void ack_lease (packet, lease, offer, when, msg, ms_nulltp, hp)
-@@ -1573,6 +1596,8 @@ void ack_lease (packet, lease, offer, wh
+@@ -1570,6 +1593,8 @@ void ack_lease (packet, lease, offer, wh
  	if (lease -> state)
  		return;
  
@@ -185,7 +185,7 @@ diff -up dhcp-4.2.5b1/server/dhcp.c.systemtap dhcp-4.2.5b1/server/dhcp.c
  	/* Save original cltt for comparison later. */
  	lease_cltt = lease->cltt;
  
-@@ -2936,6 +2961,8 @@ void ack_lease (packet, lease, offer, wh
+@@ -2933,6 +2958,8 @@ void ack_lease (packet, lease, offer, wh
  #endif
  			dhcp_reply(lease);
  	}
@@ -194,7 +194,7 @@ diff -up dhcp-4.2.5b1/server/dhcp.c.systemtap dhcp-4.2.5b1/server/dhcp.c
  }
  
  /*
-@@ -3088,6 +3115,8 @@ void dhcp_reply (lease)
+@@ -3085,6 +3112,8 @@ void dhcp_reply (lease)
  	if (!state)
  		log_fatal ("dhcp_reply was supplied lease with no state!");
  
@@ -203,7 +203,7 @@ diff -up dhcp-4.2.5b1/server/dhcp.c.systemtap dhcp-4.2.5b1/server/dhcp.c
  	/* Compose a response for the client... */
  	memset (&raw, 0, sizeof raw);
  	memset (&d1, 0, sizeof d1);
-@@ -3309,6 +3338,8 @@ void dhcp_reply (lease)
+@@ -3306,6 +3335,8 @@ void dhcp_reply (lease)
  
  	free_lease_state (state, MDL);
  	lease -> state = (struct lease_state *)0;
@@ -212,7 +212,7 @@ diff -up dhcp-4.2.5b1/server/dhcp.c.systemtap dhcp-4.2.5b1/server/dhcp.c
  }
  
  int find_lease (struct lease **lp,
-@@ -3331,6 +3362,8 @@ int find_lease (struct lease **lp,
+@@ -3328,6 +3359,8 @@ int find_lease (struct lease **lp,
  	struct data_string client_identifier;
  	struct hardware h;
  
@@ -221,7 +221,7 @@ diff -up dhcp-4.2.5b1/server/dhcp.c.systemtap dhcp-4.2.5b1/server/dhcp.c
  #if defined(FAILOVER_PROTOCOL)
  	/* Quick check to see if the peer has leases. */
  	if (peer_has_leases) {
-@@ -4058,6 +4091,9 @@ int find_lease (struct lease **lp,
+@@ -4055,6 +4088,9 @@ int find_lease (struct lease **lp,
  #if defined (DEBUG_FIND_LEASE)
  	log_info ("Not returning a lease.");
  #endif
@@ -231,9 +231,9 @@ diff -up dhcp-4.2.5b1/server/dhcp.c.systemtap dhcp-4.2.5b1/server/dhcp.c
  	return 0;
  }
  
-diff -up dhcp-4.2.5b1/server/dhcpd.c.systemtap dhcp-4.2.5b1/server/dhcpd.c
---- dhcp-4.2.5b1/server/dhcpd.c.systemtap	2012-12-17 16:56:40.578881119 +0100
-+++ dhcp-4.2.5b1/server/dhcpd.c	2012-12-17 16:56:40.599880842 +0100
+diff -up dhcp-4.2.6b1/server/dhcpd.c.systemtap dhcp-4.2.6b1/server/dhcpd.c
+--- dhcp-4.2.6b1/server/dhcpd.c.systemtap	2014-01-23 14:45:04.820357557 +0100
++++ dhcp-4.2.6b1/server/dhcpd.c	2014-01-23 14:45:49.348731180 +0100
 @@ -58,6 +58,8 @@ static const char url [] =
  #  undef group
  #endif /* PARANOIA */
@@ -243,17 +243,18 @@ diff -up dhcp-4.2.5b1/server/dhcpd.c.systemtap dhcp-4.2.5b1/server/dhcpd.c
  #ifndef UNIT_TEST
  static void usage(void);
  #endif
-@@ -865,6 +867,7 @@ main(int argc, char **argv) {
- 	omapi_set_int_value ((omapi_object_t *)dhcp_control_object,
- 			     (omapi_object_t *)0, "state", server_running);
+@@ -869,6 +871,8 @@ main(int argc, char **argv) {
+ 	signal(SIGINT, dhcp_signal_handler);   /* control-c */
+ 	signal(SIGTERM, dhcp_signal_handler);  /* kill */
  
-+        TRACE(DHCPD_MAIN());
- 	/* Receive packets and dispatch them... */
- 	dispatch ();
- 
-diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
---- dhcp-4.2.5b1/server/dhcpv6.c.systemtap	2012-12-17 16:56:40.571881210 +0100
-+++ dhcp-4.2.5b1/server/dhcpv6.c	2012-12-17 16:56:40.601880816 +0100
++	TRACE(DHCPD_MAIN());
++
+ 	/*
+ 	 * Receive packets and dispatch them...
+ 	 * dispatch() will never return.
+diff -up dhcp-4.2.6b1/server/dhcpv6.c.systemtap dhcp-4.2.6b1/server/dhcpv6.c
+--- dhcp-4.2.6b1/server/dhcpv6.c.systemtap	2014-01-23 14:45:04.812357670 +0100
++++ dhcp-4.2.6b1/server/dhcpv6.c	2014-01-23 14:45:04.850357135 +0100
 @@ -15,6 +15,7 @@
   */
  
@@ -262,7 +263,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  
  #ifdef DHCPv6
  
-@@ -4212,6 +4213,8 @@ static void
+@@ -4351,6 +4352,8 @@ static void
  dhcpv6_solicit(struct data_string *reply_ret, struct packet *packet) {
  	struct data_string client_id;
  
@@ -271,7 +272,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  	/* 
  	 * Validate our input.
  	 */
-@@ -4225,6 +4228,8 @@ dhcpv6_solicit(struct data_string *reply
+@@ -4364,6 +4367,8 @@ dhcpv6_solicit(struct data_string *reply
  	 * Clean up.
  	 */
  	data_string_forget(&client_id, MDL);
@@ -280,7 +281,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  }
  
  /*
-@@ -4238,6 +4243,8 @@ dhcpv6_request(struct data_string *reply
+@@ -4377,6 +4382,8 @@ dhcpv6_request(struct data_string *reply
  	struct data_string client_id;
  	struct data_string server_id;
  
@@ -289,7 +290,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  	/*
  	 * Validate our input.
  	 */
-@@ -4255,6 +4262,8 @@ dhcpv6_request(struct data_string *reply
+@@ -4394,6 +4401,8 @@ dhcpv6_request(struct data_string *reply
  	 */
  	data_string_forget(&client_id, MDL);
  	data_string_forget(&server_id, MDL);
@@ -298,7 +299,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  }
  
  /* Find a DHCPv6 packet's shared network from hints in the packet.
-@@ -4367,6 +4376,8 @@ dhcpv6_confirm(struct data_string *reply
+@@ -4506,6 +4515,8 @@ dhcpv6_confirm(struct data_string *reply
  	struct dhcpv6_packet *reply = (struct dhcpv6_packet *)reply_data;
  	int reply_ofs = (int)(offsetof(struct dhcpv6_packet, options));
  
@@ -307,7 +308,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  	/* 
  	 * Basic client message validation.
  	 */
-@@ -4553,6 +4564,8 @@ exit:
+@@ -4692,6 +4703,8 @@ exit:
  		option_state_dereference(&cli_enc_opt_state, MDL);
  	if (opt_state != NULL)
  		option_state_dereference(&opt_state, MDL);
@@ -316,7 +317,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  }
  
  /*
-@@ -4567,6 +4580,8 @@ dhcpv6_renew(struct data_string *reply,
+@@ -4706,6 +4719,8 @@ dhcpv6_renew(struct data_string *reply,
  	struct data_string client_id;
  	struct data_string server_id;
  
@@ -325,7 +326,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  	/* 
  	 * Validate the request.
  	 */
-@@ -4584,6 +4599,8 @@ dhcpv6_renew(struct data_string *reply,
+@@ -4723,6 +4738,8 @@ dhcpv6_renew(struct data_string *reply,
  	 */
  	data_string_forget(&server_id, MDL);
  	data_string_forget(&client_id, MDL);
@@ -334,7 +335,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  }
  
  /*
-@@ -4597,6 +4614,8 @@ static void
+@@ -4736,6 +4753,8 @@ static void
  dhcpv6_rebind(struct data_string *reply, struct packet *packet) {
  	struct data_string client_id;
  
@@ -343,7 +344,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  	if (!valid_client_msg(packet, &client_id)) {
  		return;
  	}
-@@ -4604,6 +4623,8 @@ dhcpv6_rebind(struct data_string *reply,
+@@ -4743,6 +4762,8 @@ dhcpv6_rebind(struct data_string *reply,
  	lease_to_client(reply, packet, &client_id, NULL);
  
  	data_string_forget(&client_id, MDL);
@@ -352,7 +353,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  }
  
  static void
-@@ -5048,6 +5069,8 @@ dhcpv6_decline(struct data_string *reply
+@@ -5187,6 +5208,8 @@ dhcpv6_decline(struct data_string *reply
  	struct data_string client_id;
  	struct data_string server_id;
  
@@ -361,7 +362,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  	/* 
  	 * Validate our input.
  	 */
-@@ -5068,6 +5091,8 @@ dhcpv6_decline(struct data_string *reply
+@@ -5207,6 +5230,8 @@ dhcpv6_decline(struct data_string *reply
  
  	data_string_forget(&server_id, MDL);
  	data_string_forget(&client_id, MDL);
@@ -370,7 +371,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  }
  
  static void
-@@ -5516,6 +5541,8 @@ dhcpv6_release(struct data_string *reply
+@@ -5655,6 +5680,8 @@ dhcpv6_release(struct data_string *reply
  	struct data_string client_id;
  	struct data_string server_id;
  
@@ -379,7 +380,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  	/* 
  	 * Validate our input.
  	 */
-@@ -5537,6 +5564,8 @@ dhcpv6_release(struct data_string *reply
+@@ -5676,6 +5703,8 @@ dhcpv6_release(struct data_string *reply
  
  	data_string_forget(&server_id, MDL);
  	data_string_forget(&client_id, MDL);
@@ -388,7 +389,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  }
  
  /*
-@@ -5549,6 +5578,8 @@ dhcpv6_information_request(struct data_s
+@@ -5688,6 +5717,8 @@ dhcpv6_information_request(struct data_s
  	struct data_string client_id;
  	struct data_string server_id;
  
@@ -397,7 +398,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  	/*
  	 * Validate our input.
  	 */
-@@ -5580,6 +5611,8 @@ dhcpv6_information_request(struct data_s
+@@ -5719,6 +5750,8 @@ dhcpv6_information_request(struct data_s
  		data_string_forget(&client_id, MDL);
  	}
  	data_string_forget(&server_id, MDL);
@@ -406,7 +407,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  }
  
  /* 
-@@ -5608,6 +5641,8 @@ dhcpv6_relay_forw(struct data_string *re
+@@ -5747,6 +5780,8 @@ dhcpv6_relay_forw(struct data_string *re
  	struct dhcpv6_relay_packet *reply;
  	int reply_ofs;
  
@@ -415,7 +416,7 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  	/* 
  	 * Initialize variables for early exit.
  	 */
-@@ -5867,6 +5902,8 @@ exit:
+@@ -6006,6 +6041,8 @@ exit:
  	if (enc_packet != NULL) {
  		packet_dereference(&enc_packet, MDL);
  	}
@@ -424,9 +425,9 @@ diff -up dhcp-4.2.5b1/server/dhcpv6.c.systemtap dhcp-4.2.5b1/server/dhcpv6.c
  }
  
  static void
-diff -up dhcp-4.2.5b1/server/failover.c.systemtap dhcp-4.2.5b1/server/failover.c
---- dhcp-4.2.5b1/server/failover.c.systemtap	2012-12-05 02:17:39.000000000 +0100
-+++ dhcp-4.2.5b1/server/failover.c	2012-12-17 16:56:40.603880790 +0100
+diff -up dhcp-4.2.6b1/server/failover.c.systemtap dhcp-4.2.6b1/server/failover.c
+--- dhcp-4.2.6b1/server/failover.c.systemtap	2014-01-21 20:29:10.000000000 +0100
++++ dhcp-4.2.6b1/server/failover.c	2014-01-23 14:45:04.852357107 +0100
 @@ -36,6 +36,8 @@
  #include "dhcpd.h"
  #include <omapip/omapip_p.h>
@@ -436,7 +437,7 @@ diff -up dhcp-4.2.5b1/server/failover.c.systemtap dhcp-4.2.5b1/server/failover.c
  #if defined (FAILOVER_PROTOCOL)
  dhcp_failover_state_t *failover_states;
  static isc_result_t do_a_failover_option (omapi_object_t *,
-@@ -1712,6 +1714,8 @@ isc_result_t dhcp_failover_set_state (dh
+@@ -1710,6 +1712,8 @@ isc_result_t dhcp_failover_set_state (dh
      struct lease *l;
      struct timeval tv;
  
@@ -445,7 +446,7 @@ diff -up dhcp-4.2.5b1/server/failover.c.systemtap dhcp-4.2.5b1/server/failover.c
      /* If we're in certain states where we're sending updates, and the peer
       * state changes, we need to re-schedule any pending updates just to
       * be on the safe side.  This results in retransmission.
-@@ -1939,6 +1943,8 @@ isc_result_t dhcp_failover_set_state (dh
+@@ -1937,6 +1941,8 @@ isc_result_t dhcp_failover_set_state (dh
  	    break;
      }
  
@@ -454,7 +455,7 @@ diff -up dhcp-4.2.5b1/server/failover.c.systemtap dhcp-4.2.5b1/server/failover.c
      return ISC_R_SUCCESS;
  }
  
-@@ -2422,6 +2428,8 @@ dhcp_failover_pool_dobalance(dhcp_failov
+@@ -2420,6 +2426,8 @@ dhcp_failover_pool_dobalance(dhcp_failov
  	if (state -> me.state != normal)
  		return 0;
  
@@ -463,7 +464,7 @@ diff -up dhcp-4.2.5b1/server/failover.c.systemtap dhcp-4.2.5b1/server/failover.c
  	state->last_balance = cur_time;
  
  	for (s = shared_networks ; s ; s = s->next) {
-@@ -2582,6 +2590,8 @@ dhcp_failover_pool_dobalance(dhcp_failov
+@@ -2580,6 +2588,8 @@ dhcp_failover_pool_dobalance(dhcp_failov
  	if (leases_queued)
  		commit_leases();
  
@@ -472,9 +473,9 @@ diff -up dhcp-4.2.5b1/server/failover.c.systemtap dhcp-4.2.5b1/server/failover.c
  	return leases_queued;
  }
  
-diff -up dhcp-4.2.5b1/server/Makefile.am.systemtap dhcp-4.2.5b1/server/Makefile.am
---- dhcp-4.2.5b1/server/Makefile.am.systemtap	2012-12-17 16:56:40.563881316 +0100
-+++ dhcp-4.2.5b1/server/Makefile.am	2012-12-17 16:56:40.603880790 +0100
+diff -up dhcp-4.2.6b1/server/Makefile.am.systemtap dhcp-4.2.6b1/server/Makefile.am
+--- dhcp-4.2.6b1/server/Makefile.am.systemtap	2014-01-23 14:45:04.802357811 +0100
++++ dhcp-4.2.6b1/server/Makefile.am	2014-01-23 14:45:04.852357107 +0100
 @@ -10,7 +10,7 @@ dist_sysconf_DATA = dhcpd.conf.example
  sbin_PROGRAMS = dhcpd
  dhcpd_SOURCES = dhcpd.c dhcp.c bootp.c confpars.c db.c class.c failover.c \
@@ -498,9 +499,9 @@ diff -up dhcp-4.2.5b1/server/Makefile.am.systemtap dhcp-4.2.5b1/server/Makefile.
 +
 +dhcpd_LDADD += probes.o
 +endif
-diff -up dhcp-4.2.5b1/server/probes.d.systemtap dhcp-4.2.5b1/server/probes.d
---- dhcp-4.2.5b1/server/probes.d.systemtap	2012-12-17 16:56:40.603880790 +0100
-+++ dhcp-4.2.5b1/server/probes.d	2012-12-17 16:56:40.603880790 +0100
+diff -up dhcp-4.2.6b1/server/probes.d.systemtap dhcp-4.2.6b1/server/probes.d
+--- dhcp-4.2.6b1/server/probes.d.systemtap	2014-01-23 14:45:04.852357107 +0100
++++ dhcp-4.2.6b1/server/probes.d	2014-01-23 14:45:04.852357107 +0100
 @@ -0,0 +1,43 @@
 +provider dhcpd {
 +	 probe main();
@@ -545,9 +546,9 @@ diff -up dhcp-4.2.5b1/server/probes.d.systemtap dhcp-4.2.5b1/server/probes.d
 +	 probe failover_set_state_start(int, int) /* state, new_state */
 +	 probe failover_set_state_done()
 +};
-diff -up dhcp-4.2.5b1/server/tests/Makefile.am.systemtap dhcp-4.2.5b1/server/tests/Makefile.am
---- dhcp-4.2.5b1/server/tests/Makefile.am.systemtap	2012-12-17 16:56:40.564881302 +0100
-+++ dhcp-4.2.5b1/server/tests/Makefile.am	2012-12-17 16:56:57.505650518 +0100
+diff -up dhcp-4.2.6b1/server/tests/Makefile.am.systemtap dhcp-4.2.6b1/server/tests/Makefile.am
+--- dhcp-4.2.6b1/server/tests/Makefile.am.systemtap	2014-01-23 14:45:04.803357797 +0100
++++ dhcp-4.2.6b1/server/tests/Makefile.am	2014-01-23 14:45:04.852357107 +0100
 @@ -20,6 +20,10 @@ DHCPSRC = ../dhcp.c ../bootp.c ../confpa
  DHCPLIBS = $(top_builddir)/common/libdhcp.a $(top_builddir)/omapip/libomapi.la    \
            $(top_builddir)/dhcpctl/libdhcpctl.la $(BIND9_LIBDIR) -ldns-export -lisc-export
@@ -559,9 +560,9 @@ diff -up dhcp-4.2.5b1/server/tests/Makefile.am.systemtap dhcp-4.2.5b1/server/tes
  ATF_TESTS =
  TESTS = 
  if HAVE_ATF
-diff -up dhcp-4.2.5b1/server/trace.h.systemtap dhcp-4.2.5b1/server/trace.h
---- dhcp-4.2.5b1/server/trace.h.systemtap	2012-12-17 16:56:40.604880777 +0100
-+++ dhcp-4.2.5b1/server/trace.h	2012-12-17 16:56:40.604880777 +0100
+diff -up dhcp-4.2.6b1/server/trace.h.systemtap dhcp-4.2.6b1/server/trace.h
+--- dhcp-4.2.6b1/server/trace.h.systemtap	2014-01-23 14:45:04.853357093 +0100
++++ dhcp-4.2.6b1/server/trace.h	2014-01-23 14:45:04.853357093 +0100
 @@ -0,0 +1,11 @@
 +// trace.h
 +
@@ -574,9 +575,9 @@ diff -up dhcp-4.2.5b1/server/trace.h.systemtap dhcp-4.2.5b1/server/trace.h
 +// Wrap the probe to allow it to be removed when no systemtap available
 +#define TRACE(probe)
 +#endif
-diff -up dhcp-4.2.5b1/tapset/dhcpd.stp.systemtap dhcp-4.2.5b1/tapset/dhcpd.stp
---- dhcp-4.2.5b1/tapset/dhcpd.stp.systemtap	2012-12-17 16:56:40.604880777 +0100
-+++ dhcp-4.2.5b1/tapset/dhcpd.stp	2012-12-17 16:56:40.604880777 +0100
+diff -up dhcp-4.2.6b1/tapset/dhcpd.stp.systemtap dhcp-4.2.6b1/tapset/dhcpd.stp
+--- dhcp-4.2.6b1/tapset/dhcpd.stp.systemtap	2014-01-23 14:45:04.853357093 +0100
++++ dhcp-4.2.6b1/tapset/dhcpd.stp	2014-01-23 14:45:04.853357093 +0100
 @@ -0,0 +1,212 @@
 +/* dhcpd tapset
 +   Copyright (C) 2011, Red Hat Inc.
@@ -790,9 +791,9 @@ diff -up dhcp-4.2.5b1/tapset/dhcpd.stp.systemtap dhcp-4.2.5b1/tapset/dhcpd.stp
 +{
 +  probestr = sprintf("%s", $$name);
 +}
-diff -up dhcp-4.2.5b1/tapset/Makefile.am.systemtap dhcp-4.2.5b1/tapset/Makefile.am
---- dhcp-4.2.5b1/tapset/Makefile.am.systemtap	2012-12-17 16:56:40.604880777 +0100
-+++ dhcp-4.2.5b1/tapset/Makefile.am	2012-12-17 16:56:40.604880777 +0100
+diff -up dhcp-4.2.6b1/tapset/Makefile.am.systemtap dhcp-4.2.6b1/tapset/Makefile.am
+--- dhcp-4.2.6b1/tapset/Makefile.am.systemtap	2014-01-23 14:45:04.853357093 +0100
++++ dhcp-4.2.6b1/tapset/Makefile.am	2014-01-23 14:45:04.853357093 +0100
 @@ -0,0 +1,26 @@
 +# Makefile.am for dhcp/tapset
 +# Jiri Popelka
