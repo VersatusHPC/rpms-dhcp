@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  0.4.%{prever}%{?dist}
+Release:  0.5.%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -624,6 +624,9 @@ done
 
 
 %changelog
+* Sun Jan 26 2014 Kevin Fenzi <kevin@scrye.com> 12:4.3.0-0.5.b1
+- Rebuild for new bind
+
 * Tue Jan 21 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-0.4.b1
 - 4.3.0b1
 - ship dhcp-lease-list.pl
