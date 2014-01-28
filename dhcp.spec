@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.2.5
-Release:  25%{?dist}
+Release:  26%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -267,7 +267,9 @@ rm -rf includes/isc-dhcp
 # In client initiated message exchanges stop retransmission
 # upon reaching the MRD rather than at some point after it (#559153)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #21238])
-%patch23 -p1 -b .retransmission
+# It causes RHBZ#1026565 and because we carry it around *only* to silence TAHI
+# tests, un-apply it until I find out how to fix it.
+#%%patch23 -p1 -b .retransmission
 
 # RFC 3442 - Classless Static Route Option for DHCPv4 (#516325)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24572])
@@ -624,6 +626,9 @@ done
 
 
 %changelog
+* Tue Jan 28 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.5-26
+- don't apply retransmission.patch for now (RHBZ#1026565)
+
 * Thu Oct 24 2013 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.5-25
 - use upstream patch for #1001742 ([ISC-Bugs #34784])
 
