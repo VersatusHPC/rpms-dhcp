@@ -9,7 +9,7 @@
 
 
 #%%global patchver P2
-%global prever b1
+%global prever rc1
 
 #%%global VERSION %{version}-%{patchver}
 #%%global VERSION %{version}
@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.2.6
-Release:  0.2.%{prever}%{?dist}
+Release:  0.3.%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -43,7 +43,7 @@ Patch2:   dhcp-4.2.6-release-by-ifup.patch
 Patch3:   dhcp-4.2.0-dhclient-decline-backoff.patch
 Patch4:   dhcp-4.2.4-unicast-bootp.patch
 Patch7:   dhcp-4.2.0-default-requested-options.patch
-Patch8:   dhcp-4.2.2-xen-checksum.patch
+Patch8:   dhcp-4.2.6-xen-checksum.patch
 Patch10:  dhcp-4.2.5-manpages.patch
 Patch11:  dhcp-4.2.4-paths.patch
 Patch12:  dhcp-4.2.6-CLOEXEC.patch
@@ -628,6 +628,9 @@ done
 
 
 %changelog
+* Wed Jan 29 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.6-0.3.rc1
+- 4.2.6rc1
+
 * Tue Jan 28 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.6-0.2.b1
 - don't apply retransmission.patch for now (RHBZ#1026565)
 
