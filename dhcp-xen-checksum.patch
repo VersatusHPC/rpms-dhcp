@@ -1,18 +1,18 @@
-diff -up dhcp-4.3.0a1/common/bpf.c.xen dhcp-4.3.0a1/common/bpf.c
---- dhcp-4.3.0a1/common/bpf.c.xen	2013-12-11 01:01:02.000000000 +0100
-+++ dhcp-4.3.0a1/common/bpf.c	2013-12-19 15:14:40.226614464 +0100
-@@ -486,7 +486,7 @@ ssize_t receive_packet (interface, buf,
- 		offset = decode_udp_ip_header (interface,
- 					       interface -> rbuf,
- 					       interface -> rbuf_offset,
+diff -up dhcp-4.3.0rc1/common/bpf.c.xen dhcp-4.3.0rc1/common/bpf.c
+--- dhcp-4.3.0rc1/common/bpf.c.xen	2014-01-29 10:03:27.503941664 +0100
++++ dhcp-4.3.0rc1/common/bpf.c	2014-01-29 10:03:37.564812175 +0100
+@@ -481,7 +481,7 @@ ssize_t receive_packet (interface, buf,
+ 		/* Decode the IP and UDP headers... */
+ 		offset = decode_udp_ip_header(interface, interface->rbuf,
+ 					       interface->rbuf_offset,
 -  					       from, hdr.bh_caplen, &paylen);
 +  					       from, hdr.bh_caplen, &paylen, 0);
  
  		/* If the IP or UDP checksum was bad, skip the packet... */
  		if (offset < 0) {
-diff -up dhcp-4.3.0a1/common/dlpi.c.xen dhcp-4.3.0a1/common/dlpi.c
---- dhcp-4.3.0a1/common/dlpi.c.xen	2013-12-11 01:25:12.000000000 +0100
-+++ dhcp-4.3.0a1/common/dlpi.c	2013-12-19 15:14:40.227614451 +0100
+diff -up dhcp-4.3.0rc1/common/dlpi.c.xen dhcp-4.3.0rc1/common/dlpi.c
+--- dhcp-4.3.0rc1/common/dlpi.c.xen	2014-01-25 05:18:03.000000000 +0100
++++ dhcp-4.3.0rc1/common/dlpi.c	2014-01-29 10:03:27.503941664 +0100
 @@ -691,7 +691,7 @@ ssize_t receive_packet (interface, buf,
  	length -= offset;
  #endif
@@ -22,9 +22,9 @@ diff -up dhcp-4.3.0a1/common/dlpi.c.xen dhcp-4.3.0a1/common/dlpi.c
  
  	/*
  	 * If the IP or UDP checksum was bad, skip the packet...
-diff -up dhcp-4.3.0a1/common/lpf.c.xen dhcp-4.3.0a1/common/lpf.c
---- dhcp-4.3.0a1/common/lpf.c.xen	2013-12-11 01:01:02.000000000 +0100
-+++ dhcp-4.3.0a1/common/lpf.c	2013-12-19 15:25:33.635559701 +0100
+diff -up dhcp-4.3.0rc1/common/lpf.c.xen dhcp-4.3.0rc1/common/lpf.c
+--- dhcp-4.3.0rc1/common/lpf.c.xen	2014-01-25 05:18:03.000000000 +0100
++++ dhcp-4.3.0rc1/common/lpf.c	2014-01-29 10:03:27.504941651 +0100
 @@ -29,14 +29,15 @@
  
  #include "dhcpd.h"
@@ -192,10 +192,10 @@ diff -up dhcp-4.3.0a1/common/lpf.c.xen dhcp-4.3.0a1/common/lpf.c
  
  	/* If the IP or UDP checksum was bad, skip the packet... */
  	if (offset < 0)
-diff -up dhcp-4.3.0a1/common/nit.c.xen dhcp-4.3.0a1/common/nit.c
---- dhcp-4.3.0a1/common/nit.c.xen	2013-11-07 20:15:08.000000000 +0100
-+++ dhcp-4.3.0a1/common/nit.c	2013-12-19 15:14:40.228614437 +0100
-@@ -369,7 +369,7 @@ ssize_t receive_packet (interface, buf,
+diff -up dhcp-4.3.0rc1/common/nit.c.xen dhcp-4.3.0rc1/common/nit.c
+--- dhcp-4.3.0rc1/common/nit.c.xen	2014-01-26 19:40:44.000000000 +0100
++++ dhcp-4.3.0rc1/common/nit.c	2014-01-29 10:03:27.504941651 +0100
+@@ -363,7 +363,7 @@ ssize_t receive_packet (interface, buf,
  
  	/* Decode the IP and UDP headers... */
  	offset = decode_udp_ip_header (interface, ibuf, bufix,
@@ -204,9 +204,9 @@ diff -up dhcp-4.3.0a1/common/nit.c.xen dhcp-4.3.0a1/common/nit.c
  
  	/* If the IP or UDP checksum was bad, skip the packet... */
  	if (offset < 0)
-diff -up dhcp-4.3.0a1/common/packet.c.xen dhcp-4.3.0a1/common/packet.c
---- dhcp-4.3.0a1/common/packet.c.xen	2013-12-11 01:01:02.000000000 +0100
-+++ dhcp-4.3.0a1/common/packet.c	2013-12-19 15:14:40.228614437 +0100
+diff -up dhcp-4.3.0rc1/common/packet.c.xen dhcp-4.3.0rc1/common/packet.c
+--- dhcp-4.3.0rc1/common/packet.c.xen	2013-12-11 01:01:02.000000000 +0100
++++ dhcp-4.3.0rc1/common/packet.c	2014-01-29 10:03:27.504941651 +0100
 @@ -226,7 +226,7 @@ ssize_t
  decode_udp_ip_header(struct interface_info *interface,
  		     unsigned char *buf, unsigned bufix,
@@ -225,10 +225,10 @@ diff -up dhcp-4.3.0a1/common/packet.c.xen dhcp-4.3.0a1/common/packet.c
  	  udp_packets_bad_checksum++;
  	  if (udp_packets_seen > 4 &&
  	      (udp_packets_seen / udp_packets_bad_checksum) < 2) {
-diff -up dhcp-4.3.0a1/common/upf.c.xen dhcp-4.3.0a1/common/upf.c
---- dhcp-4.3.0a1/common/upf.c.xen	2013-11-07 20:15:08.000000000 +0100
-+++ dhcp-4.3.0a1/common/upf.c	2013-12-19 15:14:40.228614437 +0100
-@@ -320,7 +320,7 @@ ssize_t receive_packet (interface, buf,
+diff -up dhcp-4.3.0rc1/common/upf.c.xen dhcp-4.3.0rc1/common/upf.c
+--- dhcp-4.3.0rc1/common/upf.c.xen	2014-01-26 19:40:44.000000000 +0100
++++ dhcp-4.3.0rc1/common/upf.c	2014-01-29 10:03:27.505941638 +0100
+@@ -314,7 +314,7 @@ ssize_t receive_packet (interface, buf,
  
  	/* Decode the IP and UDP headers... */
  	offset = decode_udp_ip_header (interface, ibuf, bufix,
@@ -237,10 +237,10 @@ diff -up dhcp-4.3.0a1/common/upf.c.xen dhcp-4.3.0a1/common/upf.c
  
  	/* If the IP or UDP checksum was bad, skip the packet... */
  	if (offset < 0)
-diff -up dhcp-4.3.0a1/includes/dhcpd.h.xen dhcp-4.3.0a1/includes/dhcpd.h
---- dhcp-4.3.0a1/includes/dhcpd.h.xen	2013-12-19 15:14:40.213614645 +0100
-+++ dhcp-4.3.0a1/includes/dhcpd.h	2013-12-19 15:14:40.229614423 +0100
-@@ -2867,7 +2867,7 @@ ssize_t decode_hw_header (struct interfa
+diff -up dhcp-4.3.0rc1/includes/dhcpd.h.xen dhcp-4.3.0rc1/includes/dhcpd.h
+--- dhcp-4.3.0rc1/includes/dhcpd.h.xen	2014-01-29 10:03:27.489941844 +0100
++++ dhcp-4.3.0rc1/includes/dhcpd.h	2014-01-29 10:03:27.506941626 +0100
+@@ -2861,7 +2861,7 @@ ssize_t decode_hw_header (struct interfa
  			  unsigned, struct hardware *);
  ssize_t decode_udp_ip_header (struct interface_info *, unsigned char *,
  			      unsigned, struct sockaddr_in *,
