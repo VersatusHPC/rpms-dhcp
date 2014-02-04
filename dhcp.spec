@@ -9,16 +9,16 @@
 
 
 #%%global patchver P2
-%global prever rc1
+#%%global prever rc1
 
 #%%global VERSION %{version}-%{patchver}
-#%%global VERSION %{version}
-%global VERSION %{version}%{prever}
+#%%global VERSION %{version}%{prever}
+%global VERSION %{version}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  0.7.%{prever}%{?dist}
+Release:  1%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -626,6 +626,9 @@ done
 
 
 %changelog
+* Tue Feb 04 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-1
+- 4.3.0
+
 * Wed Jan 29 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-0.7.rc1
 - 4.3.0rc1
 
