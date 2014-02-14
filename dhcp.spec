@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.2.6
-Release:  1%{?dist}
+Release:  2%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -489,9 +489,12 @@ EOF
 # Send client identifier as "hardware-type.link-layer address" (e.g. "1.c2.23.7d.c3.52.2c")
 # Required in environments where a bridge might be clobbering the forwarded
 # packet's MAC address (common in Wifi, Docsis, or ADSL bridging scenarios)
+# Exclude InfiniBand (32) which is special case (RFC 4390).
 # see dhcp-options(5) man page for 'dhcp-client-identifier'
 # see dhcp-eval(5) man page for 'hardware'
-send dhcp-client-identifier = hardware;
+if not hardware = 32 {
+    send dhcp-client-identifier = hardware;
+}
 EOF
 
 # Install dhcp.schema for LDAP configuration
@@ -628,6 +631,9 @@ done
 
 
 %changelog
+* Fri Feb 14 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.6-2
+- dhclient.conf: don't create client-id if InfiniBand (#560361#c38)
+
 * Tue Feb 04 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.6-1
 - 4.2.6
 
