@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  1%{?dist}
+Release:  2%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -77,6 +77,7 @@ Patch37:  dhcp-range6.patch
 Patch38:  dhcp-next-server.patch
 Patch39:  dhcp-no-subnet-error2info.patch
 Patch40:  dhcp-ffff-checksum.patch
+Patch41:  dhcp-duidv4.patch
 
 
 BuildRequires: autoconf
@@ -287,7 +288,7 @@ rm -rf includes/isc-dhcp
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24249])
 %patch25 -p1 -b .lpf-ib
 %patch26 -p1 -b .improved-xid
-%patch27 -p1 -b .gpxe-cid
+#%%patch27 -p1 -b .gpxe-cid
 
 # http://sourceware.org/systemtap/wiki/SystemTap
 %patch28 -p1 -b .systemtap
@@ -339,6 +340,9 @@ rm -rf includes/isc-dhcp
 # dhcpd rejects the udp packet with checksum=0xffff (#1015997)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #25587])
 %patch40 -p1 -b .ffff
+
+# Turn on using of DUID with DHCPv4 clients (#560361,c#40)
+%patch41 -p1 -b .duidv4
 
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
@@ -476,22 +480,6 @@ EOF
 #
 EOF
 
-# Install default dhclient.conf:
-%{__mkdir} -p %{buildroot}%{dhcpconfdir}
-%{__cat} << EOF > %{buildroot}%{dhcpconfdir}/dhclient.conf
-#
-# DHCP Client Configuration file.
-#   see /usr/share/doc/dhclient/dhclient.conf.example
-#   see dhclient.conf(5) man page
-#
-# Send client identifier as "hardware-type.link-layer address" (e.g. "1.c2.23.7d.c3.52.2c")
-# Required in environments where a bridge might be clobbering the forwarded
-# packet's MAC address (common in Wifi, Docsis, or ADSL bridging scenarios)
-# see dhcp-options(5) man page for 'dhcp-client-identifier'
-# see dhcp-eval(5) man page for 'hardware'
-send dhcp-client-identifier = hardware;
-EOF
-
 # Install dhcp.schema for LDAP configuration
 %{__mkdir} -p %{buildroot}%{_sysconfdir}/openldap/schema
 %{__install} -p -m 0644 -D contrib/ldap/dhcp.schema \
@@ -592,7 +580,6 @@ done
 %files -n dhclient
 %doc client/dhclient.conf.example client/dhclient6.conf.example README.dhclient.d
 %attr(0750,root,root) %dir %{dhcpconfdir}
-%config(noreplace) %{dhcpconfdir}/dhclient.conf
 %dir %{dhcpconfdir}/dhclient.d
 %dir %{_localstatedir}/lib/dhclient
 %dir %{_sysconfdir}/NetworkManager
@@ -626,6 +613,10 @@ done
 
 
 %changelog
+* Mon Feb 17 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-2
+- turn on using of DUID with DHCPv4 clients (#560361,c#40)
+- remove default /etc/dhcp/dhclient.conf
+
 * Tue Feb 04 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-1
 - 4.3.0
 
