@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  2%{?dist}
+Release:  3%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -87,11 +87,6 @@ BuildRequires: openldap-devel
 BuildRequires: libcap-ng-devel
 BuildRequires: bind-lite-devel >= 32:9.9.5-0.1.b1
 BuildRequires: systemd
-%if 0%{?fedora}
-# %%check
-# there's no atf package in RHEL
-BuildRequires: atf libatf-c-devel
-%endif
 %if %sdt
 BuildRequires: systemtap-sdt-devel
 %global tapsetdir    /usr/share/systemtap/tapset
@@ -385,16 +380,8 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --enable-systemtap \
     --with-tapset-install-dir=%{tapsetdir} \
 %endif
-%if 0%{?fedora}
-    --with-atf \
-%endif
     --enable-paranoia --enable-early-chroot
 %{__make} %{?_smp_mflags}
-
-%if 0%{?fedora}
-%check
-%{__make} check
-%endif
 
 %install
 %{__make} install DESTDIR=%{buildroot}
@@ -613,6 +600,9 @@ done
 
 
 %changelog
+* Mon Feb 17 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-3
+- don't try to run tests because there's no atf package since F21
+
 * Mon Feb 17 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-2
 - turn on using of DUID with DHCPv4 clients (#560361,c#40)
 - remove default /etc/dhcp/dhclient.conf
