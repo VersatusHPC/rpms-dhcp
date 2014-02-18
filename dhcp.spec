@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  3%{?dist}
+Release:  4%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -62,23 +62,23 @@ Patch22:  dhcp-honor-expired.patch
 Patch23:  dhcp-PPP.patch
 Patch24:  dhcp-paranoia.patch
 Patch25:  dhcp-lpf-ib.patch
-Patch26:  dhcp-improved-xid.patch
-Patch27:  dhcp-gpxe-cid.patch
-Patch28:  dhcp-systemtap.patch
-Patch29:  dhcp-dhclient-decline-onetry.patch
-Patch30:  dhcp-log_perror.patch
-Patch31:  dhcp-getifaddrs.patch
-Patch32:  dhcp-omapi-leak.patch
-Patch33:  dhcp-failOverPeer.patch
-Patch34:  dhcp-interval.patch
-Patch35:  dhcp-conflex-do-forward-updates.patch
-Patch36:  dhcp-dupl-key.patch
-Patch37:  dhcp-range6.patch
-Patch38:  dhcp-next-server.patch
-Patch39:  dhcp-no-subnet-error2info.patch
-Patch40:  dhcp-ffff-checksum.patch
-Patch41:  dhcp-duidv4.patch
-
+Patch26:  dhcp-IPoIB-log-id.patch
+Patch27:  dhcp-improved-xid.patch
+Patch28:  dhcp-gpxe-cid.patch
+Patch29:  dhcp-duidv4.patch
+Patch30:  dhcp-systemtap.patch
+Patch31:  dhcp-dhclient-decline-onetry.patch
+Patch32:  dhcp-log_perror.patch
+Patch33:  dhcp-getifaddrs.patch
+Patch34:  dhcp-omapi-leak.patch
+Patch35:  dhcp-failOverPeer.patch
+Patch36:  dhcp-interval.patch
+Patch37:  dhcp-conflex-do-forward-updates.patch
+Patch38:  dhcp-dupl-key.patch
+Patch39:  dhcp-range6.patch
+Patch40:  dhcp-next-server.patch
+Patch41:  dhcp-no-subnet-error2info.patch
+Patch42:  dhcp-ffff-checksum.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -282,62 +282,65 @@ rm -rf includes/isc-dhcp
 # IPoIB support (#660681)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24249])
 %patch25 -p1 -b .lpf-ib
-%patch26 -p1 -b .improved-xid
-#%%patch27 -p1 -b .gpxe-cid
+# add GUID/DUID to dhcpd logs (#1064416)
+%patch26 -p1 -b .IPoIB-log-id
+%patch27 -p1 -b .improved-xid
+# create client identifier per rfc4390
+#%%patch28 -p1 -b .gpxe-cid (not needed as we use DUIDs - see next patch)
+# Turn on creating/sending of DUID as client identifier with DHCPv4 clients (#560361c#40, rfc4361)
+%patch29 -p1 -b .duidv4
 
 # http://sourceware.org/systemtap/wiki/SystemTap
-%patch28 -p1 -b .systemtap
+%patch30 -p1 -b .systemtap
 
 # Send DHCPDECLINE and exit(2) when duplicate address was detected and
 # dhclient had been started with '-1' (#756759).
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #26735])
-%patch29 -p1 -b .decline-onetry
+%patch31 -p1 -b .decline-onetry
 
 # Don't send log messages to the standard error descriptor by default (#790387)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28049])
-%patch30 -p1 -b .log_perror
+%patch32 -p1 -b .log_perror
 
 # Use getifaddrs() to scan for interfaces on Linux (#449946)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28761])
-%patch31 -p1 -b .getifaddrs
+%patch33 -p1 -b .getifaddrs
 
 # Fix several memory leaks in omapi (#978420)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #33990])
-%patch32 -p1 -b .leak
+%patch34 -p1 -b .leak
 
 # Dhcpd does not correctly follow DhcpFailOverPeerDN (#838400)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30402])
-%patch33 -p1 -b .failOverPeer
+%patch35 -p1 -b .failOverPeer
 
 # isc_time_nowplusinterval() is not safe with 64-bit time_t (#662254, #789601)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28038])
-%patch34 -p1 -b .interval
+%patch36 -p1 -b .interval
 
 # do-forward-updates statement wasn't recognized (#863646)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #31328])
-%patch35 -p1 -b .forward-updates
+%patch37 -p1 -b .forward-updates
 
 # multiple key statements in zone definition causes inappropriate error (#873794)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #31892])
-%patch36 -p1 -b .dupl-key
+%patch38 -p1 -b .dupl-key
 
 # Make sure range6 is correct for subnet6 where it's declared (#902966)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #32453])
-%patch37 -p1 -b .range6
+%patch39 -p1 -b .range6
 
 # Expose next-server DHCPv4 option to dhclient script
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #33098])
-%patch38 -p1 -b .next-server
+%patch40 -p1 -b .next-server
 
 # 'No subnet declaration for <iface>' should be info, not error.
-%patch39 -p1 -b .error2info
+%patch41 -p1 -b .error2info
 
 # dhcpd rejects the udp packet with checksum=0xffff (#1015997)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #25587])
-%patch40 -p1 -b .ffff
+%patch42 -p1 -b .ffff
 
-# Turn on using of DUID with DHCPv4 clients (#560361,c#40)
-%patch41 -p1 -b .duidv4
 
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
@@ -600,6 +603,9 @@ done
 
 
 %changelog
+* Tue Feb 18 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-4
+- IPoIB: add GUID/DUID to dhcpd logs (#1064416)
+
 * Mon Feb 17 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-3
 - don't try to run tests because there's no atf package since F21
 
