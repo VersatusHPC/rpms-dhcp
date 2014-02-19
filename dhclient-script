@@ -320,10 +320,20 @@ execute_client_side_configuration_scripts() {
 
 flush_dev() {
 # Instead of bringing the interface down (#574568)
-# explicitly clear the ARP cache and flush all addresses & routes.
+# explicitly clear ARP cache and flush all addresses & routes.
     ip -4 addr flush dev ${1} >/dev/null 2>&1
     ip -4 route flush dev ${1} >/dev/null 2>&1
     ip -4 neigh flush dev ${1} >/dev/null 2>&1
+}
+
+remove_old_addr() {
+    if [ -n "${old_ip_address}" ]; then
+        if [ -n "${old_prefix}" ]; then
+            ip -4 addr del ${old_ip_address}/${old_prefix} dev ${interface} >/dev/null 2>&1
+        else
+            ip -4 addr del ${old_ip_address} dev ${interface} >/dev/null 2>&1
+        fi
+    fi
 }
 
 dhconfig() {
@@ -695,8 +705,9 @@ case "${reason}" in
         # ensure interface is up
         ip link set dev ${interface} up
 
-        # remove any stale addresses from aborted clients
-        ip -6 addr flush dev ${interface} scope global permanent
+        # aborted client cleans after itself since 4.2.6
+        # so the following is not needed anymore
+        #ip -6 addr flush dev ${interface} scope global permanent
 
         exit_with_hooks 0
         ;;
@@ -752,10 +763,10 @@ case "${reason}" in
             ip -4 addr flush dev ${interface} label ${interface}:0 >/dev/null 2>&1
         fi
 
-        if [ -n "${old_ip_address}" ]; then
-            # Delete addresses/routes/arp cache.
-            flush_dev ${interface}
-        fi
+        # upstream script sets interface down here,
+        # we only remove old ip address
+        #flush_dev ${interface}
+        remove_old_addr
 
         if [ -n "${alias_ip_address}" ]; then
             ip -4 addr add ${alias_ip_address}/${alias_prefix} broadcast ${alias_broadcast_address} dev ${interface} label ${interface}:0
@@ -781,7 +792,8 @@ case "${reason}" in
                 exit_with_hooks 0
             fi
 
-            flush_dev ${interface}
+            #flush_dev ${interface}
+            remove_old_addr
             exit_with_hooks 1
         else
             exit_with_hooks 1

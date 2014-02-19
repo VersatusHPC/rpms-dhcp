@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  4%{?dist}
+Release:  5%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -603,6 +603,9 @@ done
 
 
 %changelog
+* Wed Feb 19 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-5
+- dhclient-script: don't flush all addresses, just the used one
+
 * Tue Feb 18 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-4
 - IPoIB: add GUID/DUID to dhcpd logs (#1064416)
 
