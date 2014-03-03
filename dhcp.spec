@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  6%{?dist}
+Release:  7%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -87,6 +87,7 @@ BuildRequires: openldap-devel
 BuildRequires: libcap-ng-devel
 BuildRequires: bind-lite-devel >= 32:9.9.5-0.1.b1
 BuildRequires: systemd
+BuildRequires: doxygen
 %if %sdt
 BuildRequires: systemtap-sdt-devel
 %global tapsetdir    /usr/share/systemtap/tapset
@@ -162,6 +163,17 @@ Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 %description devel
 Header files and API documentation for using the ISC DHCP libraries.  The
 libdhcpctl and libomapi static libraries are also included in this package.
+
+%package doc
+Summary: ISC DHCP Documentation
+Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+BuildArch: noarch
+
+%description doc
+This is an ISC DHCP Developer's Guide.
+This documentation is intended for developers, contributors and other
+programmers that are interested in internal operation of the code.
+(This package contains doxygen-generated documentation.)
 
 %prep
 %setup -q -n dhcp-%{VERSION}
@@ -385,6 +397,9 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
 %endif
     --enable-paranoia --enable-early-chroot
 %{__make} %{?_smp_mflags}
+pushd doc
+%{__make} devel
+popd
 
 %install
 %{__make} install DESTDIR=%{buildroot}
@@ -601,8 +616,13 @@ done
 %attr(0644,root,root) %{_mandir}/man3/dhcpctl.3.gz
 %attr(0644,root,root) %{_mandir}/man3/omapi.3.gz
 
+%files doc
+%doc doc/html/
 
 %changelog
+* Mon Mar 03 2014 Jaromír Končický <jkoncick@redhat.com> - 12:4.3.0-7
+- added 'doc' package containing doxygen-generated documentation
+
 * Wed Feb 19 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-6
 - dhclient: rename our -I option to -C as upstream now uses -I
 
