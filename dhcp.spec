@@ -166,7 +166,7 @@ libdhcpctl and libomapi static libraries are also included in this package.
 
 %package doc
 Summary: ISC DHCP Documentation
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}-libs = %{epoch}:%{version}-%{release}
 BuildArch: noarch
 
 %description doc
