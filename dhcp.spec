@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  7%{?dist}
+Release:  8%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -164,16 +164,15 @@ Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Header files and API documentation for using the ISC DHCP libraries.  The
 libdhcpctl and libomapi static libraries are also included in this package.
 
-%package doc
-Summary: ISC DHCP Documentation
+%package devel-doc
+Summary: Developer's Guide for ISC DHCP
 Requires: %{name}-libs = %{epoch}:%{version}-%{release}
 BuildArch: noarch
 
-%description doc
-This is an ISC DHCP Developer's Guide.
+%description devel-doc
 This documentation is intended for developers, contributors and other
 programmers that are interested in internal operation of the code.
-(This package contains doxygen-generated documentation.)
+This package contains doxygen-generated documentation.
 
 %prep
 %setup -q -n dhcp-%{VERSION}
@@ -616,10 +615,13 @@ done
 %attr(0644,root,root) %{_mandir}/man3/dhcpctl.3.gz
 %attr(0644,root,root) %{_mandir}/man3/omapi.3.gz
 
-%files doc
+%files devel-doc
 %doc doc/html/
 
 %changelog
+* Fri Mar 07 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-8
+- rename doc subpackage do devel-doc
+
 * Mon Mar 03 2014 Jaromír Končický <jkoncick@redhat.com> - 12:4.3.0-7
 - added 'doc' package containing doxygen-generated documentation
 
