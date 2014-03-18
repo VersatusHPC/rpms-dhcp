@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  8%{?dist}
+Release:  9%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -79,6 +79,7 @@ Patch39:  dhcp-range6.patch
 Patch40:  dhcp-next-server.patch
 Patch41:  dhcp-no-subnet-error2info.patch
 Patch42:  dhcp-ffff-checksum.patch
+Patch43:  dhcp-sd-daemon.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -86,7 +87,7 @@ BuildRequires: libtool
 BuildRequires: openldap-devel
 BuildRequires: libcap-ng-devel
 BuildRequires: bind-lite-devel >= 32:9.9.5-0.1.b1
-BuildRequires: systemd
+BuildRequires: systemd systemd-devel
 BuildRequires: doxygen
 %if %sdt
 BuildRequires: systemtap-sdt-devel
@@ -352,6 +353,8 @@ rm -rf includes/isc-dhcp
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #25587])
 %patch42 -p1 -b .ffff
 
+# support for sending startup notification to systemd (#1077666)
+%patch43 -p1 -b .sd-daemon
 
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
@@ -394,7 +397,8 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --enable-systemtap \
     --with-tapset-install-dir=%{tapsetdir} \
 %endif
-    --enable-paranoia --enable-early-chroot
+    --enable-paranoia --enable-early-chroot \
+    --with-systemd
 %{__make} %{?_smp_mflags}
 pushd doc
 %{__make} devel
@@ -509,11 +513,15 @@ exit 0
 # Initial installation
 %systemd_post dhcpd.service dhcpd6.service dhcrelay.service
 
-# Update
-if [ $1 -gt 1 ] ; then
-  chown -R dhcpd:dhcpd %{_localstatedir}/lib/dhcpd/
-fi
+chown -R dhcpd:dhcpd %{_localstatedir}/lib/dhcpd/
 
+for servicename in dhcpd dhcpd6 dhcrelay; do
+  etcservicefile=%{_sysconfdir}/systemd/system/${servicename}.service
+  if [ -f ${etcservicefile} ]; then
+    grep -q Type= ${etcservicefile} || sed -i '/\[Service\]/a Type=notify' ${etcservicefile}
+  fi
+done
+exit 0
 
 %preun
 # Package removal, not upgrade
@@ -619,6 +627,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Mar 18 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-9
+- support for sending startup notifications to systemd (#1077666)
+
 * Fri Mar 07 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-8
 - rename doc subpackage do devel-doc
 

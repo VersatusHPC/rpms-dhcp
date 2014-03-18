@@ -5,6 +5,7 @@ After=network.target
 After=time-sync.target
 
 [Service]
+Type=notify
 ExecStart=/usr/sbin/dhcpd -f -cf /etc/dhcp/dhcpd.conf -user dhcpd -group dhcpd --no-pid
 
 [Install]
