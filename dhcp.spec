@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  9%{?dist}
+Release:  10%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -68,7 +68,6 @@ Patch28:  dhcp-gpxe-cid.patch
 Patch29:  dhcp-duidv4.patch
 Patch30:  dhcp-systemtap.patch
 Patch31:  dhcp-dhclient-decline-onetry.patch
-Patch32:  dhcp-log_perror.patch
 Patch33:  dhcp-getifaddrs.patch
 Patch34:  dhcp-omapi-leak.patch
 Patch35:  dhcp-failOverPeer.patch
@@ -309,10 +308,6 @@ rm -rf includes/isc-dhcp
 # dhclient had been started with '-1' (#756759).
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #26735])
 %patch31 -p1 -b .decline-onetry
-
-# Don't send log messages to the standard error descriptor by default (#790387)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28049])
-%patch32 -p1 -b .log_perror
 
 # Use getifaddrs() to scan for interfaces on Linux (#449946)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28761])
@@ -627,6 +622,9 @@ done
 %doc doc/html/
 
 %changelog
+* Wed May 07 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-10
+- use StandardError=null instead of log_perror.patch
+
 * Tue Mar 18 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-9
 - support for sending startup notifications to systemd (#1077666)
 

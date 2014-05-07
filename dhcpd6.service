@@ -7,6 +7,7 @@ After=time-sync.target
 [Service]
 Type=notify
 ExecStart=/usr/sbin/dhcpd -f -6 -cf /etc/dhcp/dhcpd6.conf -user dhcpd -group dhcpd --no-pid
+StandardError=null
 
 [Install]
 WantedBy=multi-user.target
