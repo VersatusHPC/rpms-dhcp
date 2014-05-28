@@ -598,18 +598,16 @@ dh6config() {
             ;;
 
         RENEW6|REBIND6)
-            if [ -z "${new_ip6_address}" ] ||
-               [ -z "${new_ip6_prefixlen}" ]; then
-                exit_with_hooks 2
-            fi
-
-            if [  ! "${new_ip6_address}" = "${old_ip6_address}" ]; then
-                [[ -n "${old_ip6_address}" ]] && ip -6 addr del ${old_ip6_address} dev ${interface}
-                add_ipv6_addr_with_DAD
-            else # only update address lifetimes
-                ip -6 addr change ${new_ip6_address}/${new_ip6_prefixlen} \
-                   dev ${interface} scope global valid_lft ${new_max_life} \
-                                             preferred_lft ${new_preferred_life}
+            if [[ -n "${new_ip6_address}" ]] &&
+               [[ -n "${new_ip6_prefixlen}" ]]; then
+               if [[  ! "${new_ip6_address}" = "${old_ip6_address}" ]]; then
+                   [[ -n "${old_ip6_address}" ]] && ip -6 addr del ${old_ip6_address} dev ${interface}
+                   add_ipv6_addr_with_DAD
+               else # only update address lifetimes
+                   ip -6 addr change ${new_ip6_address}/${new_ip6_prefixlen} \
+                      dev ${interface} scope global valid_lft ${new_max_life} \
+                                                preferred_lft ${new_preferred_life}
+               fi
             fi
 
             if [ ! "${new_dhcp6_name_servers}" = "${old_dhcp6_name_servers}" ] ||

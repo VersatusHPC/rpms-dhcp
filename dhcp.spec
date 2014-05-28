@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  10%{?dist}
+Release:  11%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -622,6 +622,9 @@ done
 %doc doc/html/
 
 %changelog
+* Wed May 28 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-11
+- dhclient-script: fix stateless DHCPv6 mode (#1101149)
+
 * Wed May 07 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-10
 - use StandardError=null instead of log_perror.patch
 
