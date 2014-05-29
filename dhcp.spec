@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  11%{?dist}
+Release:  12%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -78,7 +78,7 @@ Patch39:  dhcp-range6.patch
 Patch40:  dhcp-next-server.patch
 Patch41:  dhcp-no-subnet-error2info.patch
 Patch42:  dhcp-ffff-checksum.patch
-Patch43:  dhcp-sd-daemon.patch
+Patch43:  dhcp-sd_notify.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -87,6 +87,8 @@ BuildRequires: openldap-devel
 BuildRequires: libcap-ng-devel
 BuildRequires: bind-lite-devel >= 32:9.9.5-0.1.b1
 BuildRequires: systemd systemd-devel
+# dhcp-sd_notify.patch
+BuildRequires: pkgconfig(libsystemd)
 BuildRequires: doxygen
 %if %sdt
 BuildRequires: systemtap-sdt-devel
@@ -349,7 +351,7 @@ rm -rf includes/isc-dhcp
 %patch42 -p1 -b .ffff
 
 # support for sending startup notification to systemd (#1077666)
-%patch43 -p1 -b .sd-daemon
+%patch43 -p1 -b .sd_notify
 
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
@@ -622,6 +624,9 @@ done
 %doc doc/html/
 
 %changelog
+* Thu May 29 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-12
+- dhcp-sd_notify.patch BuildRequires: pkgconfig(libsystemd)
+
 * Wed May 28 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-11
 - dhclient-script: fix stateless DHCPv6 mode (#1101149)
 
