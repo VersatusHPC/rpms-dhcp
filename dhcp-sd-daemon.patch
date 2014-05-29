@@ -12,8 +12,8 @@ diff -up dhcp-4.3.0/configure.ac.sd-daemon dhcp-4.3.0/configure.ac
 +        [systemd=no])
 +
 +if test x$systemd = xyes ; then
-+   AC_CHECK_LIB(systemd-daemon, sd_notify, ,
-+                AC_MSG_FAILURE([*** sd-daemon library not present - do you need to install systemd-libs package?]))
++   AC_CHECK_LIB(systemd, sd_notifyf, ,
++                AC_MSG_FAILURE([*** systemd library not present - do you need to install systemd-libs package?]))
 +fi
 +
  # Append selected warning levels to CFLAGS before substitution (but after
@@ -26,7 +26,7 @@ diff -up dhcp-4.3.0/relay/dhcrelay.c.sd-daemon dhcp-4.3.0/relay/dhcrelay.c
     int keep_capabilities = 0;
  #endif
  
-+#ifdef HAVE_LIBSYSTEMD_DAEMON
++#ifdef HAVE_LIBSYSTEMD
 +#include <systemd/sd-daemon.h>
 +#endif
 +
@@ -37,7 +37,7 @@ diff -up dhcp-4.3.0/relay/dhcrelay.c.sd-daemon dhcp-4.3.0/relay/dhcrelay.c
  	}
  #endif
  
-+#ifdef HAVE_LIBSYSTEMD_DAEMON
++#ifdef HAVE_LIBSYSTEMD
 +        /* We are ready to process incomming packets. Let's notify systemd */
 +        sd_notifyf(0, "READY=1\n"
 +                   "STATUS=Dispatching packets...\n"
@@ -55,7 +55,7 @@ diff -up dhcp-4.3.0/server/dhcpd.c.sd-daemon dhcp-4.3.0/server/dhcpd.c
  
  #include "trace.h"
  
-+#ifdef HAVE_LIBSYSTEMD_DAEMON
++#ifdef HAVE_LIBSYSTEMD
 +#include <systemd/sd-daemon.h>
 +#endif
 +
@@ -66,7 +66,7 @@ diff -up dhcp-4.3.0/server/dhcpd.c.sd-daemon dhcp-4.3.0/server/dhcpd.c
  
  	TRACE(DHCPD_MAIN());
  
-+#ifdef HAVE_LIBSYSTEMD_DAEMON
++#ifdef HAVE_LIBSYSTEMD
 +        /* We are ready to process incomming packets. Let's notify systemd */
 +        sd_notifyf(0, "READY=1\n"
 +                   "STATUS=Dispatching packets...\n"
