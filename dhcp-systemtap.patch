@@ -293,7 +293,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  dhcpv6_solicit(struct data_string *reply_ret, struct packet *packet) {
  	struct data_string client_id;
  
-+	TRACE(DHCPD_6_SOLICIT_START());
++	TRACE(DHCPD_SIX_SOLICIT_START());
 +
  	/* 
  	 * Validate our input.
@@ -303,7 +303,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	 */
  	data_string_forget(&client_id, MDL);
 +
-+	TRACE(DHCPD_6_SOLICIT_DONE());
++	TRACE(DHCPD_SIX_SOLICIT_DONE());
  }
  
  /*
@@ -311,7 +311,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	struct data_string client_id;
  	struct data_string server_id;
  
-+	TRACE(DHCPD_6_REQUEST_START());
++	TRACE(DHCPD_SIX_REQUEST_START());
 +
  	/*
  	 * Validate our input.
@@ -321,7 +321,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	data_string_forget(&client_id, MDL);
  	data_string_forget(&server_id, MDL);
 +
-+	TRACE(DHCPD_6_REQUEST_DONE());
++	TRACE(DHCPD_SIX_REQUEST_DONE());
  }
  
  /* Find a DHCPv6 packet's shared network from hints in the packet.
@@ -329,7 +329,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	struct dhcpv6_packet *reply = (struct dhcpv6_packet *)reply_data;
  	int reply_ofs = (int)(offsetof(struct dhcpv6_packet, options));
  
-+	TRACE(DHCPD_6_CONFIRM_START());
++	TRACE(DHCPD_SIX_CONFIRM_START());
 +
  	/* 
  	 * Basic client message validation.
@@ -339,7 +339,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	if (opt_state != NULL)
  		option_state_dereference(&opt_state, MDL);
 +
-+	TRACE(DHCPD_6_CONFIRM_DONE());
++	TRACE(DHCPD_SIX_CONFIRM_DONE());
  }
  
  /*
@@ -347,7 +347,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	struct data_string client_id;
  	struct data_string server_id;
  
-+	TRACE(DHCPD_6_RENEW_START());
++	TRACE(DHCPD_SIX_RENEW_START());
 +
  	/* 
  	 * Validate the request.
@@ -357,7 +357,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	data_string_forget(&server_id, MDL);
  	data_string_forget(&client_id, MDL);
 +
-+	TRACE(DHCPD_6_RENEW_DONE());
++	TRACE(DHCPD_SIX_RENEW_DONE());
  }
  
  /*
@@ -365,7 +365,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  dhcpv6_rebind(struct data_string *reply, struct packet *packet) {
  	struct data_string client_id;
  
-+	TRACE(DHCPD_6_REBIND_START());
++	TRACE(DHCPD_SIX_REBIND_START());
 +
  	if (!valid_client_msg(packet, &client_id)) {
  		return;
@@ -375,7 +375,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  
  	data_string_forget(&client_id, MDL);
 +
-+	TRACE(DHCPD_6_REBIND_DONE());
++	TRACE(DHCPD_SIX_REBIND_DONE());
  }
  
  static void
@@ -383,7 +383,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	struct data_string client_id;
  	struct data_string server_id;
  
-+	TRACE(DHCPD_6_DECLINE_START());
++	TRACE(DHCPD_SIX_DECLINE_START());
 +
  	/* 
  	 * Validate our input.
@@ -393,7 +393,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	data_string_forget(&server_id, MDL);
  	data_string_forget(&client_id, MDL);
 +
-+	TRACE(DHCPD_6_DECLINE_DONE());
++	TRACE(DHCPD_SIX_DECLINE_DONE());
  }
  
  static void
@@ -401,7 +401,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	struct data_string client_id;
  	struct data_string server_id;
  
-+	TRACE(DHCPD_6_RELEASE_START());
++	TRACE(DHCPD_SIX_RELEASE_START());
 +
  	/* 
  	 * Validate our input.
@@ -411,7 +411,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	data_string_forget(&server_id, MDL);
  	data_string_forget(&client_id, MDL);
 +
-+	TRACE(DHCPD_6_RELEASE_DONE());
++	TRACE(DHCPD_SIX_RELEASE_DONE());
  }
  
  /*
@@ -419,7 +419,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	struct data_string client_id;
  	struct data_string server_id;
  
-+	TRACE(DHCPD_6_INFORMATION_REQUEST_START());
++	TRACE(DHCPD_SIX_INFORMATION_REQUEST_START());
 +
  	/*
  	 * Validate our input.
@@ -429,7 +429,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	}
  	data_string_forget(&server_id, MDL);
 +
-+	TRACE(DHCPD_6_INFORMATION_REQUEST_DONE());
++	TRACE(DHCPD_SIX_INFORMATION_REQUEST_DONE());
  }
  
  /* 
@@ -437,7 +437,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  	struct dhcpv6_relay_packet *reply;
  	int reply_ofs;
  
-+	TRACE(DHCPD_6_RELAY_FORW_START());
++	TRACE(DHCPD_SIX_RELAY_FORW_START());
 +
  	/* 
  	 * Initialize variables for early exit.
@@ -447,7 +447,7 @@ diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
  		packet_dereference(&enc_packet, MDL);
  	}
 +
-+	TRACE(DHCPD_6_RELAY_FORW_DONE());
++	TRACE(DHCPD_SIX_RELAY_FORW_DONE());
  }
  
  static void
@@ -505,46 +505,46 @@ diff -up dhcp-4.3.0a1/server/probes.d.systemtap dhcp-4.3.0a1/server/probes.d
 @@ -0,0 +1,43 @@
 +provider dhcpd {
 +	 probe main();
-+	 probe discover_start()
-+	 probe discover_done()
-+	 probe request_start()
-+	 probe request_done()
-+	 probe release_start()
-+	 probe release_done()
-+	 probe decline_start()
-+	 probe decline_done()
-+	 probe inform_start()
-+	 probe inform_done()
-+	 probe nak_lease_start()
-+	 probe nak_lease_done()
-+	 probe ack_lease_start()
-+	 probe ack_lease_done()
-+	 probe reply_start()
-+	 probe reply_done()
-+	 probe find_lease_start()
-+	 probe find_lease_done()
-+	 probe 6_solicit_start()
-+	 probe 6_solicit_done()
-+	 probe 6_request_start()
-+	 probe 6_request_done()
-+	 probe 6_confirm_start()
-+	 probe 6_confirm_done()
-+	 probe 6_renew_start()
-+	 probe 6_renew_done()
-+	 probe 6_rebind_start()
-+	 probe 6_rebind_done()
-+	 probe 6_decline_start()
-+	 probe 6_decline_done()
-+	 probe 6_release_start()
-+	 probe 6_release_done()
-+	 probe 6_information_request_start()
-+	 probe 6_information_request_done()
-+	 probe 6_relay_forw_start()
-+	 probe 6_relay_forw_done()
-+	 probe failover_pool_dobalance_start()
-+	 probe failover_pool_dobalance_done()
-+	 probe failover_set_state_start(int, int) /* state, new_state */
-+	 probe failover_set_state_done()
++	 probe discover_start();
++	 probe discover_done();
++	 probe request_start();
++	 probe request_done();
++	 probe release_start();
++	 probe release_done();
++	 probe decline_start();
++	 probe decline_done();
++	 probe inform_start();
++	 probe inform_done();
++	 probe nak_lease_start();
++	 probe nak_lease_done();
++	 probe ack_lease_start();
++	 probe ack_lease_done();
++	 probe reply_start();
++	 probe reply_done();
++	 probe find_lease_start();
++	 probe find_lease_done();
++	 probe six_solicit_start();
++	 probe six_solicit_done();
++	 probe six_request_start();
++	 probe six_request_done();
++	 probe six_confirm_start();
++	 probe six_confirm_done();
++	 probe six_renew_start();
++	 probe six_renew_done();
++	 probe six_rebind_start();
++	 probe six_rebind_done();
++	 probe six_decline_start();
++	 probe six_decline_done();
++	 probe six_release_start();
++	 probe six_release_done();
++	 probe six_information_request_start();
++	 probe six_information_request_done();
++	 probe six_relay_forw_start();
++	 probe six_relay_forw_done();
++	 probe failover_pool_dobalance_start();
++	 probe failover_pool_dobalance_done();
++	 probe failover_set_state_start(int, int);
++	 probe failover_set_state_done();
 +};
 diff -up dhcp-4.3.0a1/server/tests/Makefile.am.systemtap dhcp-4.3.0a1/server/tests/Makefile.am
 --- dhcp-4.3.0a1/server/tests/Makefile.am.systemtap	2013-12-20 13:30:26.315642998 +0100
@@ -709,92 +709,92 @@ diff -up dhcp-4.3.0a1/tapset/dhcpd.stp.systemtap dhcp-4.3.0a1/tapset/dhcpd.stp
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_solicit_start = process("dhcpd").mark("6_solicit_start")
++probe dhcpd_six_solicit_start = process("dhcpd").mark("six_solicit_start")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_solicit_done = process("dhcpd").mark("6_solicit_done")
++probe dhcpd_six_solicit_done = process("dhcpd").mark("six_solicit_done")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_request_start = process("dhcpd").mark("6_request_start")
++probe dhcpd_six_request_start = process("dhcpd").mark("six_request_start")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_request_done = process("dhcpd").mark("6_request_done")
++probe dhcpd_six_request_done = process("dhcpd").mark("six_request_done")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_confirm_start = process("dhcpd").mark("6_confirm_start")
++probe dhcpd_six_confirm_start = process("dhcpd").mark("six_confirm_start")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_confirm_done = process("dhcpd").mark("6_confirm_done")
++probe dhcpd_six_confirm_done = process("dhcpd").mark("six_confirm_done")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_renew_start = process("dhcpd").mark("6_renew_start")
++probe dhcpd_six_renew_start = process("dhcpd").mark("six_renew_start")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_renew_done = process("dhcpd").mark("6_renew_done")
++probe dhcpd_six_renew_done = process("dhcpd").mark("six_renew_done")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_rebind_start = process("dhcpd").mark("6_rebind_start")
++probe dhcpd_six_rebind_start = process("dhcpd").mark("six_rebind_start")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_rebind_done = process("dhcpd").mark("6_rebind_done")
++probe dhcpd_six_rebind_done = process("dhcpd").mark("six_rebind_done")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_decline_start = process("dhcpd").mark("6_decline_start")
++probe dhcpd_six_decline_start = process("dhcpd").mark("six_decline_start")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_decline_done = process("dhcpd").mark("6_decline_done")
++probe dhcpd_six_decline_done = process("dhcpd").mark("six_decline_done")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_release_start = process("dhcpd").mark("6_release_start")
++probe dhcpd_six_release_start = process("dhcpd").mark("six_release_start")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_release_done = process("dhcpd").mark("6_release_done")
++probe dhcpd_six_release_done = process("dhcpd").mark("six_release_done")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_information_request_start = process("dhcpd").mark("6_information_request_start")
++probe dhcpd_six_information_request_start = process("dhcpd").mark("six_information_request_start")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_information_request_done = process("dhcpd").mark("6_information_request_done")
++probe dhcpd_six_information_request_done = process("dhcpd").mark("six_information_request_done")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_relay_forw_start = process("dhcpd").mark("6_relay_forw_start")
++probe dhcpd_six_relay_forw_start = process("dhcpd").mark("six_relay_forw_start")
 +{
 +  probestr = sprintf("%s", $$name);
 +}
 +
-+probe dhcpd_6_relay_forw_done = process("dhcpd").mark("6_relay_forw_done")
++probe dhcpd_six_relay_forw_done = process("dhcpd").mark("six_relay_forw_done")
 +{
 +  probestr = sprintf("%s", $$name);
 +}

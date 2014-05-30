@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.0
-Release:  12%{?dist}
+Release:  13%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -624,6 +624,9 @@ done
 %doc doc/html/
 
 %changelog
+* Fri May 30 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-13
+- systemtap: fixed dtrace input file (#1102797)
+
 * Thu May 29 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.0-12
 - dhcp-sd_notify.patch BuildRequires: pkgconfig(libsystemd)
 
