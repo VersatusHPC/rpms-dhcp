@@ -274,7 +274,10 @@ is_router_reachable() {
     mysubnet="$(get_network_address ${new_ip_address} ${new_subnet_mask})"
 
     if [ ! "${routersubnet}" = "${mysubnet}" ]; then
-        ip -4 route add ${router}/32 dev ${interface}
+        # TODO: This function should not have side effects such as adding or
+        # removing routes. Can this be done with "ip route get" or similar
+        # instead? Are there cases that rely on this route being created here?
+        ip -4 route replace ${router}/32 dev ${interface}
         if [ "$?" -ne 0 ]; then
             logmessage "failed to create host route for ${router}"
             return 1
