@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.2.6
-Release:  3%{?dist}
+Release:  4%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -629,6 +629,9 @@ done
 
 
 %changelog
+* Thu Jun 12 2014 Filipe Brandenburger <filbranden@google.com> - 12:4.2.6-4
+- dhclient-script: fix issue with classless static routes that breaks Fedora 20 on GCE cloud (#1102830)
+
 * Mon Feb 17 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.6-3
 - comment out sending of client-id in dhclient.conf (#60361#c42)
 
