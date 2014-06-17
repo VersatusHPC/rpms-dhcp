@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.2.6
-Release:  4%{?dist}
+Release:  5%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -492,7 +492,7 @@ EOF
 # Does not work with InfiniBand, which is special case (RFC 4390).
 # see dhcp-options(5) man page for 'dhcp-client-identifier'
 # see dhcp-eval(5) man page for 'hardware'
-# send dhcp-client-identifier = hardware;
+send dhcp-client-identifier = hardware;
 EOF
 
 # Install dhcp.schema for LDAP configuration
@@ -629,11 +629,14 @@ done
 
 
 %changelog
+* Tue Jun 17 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.6-5
+- keep sending client-id in dhclient.conf (#560361#c44)
+
 * Thu Jun 12 2014 Filipe Brandenburger <filbranden@google.com> - 12:4.2.6-4
 - dhclient-script: fix issue with classless static routes that breaks Fedora 20 on GCE cloud (#1102830)
 
 * Mon Feb 17 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.6-3
-- comment out sending of client-id in dhclient.conf (#60361#c42)
+- comment out sending of client-id in dhclient.conf (#560361#c42)
 
 * Fri Feb 14 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.6-2
 - dhclient.conf: don't create client-id if InfiniBand (#560361#c38)
