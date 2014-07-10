@@ -1,19 +1,7 @@
-diff -up dhcp-4.3.0a1/Makefile.am.systemtap dhcp-4.3.0a1/Makefile.am
---- dhcp-4.3.0a1/Makefile.am.systemtap	2013-12-20 13:30:26.149645305 +0100
-+++ dhcp-4.3.0a1/Makefile.am	2013-12-20 13:30:26.307643109 +0100
-@@ -33,5 +33,8 @@ endif
- 
- SUBDIRS += includes tests common omapip client dhcpctl relay server
- 
-+SUBDIRS += tapset
-+#DIST_SUBDIRS = $(SUBDIRS)
-+
- nobase_include_HEADERS = dhcpctl/dhcpctl.h
- 
-diff -up dhcp-4.3.0a1/configure.ac.systemtap dhcp-4.3.0a1/configure.ac
---- dhcp-4.3.0a1/configure.ac.systemtap	2013-12-20 13:30:26.229644193 +0100
-+++ dhcp-4.3.0a1/configure.ac	2013-12-20 13:31:39.195630065 +0100
-@@ -524,6 +524,35 @@ else
+diff -up dhcp-4.3.1b1/configure.ac.systemtap dhcp-4.3.1b1/configure.ac
+--- dhcp-4.3.1b1/configure.ac.systemtap	2014-07-10 18:31:05.966880404 +0200
++++ dhcp-4.3.1b1/configure.ac	2014-07-10 18:31:06.027879541 +0200
+@@ -534,6 +534,35 @@ else
      AC_MSG_RESULT(no)
  fi
  
@@ -49,7 +37,7 @@ diff -up dhcp-4.3.0a1/configure.ac.systemtap dhcp-4.3.0a1/configure.ac
  # Solaris needs some libraries for functions
  AC_SEARCH_LIBS(socket, [socket])
  AC_SEARCH_LIBS(inet_ntoa, [nsl])
-@@ -675,6 +704,7 @@ AC_CONFIG_FILES([
+@@ -686,6 +715,7 @@ AC_CONFIG_FILES([
    tests/Makefile
    server/tests/Makefile
    doc/devel/doxyfile
@@ -57,9 +45,437 @@ diff -up dhcp-4.3.0a1/configure.ac.systemtap dhcp-4.3.0a1/configure.ac
  ])
  AC_OUTPUT
  
-diff -up dhcp-4.3.0a1/server/Makefile.am.systemtap dhcp-4.3.0a1/server/Makefile.am
---- dhcp-4.3.0a1/server/Makefile.am.systemtap	2013-12-20 13:30:26.156645207 +0100
-+++ dhcp-4.3.0a1/server/Makefile.am	2013-12-20 13:34:16.057447630 +0100
+diff -up dhcp-4.3.1b1/Makefile.am.systemtap dhcp-4.3.1b1/Makefile.am
+--- dhcp-4.3.1b1/Makefile.am.systemtap	2014-07-10 18:31:05.891881465 +0200
++++ dhcp-4.3.1b1/Makefile.am	2014-07-10 18:31:06.027879541 +0200
+@@ -33,5 +33,8 @@ endif
+ 
+ SUBDIRS += includes tests common omapip client dhcpctl relay server
+ 
++SUBDIRS += tapset
++#DIST_SUBDIRS = $(SUBDIRS)
++
+ nobase_include_HEADERS = dhcpctl/dhcpctl.h
+ 
+diff -up dhcp-4.3.1b1/server/dhcp.c.systemtap dhcp-4.3.1b1/server/dhcp.c
+--- dhcp-4.3.1b1/server/dhcp.c.systemtap	2014-07-10 18:31:06.016879697 +0200
++++ dhcp-4.3.1b1/server/dhcp.c	2014-07-10 18:36:07.392617942 +0200
+@@ -30,7 +30,7 @@
+ #include <errno.h>
+ #include <limits.h>
+ #include <sys/time.h>
+-
++#include "trace.h"
+ static void commit_leases_ackout(void *foo);
+ static void maybe_return_agent_options(struct packet *packet,
+ 				       struct option_state *options);
+@@ -303,6 +303,8 @@ void dhcpdiscover (packet, ms_nulltp)
+ 	dhcp_failover_state_t *peer;
+ #endif
+ 
++	TRACE(DHCPD_DISCOVER_START());
++
+ 	find_lease (&lease, packet, packet -> shared_network,
+ 		    0, &peer_has_leases, (struct lease *)0, MDL);
+ 
+@@ -425,6 +427,8 @@ void dhcpdiscover (packet, ms_nulltp)
+       out:
+ 	if (lease)
+ 		lease_dereference (&lease, MDL);
++
++	TRACE(DHCPD_DISCOVER_DONE());
+ }
+ 
+ void dhcprequest (packet, ms_nulltp, ip_lease)
+@@ -447,6 +451,8 @@ void dhcprequest (packet, ms_nulltp, ip_
+ #endif
+ 	int have_requested_addr = 0;
+ 
++	TRACE(DHCPD_REQUEST_START());
++
+ 	oc = lookup_option (&dhcp_universe, packet -> options,
+ 			    DHO_DHCP_REQUESTED_ADDRESS);
+ 	memset (&data, 0, sizeof data);
+@@ -724,6 +730,9 @@ void dhcprequest (packet, ms_nulltp, ip_
+ 		log_info ("%s: unknown lease %s.", msgbuf, piaddr (cip));
+ 
+       out:
++
++	TRACE(DHCPD_REQUEST_DONE());
++
+ 	if (subnet)
+ 		subnet_dereference (&subnet, MDL);
+ 	if (lease)
+@@ -742,6 +751,7 @@ void dhcprelease (packet, ms_nulltp)
+ 	const char *s;
+ 	char msgbuf [1024], cstr[16]; /* XXX */
+ 
++	TRACE(DHCPD_RELEASE_START());
+ 
+ 	/* DHCPRELEASE must not specify address in requested-address
+ 	   option, but old protocol specs weren't explicit about this,
+@@ -862,6 +872,8 @@ void dhcprelease (packet, ms_nulltp)
+ #endif
+ 	if (lease)
+ 		lease_dereference (&lease, MDL);
++
++	TRACE(DHCPD_RELEASE_DONE());
+ }
+ 
+ void dhcpdecline (packet, ms_nulltp)
+@@ -879,6 +891,8 @@ void dhcpdecline (packet, ms_nulltp)
+ 	struct option_cache *oc;
+ 	struct data_string data;
+ 
++	TRACE(DHCPD_DECLINE_START());
++
+ 	/* DHCPDECLINE must specify address. */
+ 	if (!(oc = lookup_option (&dhcp_universe, packet -> options,
+ 				  DHO_DHCP_REQUESTED_ADDRESS)))
+@@ -985,6 +999,8 @@ void dhcpdecline (packet, ms_nulltp)
+ 		option_state_dereference (&options, MDL);
+ 	if (lease)
+ 		lease_dereference (&lease, MDL);
++
++	TRACE(DHCPD_DECLINE_DONE());
+ }
+ 
+ void dhcpinform (packet, ms_nulltp)
+@@ -1012,6 +1028,8 @@ void dhcpinform (packet, ms_nulltp)
+ 	int h_w_fixed_addr = 0;
+ #endif
+ 
++	TRACE(DHCPD_INFORM_START());
++
+ 	/* The client should set ciaddr to its IP address, but apparently
+ 	   it's common for clients not to do this, so we'll use their IP
+ 	   source address if they didn't set ciaddr. */
+@@ -1584,6 +1602,8 @@ void dhcpinform (packet, ms_nulltp)
+ 
+ 	if (subnet)
+ 		subnet_dereference (&subnet, MDL);
++
++	TRACE(DHCPD_INFORM_DONE());
+ }
+ 
+ void nak_lease (packet, cip)
+@@ -1600,6 +1620,8 @@ void nak_lease (packet, cip)
+ 	struct option_state *options = (struct option_state *)0;
+ 	struct option_cache *oc = (struct option_cache *)0;
+ 
++	TRACE(DHCPD_NAK_LEASE_START());
++
+ 	option_state_allocate (&options, MDL);
+ 	memset (&outgoing, 0, sizeof outgoing);
+ 	memset (&raw, 0, sizeof raw);
+@@ -1764,6 +1786,7 @@ void nak_lease (packet, cip)
+                            packet->interface->name);
+         }
+ 
++	TRACE(DHCPD_NAK_LEASE_DONE());
+ }
+ 
+ void check_pool_threshold (packet, lease, state)
+@@ -1899,6 +1922,8 @@ void ack_lease (packet, lease, offer, wh
+ 	if (lease -> state)
+ 		return;
+ 
++	TRACE(DHCPD_ACK_LEASE_START());
++
+ 	/* Save original cltt for comparison later. */
+ 	lease_cltt = lease->cltt;
+ 
+@@ -3340,6 +3365,8 @@ void ack_lease (packet, lease, offer, wh
+ #endif
+ 			dhcp_reply(lease);
+ 	}
++
++	TRACE(DHCPD_ACK_LEASE_DONE());
+ }
+ 
+ /*
+@@ -3492,6 +3519,8 @@ void dhcp_reply (lease)
+ 	if (!state)
+ 		log_fatal ("dhcp_reply was supplied lease with no state!");
+ 
++	TRACE(DHCPD_REPLY_START());
++
+ 	/* Compose a response for the client... */
+ 	memset (&raw, 0, sizeof raw);
+ 	memset (&d1, 0, sizeof d1);
+@@ -3713,6 +3742,8 @@ void dhcp_reply (lease)
+ 
+ 	free_lease_state (state, MDL);
+ 	lease -> state = (struct lease_state *)0;
++
++	TRACE(DHCPD_REPLY_DONE());
+ }
+ 
+ int find_lease (struct lease **lp,
+@@ -3735,6 +3766,8 @@ int find_lease (struct lease **lp,
+ 	struct data_string client_identifier;
+ 	struct hardware h;
+ 
++	TRACE(DHCPD_FIND_LEASE_START());
++
+ #if defined(FAILOVER_PROTOCOL)
+ 	/* Quick check to see if the peer has leases. */
+ 	if (peer_has_leases) {
+@@ -4457,6 +4490,9 @@ int find_lease (struct lease **lp,
+ #if defined (DEBUG_FIND_LEASE)
+ 	log_info ("Not returning a lease.");
+ #endif
++
++	TRACE(DHCPD_FIND_LEASE_DONE());
++
+ 	return 0;
+ }
+ 
+diff -up dhcp-4.3.1b1/server/dhcpd.c.systemtap dhcp-4.3.1b1/server/dhcpd.c
+--- dhcp-4.3.1b1/server/dhcpd.c.systemtap	2014-07-10 18:31:06.006879838 +0200
++++ dhcp-4.3.1b1/server/dhcpd.c	2014-07-10 18:31:06.030879499 +0200
+@@ -52,6 +52,8 @@ static const char url [] =
+ #  undef group
+ #endif /* PARANOIA */
+ 
++#include "trace.h"
++
+ #ifndef UNIT_TEST
+ static void usage(void);
+ #endif
+@@ -801,6 +803,8 @@ main(int argc, char **argv) {
+ 	/* Log that we are about to start working */
+ 	log_info("Server starting service.");
+ 
++	TRACE(DHCPD_MAIN());
++
+ 	/*
+ 	 * Receive packets and dispatch them...
+ 	 * dispatch() will never return.
+diff -up dhcp-4.3.1b1/server/dhcpv6.c.systemtap dhcp-4.3.1b1/server/dhcpv6.c
+--- dhcp-4.3.1b1/server/dhcpv6.c.systemtap	2014-07-10 18:31:05.998879951 +0200
++++ dhcp-4.3.1b1/server/dhcpv6.c	2014-07-10 18:31:06.032879471 +0200
+@@ -17,6 +17,7 @@
+ /*! \file server/dhcpv6.c */
+ 
+ #include "dhcpd.h"
++#include "trace.h"
+ 
+ #ifdef DHCPv6
+ 
+@@ -4829,6 +4830,8 @@ static void
+ dhcpv6_solicit(struct data_string *reply_ret, struct packet *packet) {
+ 	struct data_string client_id;
+ 
++	TRACE(DHCPD_SIX_SOLICIT_START());
++
+ 	/* 
+ 	 * Validate our input.
+ 	 */
+@@ -4842,6 +4845,8 @@ dhcpv6_solicit(struct data_string *reply
+ 	 * Clean up.
+ 	 */
+ 	data_string_forget(&client_id, MDL);
++
++	TRACE(DHCPD_SIX_SOLICIT_DONE());
+ }
+ 
+ /*
+@@ -4855,6 +4860,8 @@ dhcpv6_request(struct data_string *reply
+ 	struct data_string client_id;
+ 	struct data_string server_id;
+ 
++	TRACE(DHCPD_SIX_REQUEST_START());
++
+ 	/*
+ 	 * Validate our input.
+ 	 */
+@@ -4872,6 +4879,8 @@ dhcpv6_request(struct data_string *reply
+ 	 */
+ 	data_string_forget(&client_id, MDL);
+ 	data_string_forget(&server_id, MDL);
++
++	TRACE(DHCPD_SIX_REQUEST_DONE());
+ }
+ 
+ /* Find a DHCPv6 packet's shared network from hints in the packet.
+@@ -4984,6 +4993,8 @@ dhcpv6_confirm(struct data_string *reply
+ 	struct dhcpv6_packet *reply = (struct dhcpv6_packet *)reply_data;
+ 	int reply_ofs = (int)(offsetof(struct dhcpv6_packet, options));
+ 
++	TRACE(DHCPD_SIX_CONFIRM_START());
++
+ 	/* 
+ 	 * Basic client message validation.
+ 	 */
+@@ -5170,6 +5181,8 @@ exit:
+ 		option_state_dereference(&cli_enc_opt_state, MDL);
+ 	if (opt_state != NULL)
+ 		option_state_dereference(&opt_state, MDL);
++
++	TRACE(DHCPD_SIX_CONFIRM_DONE());
+ }
+ 
+ /*
+@@ -5184,6 +5197,8 @@ dhcpv6_renew(struct data_string *reply,
+ 	struct data_string client_id;
+ 	struct data_string server_id;
+ 
++	TRACE(DHCPD_SIX_RENEW_START());
++
+ 	/* 
+ 	 * Validate the request.
+ 	 */
+@@ -5201,6 +5216,8 @@ dhcpv6_renew(struct data_string *reply,
+ 	 */
+ 	data_string_forget(&server_id, MDL);
+ 	data_string_forget(&client_id, MDL);
++
++	TRACE(DHCPD_SIX_RENEW_DONE());
+ }
+ 
+ /*
+@@ -5214,6 +5231,8 @@ static void
+ dhcpv6_rebind(struct data_string *reply, struct packet *packet) {
+ 	struct data_string client_id;
+ 
++	TRACE(DHCPD_SIX_REBIND_START());
++
+ 	if (!valid_client_msg(packet, &client_id)) {
+ 		return;
+ 	}
+@@ -5221,6 +5240,8 @@ dhcpv6_rebind(struct data_string *reply,
+ 	lease_to_client(reply, packet, &client_id, NULL);
+ 
+ 	data_string_forget(&client_id, MDL);
++
++	TRACE(DHCPD_SIX_REBIND_DONE());
+ }
+ 
+ static void
+@@ -5665,6 +5686,8 @@ dhcpv6_decline(struct data_string *reply
+ 	struct data_string client_id;
+ 	struct data_string server_id;
+ 
++	TRACE(DHCPD_SIX_DECLINE_START());
++
+ 	/* 
+ 	 * Validate our input.
+ 	 */
+@@ -5685,6 +5708,8 @@ dhcpv6_decline(struct data_string *reply
+ 
+ 	data_string_forget(&server_id, MDL);
+ 	data_string_forget(&client_id, MDL);
++
++	TRACE(DHCPD_SIX_DECLINE_DONE());
+ }
+ 
+ static void
+@@ -6133,6 +6158,8 @@ dhcpv6_release(struct data_string *reply
+ 	struct data_string client_id;
+ 	struct data_string server_id;
+ 
++	TRACE(DHCPD_SIX_RELEASE_START());
++
+ 	/* 
+ 	 * Validate our input.
+ 	 */
+@@ -6154,6 +6181,8 @@ dhcpv6_release(struct data_string *reply
+ 
+ 	data_string_forget(&server_id, MDL);
+ 	data_string_forget(&client_id, MDL);
++
++	TRACE(DHCPD_SIX_RELEASE_DONE());
+ }
+ 
+ /*
+@@ -6166,6 +6195,8 @@ dhcpv6_information_request(struct data_s
+ 	struct data_string client_id;
+ 	struct data_string server_id;
+ 
++	TRACE(DHCPD_SIX_INFORMATION_REQUEST_START());
++
+ 	/*
+ 	 * Validate our input.
+ 	 */
+@@ -6197,6 +6228,8 @@ dhcpv6_information_request(struct data_s
+ 		data_string_forget(&client_id, MDL);
+ 	}
+ 	data_string_forget(&server_id, MDL);
++
++	TRACE(DHCPD_SIX_INFORMATION_REQUEST_DONE());
+ }
+ 
+ /* 
+@@ -6225,6 +6258,8 @@ dhcpv6_relay_forw(struct data_string *re
+ 	struct dhcpv6_relay_packet *reply;
+ 	int reply_ofs;
+ 
++	TRACE(DHCPD_SIX_RELAY_FORW_START());
++
+ 	/* 
+ 	 * Initialize variables for early exit.
+ 	 */
+@@ -6484,6 +6519,8 @@ exit:
+ 	if (enc_packet != NULL) {
+ 		packet_dereference(&enc_packet, MDL);
+ 	}
++
++	TRACE(DHCPD_SIX_RELAY_FORW_DONE());
+ }
+ 
+ static void
+diff -up dhcp-4.3.1b1/server/failover.c.systemtap dhcp-4.3.1b1/server/failover.c
+--- dhcp-4.3.1b1/server/failover.c.systemtap	2014-07-02 19:58:40.000000000 +0200
++++ dhcp-4.3.1b1/server/failover.c	2014-07-10 18:31:06.034879442 +0200
+@@ -30,6 +30,8 @@
+ #include "dhcpd.h"
+ #include <omapip/omapip_p.h>
+ 
++#include "trace.h"
++
+ #if defined (FAILOVER_PROTOCOL)
+ dhcp_failover_state_t *failover_states;
+ static isc_result_t do_a_failover_option (omapi_object_t *,
+@@ -1704,6 +1706,8 @@ isc_result_t dhcp_failover_set_state (dh
+     struct lease *l;
+     struct timeval tv;
+ 
++    TRACE(DHCPD_FAILOVER_SET_STATE_START(state->me.state, new_state));
++
+     /* If we're in certain states where we're sending updates, and the peer
+      * state changes, we need to re-schedule any pending updates just to
+      * be on the safe side.  This results in retransmission.
+@@ -1935,6 +1939,8 @@ isc_result_t dhcp_failover_set_state (dh
+ 	    break;
+     }
+ 
++    TRACE(DHCPD_FAILOVER_SET_STATE_DONE());
++
+     return ISC_R_SUCCESS;
+ }
+ 
+@@ -2423,6 +2429,8 @@ dhcp_failover_pool_dobalance(dhcp_failov
+ 	if (state -> me.state != normal)
+ 		return 0;
+ 
++	TRACE(DHCPD_FAILOVER_POOL_DOBALANCE_START());
++
+ 	state->last_balance = cur_time;
+ 
+ 	for (s = shared_networks ; s ; s = s->next) {
+@@ -2583,6 +2591,8 @@ dhcp_failover_pool_dobalance(dhcp_failov
+ 	if (leases_queued)
+ 		commit_leases();
+ 
++	TRACE(DHCPD_FAILOVER_POOL_DOBALANCE_DONE());
++
+ 	return leases_queued;
+ }
+ 
+diff -up dhcp-4.3.1b1/server/Makefile.am.systemtap dhcp-4.3.1b1/server/Makefile.am
+--- dhcp-4.3.1b1/server/Makefile.am.systemtap	2014-07-10 18:31:05.895881408 +0200
++++ dhcp-4.3.1b1/server/Makefile.am	2014-07-10 18:31:06.028879527 +0200
 @@ -10,7 +10,7 @@ dist_sysconf_DATA = dhcpd.conf.example
  sbin_PROGRAMS = dhcpd
  dhcpd_SOURCES = dhcpd.c dhcp.c bootp.c confpars.c db.c class.c failover.c \
@@ -83,425 +499,9 @@ diff -up dhcp-4.3.0a1/server/Makefile.am.systemtap dhcp-4.3.0a1/server/Makefile.
 +
 +dhcpd_LDADD += probes.o
 +endif
-diff -up dhcp-4.3.0a1/server/dhcp.c.systemtap dhcp-4.3.0a1/server/dhcp.c
---- dhcp-4.3.0a1/server/dhcp.c.systemtap	2013-12-20 13:30:26.182644846 +0100
-+++ dhcp-4.3.0a1/server/dhcp.c	2013-12-20 13:32:22.909022163 +0100
-@@ -36,7 +36,7 @@
- #include <errno.h>
- #include <limits.h>
- #include <sys/time.h>
--
-+#include "trace.h"
- static void commit_leases_ackout(void *foo);
- static void maybe_return_agent_options(struct packet *packet,
- 				       struct option_state *options);
-@@ -275,6 +275,8 @@ void dhcpdiscover (packet, ms_nulltp)
- 	dhcp_failover_state_t *peer;
- #endif
- 
-+	TRACE(DHCPD_DISCOVER_START());
-+
- 	find_lease (&lease, packet, packet -> shared_network,
- 		    0, &peer_has_leases, (struct lease *)0, MDL);
- 
-@@ -399,6 +401,8 @@ void dhcpdiscover (packet, ms_nulltp)
-       out:
- 	if (lease)
- 		lease_dereference (&lease, MDL);
-+
-+	TRACE(DHCPD_DISCOVER_DONE());
- }
- 
- void dhcprequest (packet, ms_nulltp, ip_lease)
-@@ -421,6 +425,8 @@ void dhcprequest (packet, ms_nulltp, ip_
- #endif
- 	int have_requested_addr = 0;
- 
-+	TRACE(DHCPD_REQUEST_START());
-+
- 	oc = lookup_option (&dhcp_universe, packet -> options,
- 			    DHO_DHCP_REQUESTED_ADDRESS);
- 	memset (&data, 0, sizeof data);
-@@ -700,6 +706,9 @@ void dhcprequest (packet, ms_nulltp, ip_
- 		log_info ("%s: unknown lease %s.", msgbuf, piaddr (cip));
- 
-       out:
-+
-+	TRACE(DHCPD_REQUEST_DONE());
-+
- 	if (subnet)
- 		subnet_dereference (&subnet, MDL);
- 	if (lease)
-@@ -718,6 +727,7 @@ void dhcprelease (packet, ms_nulltp)
- 	const char *s;
- 	char msgbuf [1024], cstr[16]; /* XXX */
- 
-+	TRACE(DHCPD_RELEASE_START());
- 
- 	/* DHCPRELEASE must not specify address in requested-address
- 	   option, but old protocol specs weren't explicit about this,
-@@ -842,6 +852,8 @@ void dhcprelease (packet, ms_nulltp)
- #endif
- 	if (lease)
- 		lease_dereference (&lease, MDL);
-+
-+	TRACE(DHCPD_RELEASE_DONE());
- }
- 
- void dhcpdecline (packet, ms_nulltp)
-@@ -859,6 +871,8 @@ void dhcpdecline (packet, ms_nulltp)
- 	struct option_cache *oc;
- 	struct data_string data;
- 
-+	TRACE(DHCPD_DECLINE_START());
-+
- 	/* DHCPDECLINE must specify address. */
- 	if (!(oc = lookup_option (&dhcp_universe, packet -> options,
- 				  DHO_DHCP_REQUESTED_ADDRESS)))
-@@ -967,6 +981,8 @@ void dhcpdecline (packet, ms_nulltp)
- 		option_state_dereference (&options, MDL);
- 	if (lease)
- 		lease_dereference (&lease, MDL);
-+
-+	TRACE(DHCPD_DECLINE_DONE());
- }
- 
- void dhcpinform (packet, ms_nulltp)
-@@ -994,6 +1010,8 @@ void dhcpinform (packet, ms_nulltp)
- 	int h_w_fixed_addr = 0;
- #endif
- 
-+	TRACE(DHCPD_INFORM_START());
-+
- 	/* The client should set ciaddr to its IP address, but apparently
- 	   it's common for clients not to do this, so we'll use their IP
- 	   source address if they didn't set ciaddr. */
-@@ -1567,6 +1585,8 @@ void dhcpinform (packet, ms_nulltp)
- 
- 	if (subnet)
- 		subnet_dereference (&subnet, MDL);
-+
-+	TRACE(DHCPD_INFORM_DONE());
- }
- 
- void nak_lease (packet, cip)
-@@ -1583,6 +1603,8 @@ void nak_lease (packet, cip)
- 	struct option_state *options = (struct option_state *)0;
- 	struct option_cache *oc = (struct option_cache *)0;
- 
-+	TRACE(DHCPD_NAK_LEASE_START());
-+
- 	option_state_allocate (&options, MDL);
- 	memset (&outgoing, 0, sizeof outgoing);
- 	memset (&raw, 0, sizeof raw);
-@@ -1749,6 +1771,7 @@ void nak_lease (packet, cip)
-                            packet->interface->name);
-         }
- 
-+	TRACE(DHCPD_NAK_LEASE_DONE());
- }
- 
- void ack_lease (packet, lease, offer, when, msg, ms_nulltp, hp)
-@@ -1792,6 +1815,8 @@ void ack_lease (packet, lease, offer, wh
- 	if (lease -> state)
- 		return;
- 
-+	TRACE(DHCPD_ACK_LEASE_START());
-+
- 	/* Save original cltt for comparison later. */
- 	lease_cltt = lease->cltt;
- 
-@@ -3225,6 +3250,8 @@ void ack_lease (packet, lease, offer, wh
- #endif
- 			dhcp_reply(lease);
- 	}
-+
-+	TRACE(DHCPD_ACK_LEASE_DONE());
- }
- 
- /*
-@@ -3377,6 +3404,8 @@ void dhcp_reply (lease)
- 	if (!state)
- 		log_fatal ("dhcp_reply was supplied lease with no state!");
- 
-+	TRACE(DHCPD_REPLY_START());
-+
- 	/* Compose a response for the client... */
- 	memset (&raw, 0, sizeof raw);
- 	memset (&d1, 0, sizeof d1);
-@@ -3598,6 +3627,8 @@ void dhcp_reply (lease)
- 
- 	free_lease_state (state, MDL);
- 	lease -> state = (struct lease_state *)0;
-+
-+	TRACE(DHCPD_REPLY_DONE());
- }
- 
- int find_lease (struct lease **lp,
-@@ -3620,6 +3651,8 @@ int find_lease (struct lease **lp,
- 	struct data_string client_identifier;
- 	struct hardware h;
- 
-+	TRACE(DHCPD_FIND_LEASE_START());
-+
- #if defined(FAILOVER_PROTOCOL)
- 	/* Quick check to see if the peer has leases. */
- 	if (peer_has_leases) {
-@@ -4347,6 +4380,9 @@ int find_lease (struct lease **lp,
- #if defined (DEBUG_FIND_LEASE)
- 	log_info ("Not returning a lease.");
- #endif
-+
-+	TRACE(DHCPD_FIND_LEASE_DONE());
-+
- 	return 0;
- }
- 
-diff -up dhcp-4.3.0a1/server/dhcpd.c.systemtap dhcp-4.3.0a1/server/dhcpd.c
---- dhcp-4.3.0a1/server/dhcpd.c.systemtap	2013-12-20 13:30:26.281643471 +0100
-+++ dhcp-4.3.0a1/server/dhcpd.c	2013-12-20 13:33:26.013144200 +0100
-@@ -58,6 +58,8 @@ static const char url [] =
- #  undef group
- #endif /* PARANOIA */
- 
-+#include "trace.h"
-+
- #ifndef UNIT_TEST
- static void usage(void);
- #endif
-@@ -793,6 +795,8 @@ main(int argc, char **argv) {
- 	/* Log that we are about to start working */
- 	log_info("Server starting service.");
- 
-+	TRACE(DHCPD_MAIN());
-+
- 	/*
- 	 * Receive packets and dispatch them...
- 	 * dispatch() will never return.
-diff -up dhcp-4.3.0a1/server/dhcpv6.c.systemtap dhcp-4.3.0a1/server/dhcpv6.c
---- dhcp-4.3.0a1/server/dhcpv6.c.systemtap	2013-12-20 13:30:26.272643596 +0100
-+++ dhcp-4.3.0a1/server/dhcpv6.c	2013-12-20 13:33:48.296834064 +0100
-@@ -17,6 +17,7 @@
- /*! \file server/dhcpv6.c */
- 
- #include "dhcpd.h"
-+#include "trace.h"
- 
- #ifdef DHCPv6
- 
-@@ -4763,6 +4764,8 @@ static void
- dhcpv6_solicit(struct data_string *reply_ret, struct packet *packet) {
- 	struct data_string client_id;
- 
-+	TRACE(DHCPD_SIX_SOLICIT_START());
-+
- 	/* 
- 	 * Validate our input.
- 	 */
-@@ -4776,6 +4779,8 @@ dhcpv6_solicit(struct data_string *reply
- 	 * Clean up.
- 	 */
- 	data_string_forget(&client_id, MDL);
-+
-+	TRACE(DHCPD_SIX_SOLICIT_DONE());
- }
- 
- /*
-@@ -4789,6 +4794,8 @@ dhcpv6_request(struct data_string *reply
- 	struct data_string client_id;
- 	struct data_string server_id;
- 
-+	TRACE(DHCPD_SIX_REQUEST_START());
-+
- 	/*
- 	 * Validate our input.
- 	 */
-@@ -4806,6 +4813,8 @@ dhcpv6_request(struct data_string *reply
- 	 */
- 	data_string_forget(&client_id, MDL);
- 	data_string_forget(&server_id, MDL);
-+
-+	TRACE(DHCPD_SIX_REQUEST_DONE());
- }
- 
- /* Find a DHCPv6 packet's shared network from hints in the packet.
-@@ -4918,6 +4927,8 @@ dhcpv6_confirm(struct data_string *reply
- 	struct dhcpv6_packet *reply = (struct dhcpv6_packet *)reply_data;
- 	int reply_ofs = (int)(offsetof(struct dhcpv6_packet, options));
- 
-+	TRACE(DHCPD_SIX_CONFIRM_START());
-+
- 	/* 
- 	 * Basic client message validation.
- 	 */
-@@ -5104,6 +5115,8 @@ exit:
- 		option_state_dereference(&cli_enc_opt_state, MDL);
- 	if (opt_state != NULL)
- 		option_state_dereference(&opt_state, MDL);
-+
-+	TRACE(DHCPD_SIX_CONFIRM_DONE());
- }
- 
- /*
-@@ -5118,6 +5131,8 @@ dhcpv6_renew(struct data_string *reply,
- 	struct data_string client_id;
- 	struct data_string server_id;
- 
-+	TRACE(DHCPD_SIX_RENEW_START());
-+
- 	/* 
- 	 * Validate the request.
- 	 */
-@@ -5135,6 +5150,8 @@ dhcpv6_renew(struct data_string *reply,
- 	 */
- 	data_string_forget(&server_id, MDL);
- 	data_string_forget(&client_id, MDL);
-+
-+	TRACE(DHCPD_SIX_RENEW_DONE());
- }
- 
- /*
-@@ -5148,6 +5165,8 @@ static void
- dhcpv6_rebind(struct data_string *reply, struct packet *packet) {
- 	struct data_string client_id;
- 
-+	TRACE(DHCPD_SIX_REBIND_START());
-+
- 	if (!valid_client_msg(packet, &client_id)) {
- 		return;
- 	}
-@@ -5155,6 +5174,8 @@ dhcpv6_rebind(struct data_string *reply,
- 	lease_to_client(reply, packet, &client_id, NULL);
- 
- 	data_string_forget(&client_id, MDL);
-+
-+	TRACE(DHCPD_SIX_REBIND_DONE());
- }
- 
- static void
-@@ -5599,6 +5620,8 @@ dhcpv6_decline(struct data_string *reply
- 	struct data_string client_id;
- 	struct data_string server_id;
- 
-+	TRACE(DHCPD_SIX_DECLINE_START());
-+
- 	/* 
- 	 * Validate our input.
- 	 */
-@@ -5619,6 +5642,8 @@ dhcpv6_decline(struct data_string *reply
- 
- 	data_string_forget(&server_id, MDL);
- 	data_string_forget(&client_id, MDL);
-+
-+	TRACE(DHCPD_SIX_DECLINE_DONE());
- }
- 
- static void
-@@ -6067,6 +6092,8 @@ dhcpv6_release(struct data_string *reply
- 	struct data_string client_id;
- 	struct data_string server_id;
- 
-+	TRACE(DHCPD_SIX_RELEASE_START());
-+
- 	/* 
- 	 * Validate our input.
- 	 */
-@@ -6088,6 +6115,8 @@ dhcpv6_release(struct data_string *reply
- 
- 	data_string_forget(&server_id, MDL);
- 	data_string_forget(&client_id, MDL);
-+
-+	TRACE(DHCPD_SIX_RELEASE_DONE());
- }
- 
- /*
-@@ -6100,6 +6129,8 @@ dhcpv6_information_request(struct data_s
- 	struct data_string client_id;
- 	struct data_string server_id;
- 
-+	TRACE(DHCPD_SIX_INFORMATION_REQUEST_START());
-+
- 	/*
- 	 * Validate our input.
- 	 */
-@@ -6131,6 +6162,8 @@ dhcpv6_information_request(struct data_s
- 		data_string_forget(&client_id, MDL);
- 	}
- 	data_string_forget(&server_id, MDL);
-+
-+	TRACE(DHCPD_SIX_INFORMATION_REQUEST_DONE());
- }
- 
- /* 
-@@ -6159,6 +6192,8 @@ dhcpv6_relay_forw(struct data_string *re
- 	struct dhcpv6_relay_packet *reply;
- 	int reply_ofs;
- 
-+	TRACE(DHCPD_SIX_RELAY_FORW_START());
-+
- 	/* 
- 	 * Initialize variables for early exit.
- 	 */
-@@ -6418,6 +6453,8 @@ exit:
- 	if (enc_packet != NULL) {
- 		packet_dereference(&enc_packet, MDL);
- 	}
-+
-+	TRACE(DHCPD_SIX_RELAY_FORW_DONE());
- }
- 
- static void
-diff -up dhcp-4.3.0a1/server/failover.c.systemtap dhcp-4.3.0a1/server/failover.c
---- dhcp-4.3.0a1/server/failover.c.systemtap	2013-12-11 01:25:12.000000000 +0100
-+++ dhcp-4.3.0a1/server/failover.c	2013-12-20 13:30:26.314643012 +0100
-@@ -36,6 +36,8 @@
- #include "dhcpd.h"
- #include <omapip/omapip_p.h>
- 
-+#include "trace.h"
-+
- #if defined (FAILOVER_PROTOCOL)
- dhcp_failover_state_t *failover_states;
- static isc_result_t do_a_failover_option (omapi_object_t *,
-@@ -1710,6 +1712,8 @@ isc_result_t dhcp_failover_set_state (dh
-     struct lease *l;
-     struct timeval tv;
- 
-+    TRACE(DHCPD_FAILOVER_SET_STATE_START(state->me.state, new_state));
-+
-     /* If we're in certain states where we're sending updates, and the peer
-      * state changes, we need to re-schedule any pending updates just to
-      * be on the safe side.  This results in retransmission.
-@@ -1941,6 +1945,8 @@ isc_result_t dhcp_failover_set_state (dh
- 	    break;
-     }
- 
-+    TRACE(DHCPD_FAILOVER_SET_STATE_DONE());
-+
-     return ISC_R_SUCCESS;
- }
- 
-@@ -2428,6 +2434,8 @@ dhcp_failover_pool_dobalance(dhcp_failov
- 	if (state -> me.state != normal)
- 		return 0;
- 
-+	TRACE(DHCPD_FAILOVER_POOL_DOBALANCE_START());
-+
- 	state->last_balance = cur_time;
- 
- 	for (s = shared_networks ; s ; s = s->next) {
-@@ -2588,6 +2596,8 @@ dhcp_failover_pool_dobalance(dhcp_failov
- 	if (leases_queued)
- 		commit_leases();
- 
-+	TRACE(DHCPD_FAILOVER_POOL_DOBALANCE_DONE());
-+
- 	return leases_queued;
- }
- 
-diff -up dhcp-4.3.0a1/server/probes.d.systemtap dhcp-4.3.0a1/server/probes.d
---- dhcp-4.3.0a1/server/probes.d.systemtap	2013-12-20 13:30:26.314643012 +0100
-+++ dhcp-4.3.0a1/server/probes.d	2013-12-20 13:30:26.314643012 +0100
+diff -up dhcp-4.3.1b1/server/probes.d.systemtap dhcp-4.3.1b1/server/probes.d
+--- dhcp-4.3.1b1/server/probes.d.systemtap	2014-07-10 18:31:06.034879442 +0200
++++ dhcp-4.3.1b1/server/probes.d	2014-07-10 18:31:06.034879442 +0200
 @@ -0,0 +1,43 @@
 +provider dhcpd {
 +	 probe main();
@@ -546,9 +546,9 @@ diff -up dhcp-4.3.0a1/server/probes.d.systemtap dhcp-4.3.0a1/server/probes.d
 +	 probe failover_set_state_start(int, int);
 +	 probe failover_set_state_done();
 +};
-diff -up dhcp-4.3.0a1/server/tests/Makefile.am.systemtap dhcp-4.3.0a1/server/tests/Makefile.am
---- dhcp-4.3.0a1/server/tests/Makefile.am.systemtap	2013-12-20 13:30:26.315642998 +0100
-+++ dhcp-4.3.0a1/server/tests/Makefile.am	2013-12-20 13:34:57.263873891 +0100
+diff -up dhcp-4.3.1b1/server/tests/Makefile.am.systemtap dhcp-4.3.1b1/server/tests/Makefile.am
+--- dhcp-4.3.1b1/server/tests/Makefile.am.systemtap	2014-07-10 18:31:05.895881408 +0200
++++ dhcp-4.3.1b1/server/tests/Makefile.am	2014-07-10 18:31:06.034879442 +0200
 @@ -21,6 +21,10 @@ DHCPLIBS = $(top_builddir)/common/libdhc
            $(top_builddir)/dhcpctl/libdhcpctl.la \
            $(BIND9_LIBDIR) -lirs-export -ldns-export -lisccfg-export -lisc-export
@@ -560,9 +560,9 @@ diff -up dhcp-4.3.0a1/server/tests/Makefile.am.systemtap dhcp-4.3.0a1/server/tes
  ATF_TESTS =
  TESTS = 
  if HAVE_ATF
-diff -up dhcp-4.3.0a1/server/trace.h.systemtap dhcp-4.3.0a1/server/trace.h
---- dhcp-4.3.0a1/server/trace.h.systemtap	2013-12-20 13:30:26.315642998 +0100
-+++ dhcp-4.3.0a1/server/trace.h	2013-12-20 13:30:26.315642998 +0100
+diff -up dhcp-4.3.1b1/server/trace.h.systemtap dhcp-4.3.1b1/server/trace.h
+--- dhcp-4.3.1b1/server/trace.h.systemtap	2014-07-10 18:31:06.034879442 +0200
++++ dhcp-4.3.1b1/server/trace.h	2014-07-10 18:31:06.034879442 +0200
 @@ -0,0 +1,11 @@
 +// trace.h
 +
@@ -575,39 +575,9 @@ diff -up dhcp-4.3.0a1/server/trace.h.systemtap dhcp-4.3.0a1/server/trace.h
 +// Wrap the probe to allow it to be removed when no systemtap available
 +#define TRACE(probe)
 +#endif
-diff -up dhcp-4.3.0a1/tapset/Makefile.am.systemtap dhcp-4.3.0a1/tapset/Makefile.am
---- dhcp-4.3.0a1/tapset/Makefile.am.systemtap	2013-12-20 13:30:26.315642998 +0100
-+++ dhcp-4.3.0a1/tapset/Makefile.am	2013-12-20 13:30:26.315642998 +0100
-@@ -0,0 +1,26 @@
-+# Makefile.am for dhcp/tapset
-+# Jiri Popelka
-+
-+.PHONY: clean-local install-data-hook uninstall-local
-+
-+#
-+EXTRA_DIST = dhcpd.stp
-+TAPSET_FILES = $(EXTRA_DIST)
-+TAPSET_INSTALL_DIR = $(DESTDIR)@ABS_TAPSET_DIR@
-+
-+if ENABLE_SYSTEMTAP
-+all-local: $(TAPSET_FILES)
-+
-+clean-local:
-+
-+install-data-hook:
-+	$(MKDIR_P) $(TAPSET_INSTALL_DIR)
-+	$(INSTALL_DATA) $(TAPSET_FILES) $(TAPSET_INSTALL_DIR)
-+
-+uninstall-local:
-+	@list='$(TAPSET_FILES)'; for p in $$list; do \
-+	  echo " rm -f '$(TAPSET_INSTALL_DIR)/$$p'"; \
-+	  rm -f "$(TAPSET_INSTALL_DIR)/$$p"; \
-+	done
-+endif
-+
-diff -up dhcp-4.3.0a1/tapset/dhcpd.stp.systemtap dhcp-4.3.0a1/tapset/dhcpd.stp
---- dhcp-4.3.0a1/tapset/dhcpd.stp.systemtap	2013-12-20 13:30:26.315642998 +0100
-+++ dhcp-4.3.0a1/tapset/dhcpd.stp	2013-12-20 13:30:26.315642998 +0100
+diff -up dhcp-4.3.1b1/tapset/dhcpd.stp.systemtap dhcp-4.3.1b1/tapset/dhcpd.stp
+--- dhcp-4.3.1b1/tapset/dhcpd.stp.systemtap	2014-07-10 18:31:06.035879428 +0200
++++ dhcp-4.3.1b1/tapset/dhcpd.stp	2014-07-10 18:31:06.035879428 +0200
 @@ -0,0 +1,212 @@
 +/* dhcpd tapset
 +   Copyright (C) 2011, Red Hat Inc.
@@ -821,3 +791,33 @@ diff -up dhcp-4.3.0a1/tapset/dhcpd.stp.systemtap dhcp-4.3.0a1/tapset/dhcpd.stp
 +{
 +  probestr = sprintf("%s", $$name);
 +}
+diff -up dhcp-4.3.1b1/tapset/Makefile.am.systemtap dhcp-4.3.1b1/tapset/Makefile.am
+--- dhcp-4.3.1b1/tapset/Makefile.am.systemtap	2014-07-10 18:31:06.035879428 +0200
++++ dhcp-4.3.1b1/tapset/Makefile.am	2014-07-10 18:31:06.034879442 +0200
+@@ -0,0 +1,26 @@
++# Makefile.am for dhcp/tapset
++# Jiri Popelka
++
++.PHONY: clean-local install-data-hook uninstall-local
++
++#
++EXTRA_DIST = dhcpd.stp
++TAPSET_FILES = $(EXTRA_DIST)
++TAPSET_INSTALL_DIR = $(DESTDIR)@ABS_TAPSET_DIR@
++
++if ENABLE_SYSTEMTAP
++all-local: $(TAPSET_FILES)
++
++clean-local:
++
++install-data-hook:
++	$(MKDIR_P) $(TAPSET_INSTALL_DIR)
++	$(INSTALL_DATA) $(TAPSET_FILES) $(TAPSET_INSTALL_DIR)
++
++uninstall-local:
++	@list='$(TAPSET_FILES)'; for p in $$list; do \
++	  echo " rm -f '$(TAPSET_INSTALL_DIR)/$$p'"; \
++	  rm -f "$(TAPSET_INSTALL_DIR)/$$p"; \
++	done
++endif
++
