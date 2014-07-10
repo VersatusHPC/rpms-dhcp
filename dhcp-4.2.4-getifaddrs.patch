@@ -1,19 +1,7 @@
-From c09dd24a7d63988e0acef7d033bd3e088fc005c0 Mon Sep 17 00:00:00 2001
-From: Jiri Popelka <jpopelka@redhat.com>
-Date: Thu, 24 Jan 2013 12:39:50 +0100
-Subject: [PATCH] Linux interface discovery
-
-Use the same discovery code as for *BSD and OS X,
-i.e. the getifaddrs() function.
----
- common/discover.c | 398 +++---------------------------------------------------
- 1 file changed, 17 insertions(+), 381 deletions(-)
-
-diff --git a/common/discover.c b/common/discover.c
-index 1d84219..f2a8f6d 100644
---- a/common/discover.c
-+++ b/common/discover.c
-@@ -379,391 +379,13 @@ end_iface_scan(struct iface_conf_list *ifaces) {
+diff -up dhcp-4.2.7b1/common/discover.c.eqpQCB dhcp-4.2.7b1/common/discover.c
+--- dhcp-4.2.7b1/common/discover.c.eqpQCB	2014-07-02 19:58:38.000000000 +0200
++++ dhcp-4.2.7b1/common/discover.c	2014-07-10 19:18:38.749501236 +0200
+@@ -373,391 +373,13 @@ end_iface_scan(struct iface_conf_list *i
  	ifaces->sock = -1;
  }
  
@@ -55,7 +43,7 @@ index 1d84219..f2a8f6d 100644
 - */
 -int 
 -begin_iface_scan(struct iface_conf_list *ifaces) {
--	char buf[256];
+-	char buf[IF_LINE_LENGTH];
 -	int len;
 -	int i;
 -
@@ -128,7 +116,7 @@ index 1d84219..f2a8f6d 100644
 - */
 -static int
 -next_iface4(struct iface_info *info, int *err, struct iface_conf_list *ifaces) {
--	char buf[256];
+-	char buf[IF_LINE_LENGTH];
 -	int len;
 -	char *p;
 -	char *name;
@@ -252,7 +240,7 @@ index 1d84219..f2a8f6d 100644
 - */
 -static int
 -next_iface6(struct iface_info *info, int *err, struct iface_conf_list *ifaces) {
--	char buf[256];
+-	char buf[IF_LINE_LENGTH];
 -	int len;
 -	char *p;
 -	char *name;
@@ -406,7 +394,7 @@ index 1d84219..f2a8f6d 100644
   * function.
   *
   * The getifaddrs() man page describes the use.
-@@ -811,6 +433,8 @@ begin_iface_scan(struct iface_conf_list *ifaces) {
+@@ -805,6 +427,8 @@ begin_iface_scan(struct iface_conf_list
   */
  int
  next_iface(struct iface_info *info, int *err, struct iface_conf_list *ifaces) {
@@ -415,7 +403,7 @@ index 1d84219..f2a8f6d 100644
  	if (ifaces->next == NULL) {
  		*err = 0;
  		return 0;
-@@ -822,8 +446,20 @@ next_iface(struct iface_info *info, int *err, struct iface_conf_list *ifaces) {
+@@ -816,8 +440,20 @@ next_iface(struct iface_info *info, int
  		return 0;
  	}
  	strcpy(info->name, ifaces->next->ifa_name);
@@ -438,6 +426,3 @@ index 1d84219..f2a8f6d 100644
  	info->flags = ifaces->next->ifa_flags;
  	ifaces->next = ifaces->next->ifa_next;
  	*err = 0;
--- 
-1.8.1
-

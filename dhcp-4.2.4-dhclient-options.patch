@@ -1,7 +1,41 @@
-diff -up dhcp-4.2.1b1/client/dhclient.8.man dhcp-4.2.1b1/client/dhclient.8
---- dhcp-4.2.1b1/client/dhclient.8.man	2010-07-14 22:09:34.000000000 +0200
-+++ dhcp-4.2.1b1/client/dhclient.8	2011-01-27 18:19:07.000000000 +0100
-@@ -115,6 +115,33 @@ dhclient - Dynamic Host Configuration Pr
+diff -up dhcp-4.2.7b1/client/clparse.c.gKnyyf dhcp-4.2.7b1/client/clparse.c
+--- dhcp-4.2.7b1/client/clparse.c.gKnyyf	2014-07-02 21:53:30.000000000 +0200
++++ dhcp-4.2.7b1/client/clparse.c	2014-07-10 19:13:31.234863761 +0200
+@@ -148,6 +148,7 @@ isc_result_t read_client_conf ()
+ 	/* Requested lease time, used by DHCPv6 (DHCPv4 uses the option cache)
+ 	 */
+ 	top_level_config.requested_lease = 7200;
++	top_level_config.bootp_broadcast_always = 0;
+ 
+ 	group_allocate (&top_level_config.on_receipt, MDL);
+ 	if (!top_level_config.on_receipt)
+@@ -314,7 +315,8 @@ void read_client_leases ()
+ 	interface-declaration |
+ 	LEASE client-lease-statement |
+ 	ALIAS client-lease-statement |
+-	KEY key-definition */
++	KEY key-definition |
++	BOOTP_BROADCAST_ALWAYS */
+ 
+ void parse_client_statement (cfile, ip, config)
+ 	struct parse *cfile;
+@@ -732,6 +734,12 @@ void parse_client_statement (cfile, ip,
+ 		parse_reject_statement (cfile, config);
+ 		return;
+ 
++	      case BOOTP_BROADCAST_ALWAYS:
++		token = next_token(&val, (unsigned*)0, cfile);
++		config -> bootp_broadcast_always = 1;
++		parse_semi (cfile);
++		return;
++
+ 	      default:
+ 		lose = 0;
+ 		stmt = (struct executable_statement *)0;
+diff -up dhcp-4.2.7b1/client/dhclient.8.gKnyyf dhcp-4.2.7b1/client/dhclient.8
+--- dhcp-4.2.7b1/client/dhclient.8.gKnyyf	2014-07-02 21:53:30.000000000 +0200
++++ dhcp-4.2.7b1/client/dhclient.8	2014-07-10 19:13:31.234863761 +0200
+@@ -118,6 +118,33 @@ dhclient - Dynamic Host Configuration Pr
  .B -w
  ]
  [
@@ -35,7 +69,7 @@ diff -up dhcp-4.2.1b1/client/dhclient.8.man dhcp-4.2.1b1/client/dhclient.8
  .B -v
  ]
  [
-@@ -264,6 +291,69 @@ not to exit when it doesn't find any suc
+@@ -265,6 +292,69 @@ not to exit when it doesn't find any suc
  program can then be used to notify the client when a network interface
  has been added or removed, so that the client can attempt to configure an IP
  address on that interface.
@@ -105,43 +139,9 @@ diff -up dhcp-4.2.1b1/client/dhclient.8.man dhcp-4.2.1b1/client/dhclient.8
  .TP
  .BI \-n
  Do not configure any interfaces.  This is most likely to be useful in
-diff -up dhcp-4.2.4-P2/client/clparse.c.options dhcp-4.2.4-P2/client/clparse.c
---- dhcp-4.2.4-P2/client/clparse.c.options	2012-08-24 21:11:21.000000000 +0200
-+++ dhcp-4.2.4-P2/client/clparse.c	2012-09-26 10:34:27.140049896 +0200
-@@ -154,6 +154,7 @@ isc_result_t read_client_conf ()
- 	/* Requested lease time, used by DHCPv6 (DHCPv4 uses the option cache)
- 	 */
- 	top_level_config.requested_lease = 7200;
-+	top_level_config.bootp_broadcast_always = 0;
- 
- 	group_allocate (&top_level_config.on_receipt, MDL);
- 	if (!top_level_config.on_receipt)
-@@ -320,7 +321,8 @@ void read_client_leases ()
- 	interface-declaration |
- 	LEASE client-lease-statement |
- 	ALIAS client-lease-statement |
--	KEY key-definition */
-+	KEY key-definition |
-+	BOOTP_BROADCAST_ALWAYS */
- 
- void parse_client_statement (cfile, ip, config)
- 	struct parse *cfile;
-@@ -739,6 +741,12 @@ void parse_client_statement (cfile, ip,
- 		parse_reject_statement (cfile, config);
- 		return;
- 
-+	      case BOOTP_BROADCAST_ALWAYS:
-+		token = next_token(&val, (unsigned*)0, cfile);
-+		config -> bootp_broadcast_always = 1;
-+		parse_semi (cfile);
-+		return;
-+
- 	      default:
- 		lose = 0;
- 		stmt = (struct executable_statement *)0;
-diff -up dhcp-4.2.4-P2/client/dhclient.c.options dhcp-4.2.4-P2/client/dhclient.c
---- dhcp-4.2.4-P2/client/dhclient.c.options	2012-08-28 04:13:03.000000000 +0200
-+++ dhcp-4.2.4-P2/client/dhclient.c	2012-09-26 10:36:10.396967531 +0200
+diff -up dhcp-4.2.7b1/client/dhclient.c.gKnyyf dhcp-4.2.7b1/client/dhclient.c
+--- dhcp-4.2.7b1/client/dhclient.c.gKnyyf	2014-07-02 21:53:30.000000000 +0200
++++ dhcp-4.2.7b1/client/dhclient.c	2014-07-10 19:14:14.670247569 +0200
 @@ -39,6 +39,12 @@
  #include <limits.h>
  #include <dns/result.h>
@@ -181,9 +181,9 @@ diff -up dhcp-4.2.4-P2/client/dhclient.c.options dhcp-4.2.4-P2/client/dhclient.c
  
  	/* Initialize client globals. */
  	memset(&default_duid, 0, sizeof(default_duid));
-@@ -310,6 +328,88 @@ main(int argc, char **argv) {
- 		} else if (!strcmp(argv[i], "--version")) {
- 			log_info("isc-dhclient-%s", PACKAGE_VERSION);
+@@ -316,6 +334,88 @@ main(int argc, char **argv) {
+ 					 strlen(PACKAGE_VERSION)));
+ 			IGNORE_RET(write(STDERR_FILENO, "\n", 1));
  			exit(0);
 +		} else if (!strcmp(argv[i], "-I")) {
 +			if ((++i == argc) || (argv[i] == NULL) || (*(argv[i])=='\0')) {
@@ -270,7 +270,7 @@ diff -up dhcp-4.2.4-P2/client/dhclient.c.options dhcp-4.2.4-P2/client/dhclient.c
  		} else if (argv[i][0] == '-') {
  		    usage();
  		} else if (interfaces_requested < 0) {
-@@ -484,6 +584,156 @@ main(int argc, char **argv) {
+@@ -497,6 +597,156 @@ main(int argc, char **argv) {
  	/* Parse the dhclient.conf file. */
  	read_client_conf();
  
@@ -427,7 +427,7 @@ diff -up dhcp-4.2.4-P2/client/dhclient.c.options dhcp-4.2.4-P2/client/dhclient.c
  	/* Parse the lease database. */
  	read_client_leases();
  
-@@ -715,6 +965,10 @@ static void usage()
+@@ -735,6 +985,10 @@ static void usage()
  		  "                [-s server-addr] [-cf config-file] "
  		  "[-lf lease-file]\n"
  		  "                [-pf pid-file] [--no-pid] [-e VAR=val]\n"
@@ -438,7 +438,7 @@ diff -up dhcp-4.2.4-P2/client/dhclient.c.options dhcp-4.2.4-P2/client/dhclient.c
  		  "                [-sf script-file] [interface]");
  }
  
-@@ -2421,7 +2675,8 @@ void make_discover (client, lease)
+@@ -2456,7 +2710,8 @@ void make_discover (client, lease)
  	client -> packet.xid = random ();
  	client -> packet.secs = 0; /* filled in by send_discover. */
  
@@ -448,7 +448,7 @@ diff -up dhcp-4.2.4-P2/client/dhclient.c.options dhcp-4.2.4-P2/client/dhclient.c
  		client -> packet.flags = 0;
  	else
  		client -> packet.flags = htons (BOOTP_BROADCAST);
-@@ -2505,7 +2760,9 @@ void make_request (client, lease)
+@@ -2540,7 +2795,9 @@ void make_request (client, lease)
  	} else {
  		memset (&client -> packet.ciaddr, 0,
  			sizeof client -> packet.ciaddr);
@@ -459,7 +459,7 @@ diff -up dhcp-4.2.4-P2/client/dhclient.c.options dhcp-4.2.4-P2/client/dhclient.c
  			client -> packet.flags = 0;
  		else
  			client -> packet.flags = htons (BOOTP_BROADCAST);
-@@ -2567,7 +2824,8 @@ void make_decline (client, lease)
+@@ -2602,7 +2859,8 @@ void make_decline (client, lease)
  	client -> packet.hops = 0;
  	client -> packet.xid = client -> xid;
  	client -> packet.secs = 0; /* Filled in by send_request. */
@@ -469,10 +469,10 @@ diff -up dhcp-4.2.4-P2/client/dhclient.c.options dhcp-4.2.4-P2/client/dhclient.c
  		client -> packet.flags = 0;
  	else
  		client -> packet.flags = htons (BOOTP_BROADCAST);
-diff -up dhcp-4.2.4-P2/common/conflex.c.options dhcp-4.2.4-P2/common/conflex.c
---- dhcp-4.2.4-P2/common/conflex.c.options	2012-08-28 04:13:03.000000000 +0200
-+++ dhcp-4.2.4-P2/common/conflex.c	2012-09-26 10:34:27.142049876 +0200
-@@ -808,6 +808,8 @@ intern(char *atom, enum dhcp_token dfv)
+diff -up dhcp-4.2.7b1/common/conflex.c.gKnyyf dhcp-4.2.7b1/common/conflex.c
+--- dhcp-4.2.7b1/common/conflex.c.gKnyyf	2014-07-02 21:53:30.000000000 +0200
++++ dhcp-4.2.7b1/common/conflex.c	2014-07-10 19:13:31.237863718 +0200
+@@ -811,6 +811,8 @@ intern(char *atom, enum dhcp_token dfv)
  			return BALANCE;
  		if (!strcasecmp (atom + 1, "ound"))
  			return BOUND;
@@ -481,10 +481,10 @@ diff -up dhcp-4.2.4-P2/common/conflex.c.options dhcp-4.2.4-P2/common/conflex.c
  		break;
  	      case 'c':
  		if (!strcasecmp(atom + 1, "ase"))
-diff -up dhcp-4.2.4-P2/includes/dhcpd.h.options dhcp-4.2.4-P2/includes/dhcpd.h
---- dhcp-4.2.4-P2/includes/dhcpd.h.options	2012-08-28 04:13:22.000000000 +0200
-+++ dhcp-4.2.4-P2/includes/dhcpd.h	2012-09-26 10:34:27.143049865 +0200
-@@ -1153,6 +1153,9 @@ struct client_config {
+diff -up dhcp-4.2.7b1/includes/dhcpd.h.gKnyyf dhcp-4.2.7b1/includes/dhcpd.h
+--- dhcp-4.2.7b1/includes/dhcpd.h.gKnyyf	2014-07-02 21:53:30.000000000 +0200
++++ dhcp-4.2.7b1/includes/dhcpd.h	2014-07-10 19:13:31.237863718 +0200
+@@ -1148,6 +1148,9 @@ struct client_config {
  	int do_forward_update;		/* If nonzero, and if we have the
  					   information we need, update the
  					   A record for the address we get. */
@@ -494,10 +494,10 @@ diff -up dhcp-4.2.4-P2/includes/dhcpd.h.options dhcp-4.2.4-P2/includes/dhcpd.h
  };
  
  /* Per-interface state used in the dhcp client... */
-diff -up dhcp-4.2.4-P2/includes/dhctoken.h.options dhcp-4.2.4-P2/includes/dhctoken.h
---- dhcp-4.2.4-P2/includes/dhctoken.h.options	2012-08-28 04:13:03.000000000 +0200
-+++ dhcp-4.2.4-P2/includes/dhctoken.h	2012-09-26 10:34:27.144049854 +0200
-@@ -364,7 +364,8 @@ enum dhcp_token {
+diff -up dhcp-4.2.7b1/includes/dhctoken.h.gKnyyf dhcp-4.2.7b1/includes/dhctoken.h
+--- dhcp-4.2.7b1/includes/dhctoken.h.gKnyyf	2014-07-02 21:53:30.000000000 +0200
++++ dhcp-4.2.7b1/includes/dhctoken.h	2014-07-10 19:13:31.237863718 +0200
+@@ -359,7 +359,8 @@ enum dhcp_token {
  	GETHOSTBYNAME = 665,
  	PRIMARY6 = 666,
  	SECONDARY6 = 667,

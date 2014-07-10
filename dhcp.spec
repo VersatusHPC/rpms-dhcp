@@ -9,16 +9,16 @@
 
 
 #%%global patchver P2
-#%%global prever rc1
+%global prever b1
 
 #%%global VERSION %{version}-%{patchver}
-#%%global VERSION %{version}%{prever}
-%global VERSION %{version}
+#%%global VERSION %{version}
+%global VERSION %{version}%{prever}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
-Version:  4.2.6
-Release:  5%{?dist}
+Version:  4.2.7
+Release:  0.1.%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -51,10 +51,10 @@ Patch14:  dhcp-4.2.0-garbage-chars.patch
 Patch17:  dhcp-4.2.0-add_timeout_when_NULL.patch
 Patch18:  dhcp-4.2.6-64_bit_lease_parse.patch
 Patch19:  dhcp-4.2.6-capability.patch
-Patch20:  dhcp-4.2.0-logpid.patch
+
 Patch21:  dhcp-4.2.4-UseMulticast.patch
 Patch22:  dhcp-4.2.5-sendDecline.patch
-Patch23:  dhcp-4.2.1-retransmission.patch
+
 Patch25:  dhcp-4.2.5-rfc3442-classless-static-routes.patch
 Patch27:  dhcp-4.2.0-honor-expired.patch
 Patch28:  dhcp-4.2.6-remove-bind.patch
@@ -66,17 +66,17 @@ Patch33:  dhcp-4.2.6-lpf-ib.patch
 Patch34:  dhcp-4.2.4-improved-xid.patch
 Patch35:  dhcp-4.2.2-gpxe-cid.patch
 Patch36:  dhcp-4.2.6-systemtap.patch
-Patch37:  dhcp-4.2.3-dhclient-decline-onetry.patch
+
 Patch38:  dhcp-4.2.3-P2-log_perror.patch
 Patch39:  dhcp-4.2.4-getifaddrs.patch
 Patch40:  dhcp-4.2.5-omapi-leak.patch
 Patch41:  dhcp-4.2.5-rfc5970-dhcpv6-options-for-network-boot.patch
 Patch42:  dhcp-4.2.4-failOverPeer.patch 
 Patch44:  dhcp-4.2.4-P1-interval.patch
-Patch45:  dhcp-4.2.4-P2-conflex-do-forward-updates.patch
-Patch46:  dhcp-4.2.4-P2-dupl-key.patch
+
+
 Patch47:  dhcp-4.2.5-range6.patch
-Patch48:  dhcp-4.2.5-next-server.patch
+
 Patch49:  dhcp-no-subnet-error2info.patch
 Patch50:  dhcp-ffff-checksum.patch
 
@@ -241,10 +241,6 @@ rm -rf includes/isc-dhcp
 # dhclient (#517649, #546765), dhcpd/dhcrelay (#699713)
 %patch19 -p1 -b .capability
 
-# dhclient logs its pid to make troubleshooting NM managed systems
-# with multiple dhclients running easier (#546792)
-%patch20 -p1 -b .logpid
-
 # Discard unicast Request/Renew/Release/Decline message
 # (unless we set unicast option) and respond with Reply
 # with UseMulticast Status Code option (#573090)
@@ -256,13 +252,6 @@ rm -rf includes/isc-dhcp
 # as described in section 18.1.7 of RFC-3315 (#559147)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #21237])
 %patch22 -p1 -b .sendDecline
-
-# In client initiated message exchanges stop retransmission
-# upon reaching the MRD rather than at some point after it (#559153)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #21238])
-# It causes RHBZ#1026565 and because we carry it around *only* to silence TAHI
-# tests, un-apply it until I find out how to fix it.
-#%%patch23 -p1 -b .retransmission
 
 # RFC 3442 - Classless Static Route Option for DHCPv4 (#516325)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24572])
@@ -293,11 +282,6 @@ rm -rf includes/isc-dhcp
 # http://sourceware.org/systemtap/wiki/SystemTap
 %patch36 -p1 -b .systemtap
 
-# Send DHCPDECLINE and exit(2) when duplicate address was detected and
-# dhclient had been started with '-1' (#756759).
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #26735])
-%patch37 -p1 -b .decline-onetry
-
 # Don't send log messages to the standard error descriptor by default (#790387)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28049])
 %patch38 -p1 -b .log_perror
@@ -321,21 +305,9 @@ rm -rf includes/isc-dhcp
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28038])
 %patch44 -p1 -b .interval
 
-# do-forward-updates statement wasn't recognized (#863646)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #31328])
-%patch45 -p1 -b .forward-updates
-
-# multiple key statements in zone definition causes inappropriate error (#873794)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #31892])
-%patch46 -p1 -b .dupl-key
-
 # Make sure range6 is correct for subnet6 where it's declared (#902966)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #32453])
 %patch47 -p1 -b .range6
-
-# Expose next-server DHCPv4 option to dhclient script
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #33098])
-%patch48 -p1 -b .next-server
 
 # 'No subnet declaration for <iface>' should be info, not error.
 %patch49 -p1 -b .error2info
@@ -629,6 +601,9 @@ done
 
 
 %changelog
+* Thu Jul 10 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.7-0.1.b1
+- 4.2.7b1
+
 * Tue Jun 17 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.6-5
 - keep sending client-id in dhclient.conf (#560361#c44)
 
