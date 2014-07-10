@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.2.7
-Release:  0.1.%{prever}%{?dist}
+Release:  0.2.%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -351,6 +351,7 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --with-ldapcrypto \
     --with-libbind=%{_includedir} --with-libbind-libs=%{_libdir} \
     --disable-static \
+    --enable-log-pid \
 %if %sdt
     --enable-systemtap \
     --with-tapset-install-dir=%{tapsetdir} \
@@ -601,6 +602,9 @@ done
 
 
 %changelog
+* Thu Jul 10 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.7-0.2.b1
+- build with --enable-log-pid
+
 * Thu Jul 10 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.7-0.1.b1
 - 4.2.7b1
 
