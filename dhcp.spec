@@ -53,26 +53,26 @@ Patch13:  dhcp-garbage-chars.patch
 Patch14:  dhcp-add_timeout_when_NULL.patch
 Patch15:  dhcp-64_bit_lease_parse.patch
 Patch16:  dhcp-capability.patch
-Patch18:  dhcp-UseMulticast.patch
-Patch19:  dhcp-sendDecline.patch
-Patch21:  dhcp-rfc3442-classless-static-routes.patch
-Patch22:  dhcp-honor-expired.patch
-Patch23:  dhcp-PPP.patch
-Patch24:  dhcp-paranoia.patch
-Patch25:  dhcp-lpf-ib.patch
-Patch26:  dhcp-IPoIB-log-id.patch
-Patch27:  dhcp-improved-xid.patch
-Patch28:  dhcp-gpxe-cid.patch
-Patch29:  dhcp-duidv4.patch
-Patch30:  dhcp-systemtap.patch
-Patch33:  dhcp-getifaddrs.patch
-Patch34:  dhcp-omapi-leak.patch
-Patch35:  dhcp-failOverPeer.patch
-Patch36:  dhcp-interval.patch
-Patch39:  dhcp-range6.patch
-Patch41:  dhcp-no-subnet-error2info.patch
-Patch42:  dhcp-ffff-checksum.patch
-Patch43:  dhcp-sd_notify.patch
+Patch17:  dhcp-UseMulticast.patch
+Patch18:  dhcp-sendDecline.patch
+Patch19:  dhcp-rfc3442-classless-static-routes.patch
+Patch20:  dhcp-honor-expired.patch
+Patch21:  dhcp-PPP.patch
+Patch22:  dhcp-paranoia.patch
+Patch23:  dhcp-lpf-ib.patch
+Patch24:  dhcp-IPoIB-log-id.patch
+Patch25:  dhcp-improved-xid.patch
+Patch26:  dhcp-gpxe-cid.patch
+Patch27:  dhcp-duidv4.patch
+Patch28:  dhcp-systemtap.patch
+Patch29:  dhcp-getifaddrs.patch
+Patch30:  dhcp-omapi-leak.patch
+Patch31:  dhcp-failOverPeer.patch
+Patch32:  dhcp-interval.patch
+Patch33:  dhcp-range6.patch
+Patch34:  dhcp-no-subnet-error2info.patch
+Patch35:  dhcp-ffff-checksum.patch
+Patch36:  dhcp-sd_notify.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -250,73 +250,73 @@ rm -rf includes/isc-dhcp
 # (unless we set unicast option) and respond with Reply
 # with UseMulticast Status Code option (#573090)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #21235])
-%patch18 -p1 -b .UseMulticast
+%patch17 -p1 -b .UseMulticast
 
 # If any of the bound addresses are found to be in use on the link,
 # the dhcpv6 client sends a Decline message to the server
 # as described in section 18.1.7 of RFC-3315 (#559147)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #21237])
-%patch19 -p1 -b .sendDecline
+%patch18 -p1 -b .sendDecline
 
 # RFC 3442 - Classless Static Route Option for DHCPv4 (#516325)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24572])
-%patch21 -p1 -b .rfc3442
+%patch19 -p1 -b .rfc3442
 
 # check whether there is any unexpired address in previous lease
 # prior to confirming (INIT-REBOOT) the lease (#585418)
 # (Submitted to dhcp-suggest@isc.org - [ISC-Bugs #22675])
-%patch22 -p1 -b .honor-expired
+%patch20 -p1 -b .honor-expired
 
 # DHCPv6 over PPP support (#626514)
-%patch23 -p1 -b .PPP
+%patch21 -p1 -b .PPP
 
 # dhcpd: BEFORE changing of the effective user/group ID:
 #  - chown leases file (#866714)
-%patch24 -p1 -b .paranoia
+%patch22 -p1 -b .paranoia
 
 # IPoIB support (#660681)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24249])
-%patch25 -p1 -b .lpf-ib
+%patch23 -p1 -b .lpf-ib
 # add GUID/DUID to dhcpd logs (#1064416)
-%patch26 -p1 -b .IPoIB-log-id
-%patch27 -p1 -b .improved-xid
+%patch24 -p1 -b .IPoIB-log-id
+%patch25 -p1 -b .improved-xid
 # create client identifier per rfc4390
-#%%patch28 -p1 -b .gpxe-cid (not needed as we use DUIDs - see next patch)
+#%%patch26 -p1 -b .gpxe-cid (not needed as we use DUIDs - see next patch)
 # Turn on creating/sending of DUID as client identifier with DHCPv4 clients (#560361c#40, rfc4361)
-%patch29 -p1 -b .duidv4
+%patch27 -p1 -b .duidv4
 
 # http://sourceware.org/systemtap/wiki/SystemTap
-%patch30 -p1 -b .systemtap
+%patch28 -p1 -b .systemtap
 
 # Use getifaddrs() to scan for interfaces on Linux (#449946)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28761])
-%patch33 -p1 -b .getifaddrs
+%patch29 -p1 -b .getifaddrs
 
 # Fix several memory leaks in omapi (#978420)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #33990])
-%patch34 -p1 -b .leak
+%patch30 -p1 -b .leak
 
 # Dhcpd does not correctly follow DhcpFailOverPeerDN (#838400)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30402])
-%patch35 -p1 -b .failOverPeer
+%patch31 -p1 -b .failOverPeer
 
 # isc_time_nowplusinterval() is not safe with 64-bit time_t (#662254, #789601)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28038])
-%patch36 -p1 -b .interval
+%patch32 -p1 -b .interval
 
 # Make sure range6 is correct for subnet6 where it's declared (#902966)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #32453])
-%patch39 -p1 -b .range6
+%patch33 -p1 -b .range6
 
 # 'No subnet declaration for <iface>' should be info, not error.
-%patch41 -p1 -b .error2info
+%patch34 -p1 -b .error2info
 
 # dhcpd rejects the udp packet with checksum=0xffff (#1015997)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #25587])
-%patch42 -p1 -b .ffff
+%patch35 -p1 -b .ffff
 
 # support for sending startup notification to systemd (#1077666)
-%patch43 -p1 -b .sd_notify
+%patch36 -p1 -b .sd_notify
 
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
