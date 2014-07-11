@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  0.1.%{prever}%{?dist}
+Release:  0.2.%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -569,7 +569,9 @@ done
 %attr(0644,root,root) %{_mandir}/man8/dhclient-script.8.gz
 
 %files common
-%doc LICENSE README RELNOTES doc/References.txt
+%{!?_licensedir:%global license %%doc}
+%license LICENSE
+%doc README RELNOTES doc/References.txt
 %attr(0644,root,root) %{_mandir}/man5/dhcp-options.5.gz
 %attr(0644,root,root) %{_mandir}/man5/dhcp-eval.5.gz
 
@@ -590,6 +592,9 @@ done
 %doc doc/html/
 
 %changelog
+* Fri Jul 11 2014 Tom Callaway <spot@fedoraproject.org> 12:4.3.1-0.2.b1
+- fix license handling
+
 * Thu Jul 10 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.1.b1
 - 4.3.1b1
 
