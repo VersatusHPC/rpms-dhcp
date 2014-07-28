@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  0.3.%{prever}%{?dist}
+Release:  0.4.%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -92,7 +92,7 @@ BuildRequires: systemtap-sdt-devel
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Requires(pre): shadow-utils
-Requires(post): coreutils
+Requires(post): coreutils grep sed
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
@@ -110,9 +110,38 @@ configuration information (IP address, subnetmask, broadcast address,
 etc.) from a DHCP server. The overall purpose of DHCP is to make it
 easier to administer a large network.
 
-To use DHCP on your network, install a DHCP service (or relay agent),
-and on clients run a DHCP client daemon.  The dhcp package provides
-the ISC DHCP service and relay agent.
+This package provides the ISC DHCP server.
+
+%package relay
+Summary: Provides the ISC DHCP relay agent.
+Requires: %{name}-common = %{epoch}:%{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires(post): grep sed
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): systemd
+
+%description relay
+DHCP (Dynamic Host Configuration Protocol) is a protocol which allows
+individual devices on an IP network to get their own network
+configuration information (IP address, subnetmask, broadcast address,
+etc.) from a DHCP server. The overall purpose of DHCP is to make it
+easier to administer a large network.
+
+This package provides the ISC DHCP relay agent.
+
+%package compat
+Summary: Utility package to help transition
+Obsoletes: dhcp < 12:4.3.1-0.4.b1
+Requires:  dhcp = %{epoch}:%{version}-%{release}
+Requires:  %{name}-relay = %{epoch}:%{version}-%{release}
+
+
+%description compat
+This package only exists to help transition dhcp users to the new
+package split (dhcp -> dhcp & dhcrelay).
+It will be removed after one distribution release cycle, please
+do not reference it or depend on it in any way.
 
 %package -n dhclient
 Summary: Provides the ISC DHCP client daemon and dhclient-script
@@ -128,13 +157,11 @@ configuration information (IP address, subnetmask, broadcast address,
 etc.) from a DHCP server. The overall purpose of DHCP is to make it
 easier to administer a large network.
 
-To use DHCP on your network, install a DHCP service (or relay agent),
-and on clients run a DHCP client daemon.  The dhclient package
-provides the ISC DHCP client daemon.
+This package provides the ISC DHCP client.
 
 %package common
-Summary: Common files used by ISC dhcp client and server
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Summary: Common files used by ISC dhcp client, server and relay agent
+BuildArch: noarch
 
 %description common
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows
@@ -474,11 +501,23 @@ exit 0
 
 %post
 # Initial installation
-%systemd_post dhcpd.service dhcpd6.service dhcrelay.service
+%systemd_post dhcpd.service dhcpd6.service
 
 chown -R dhcpd:dhcpd %{_localstatedir}/lib/dhcpd/
 
-for servicename in dhcpd dhcpd6 dhcrelay; do
+for servicename in dhcpd dhcpd6; do
+  etcservicefile=%{_sysconfdir}/systemd/system/${servicename}.service
+  if [ -f ${etcservicefile} ]; then
+    grep -q Type= ${etcservicefile} || sed -i '/\[Service\]/a Type=notify' ${etcservicefile}
+  fi
+done
+exit 0
+
+%post relay
+# Initial installation
+%systemd_post dhcrelay.service
+
+for servicename in dhcrelay; do
   etcservicefile=%{_sysconfdir}/systemd/system/${servicename}.service
   if [ -f ${etcservicefile} ]; then
     grep -q Type= ${etcservicefile} || sed -i '/\[Service\]/a Type=notify' ${etcservicefile}
@@ -488,12 +527,20 @@ exit 0
 
 %preun
 # Package removal, not upgrade
-%systemd_preun dhcpd.service dhcpd6.service dhcrelay.service
+%systemd_preun dhcpd.service dhcpd6.service
+
+%preun relay
+# Package removal, not upgrade
+%systemd_preun dhcrelay.service
 
 
 %postun
 # Package upgrade, not uninstall
-%systemd_postun_with_restart dhcpd.service dhcpd6.service dhcrelay.service
+%systemd_postun_with_restart dhcpd.service dhcpd6.service
+
+%postun relay
+# Package upgrade, not uninstall
+%systemd_postun_with_restart dhcrelay.service
 
 
 %post libs -p /sbin/ldconfig
@@ -539,18 +586,22 @@ done
 %{_sysconfdir}/NetworkManager/dispatcher.d/12-dhcpd
 %attr(0644,root,root)   %{_unitdir}/dhcpd.service
 %attr(0644,root,root)   %{_unitdir}/dhcpd6.service
-%attr(0644,root,root)   %{_unitdir}/dhcrelay.service
 %{_sbindir}/dhcpd
-%{_sbindir}/dhcrelay
 %{_bindir}/omshell
 %attr(0644,root,root) %{_mandir}/man1/omshell.1.gz
 %attr(0644,root,root) %{_mandir}/man5/dhcpd.conf.5.gz
 %attr(0644,root,root) %{_mandir}/man5/dhcpd.leases.5.gz
 %attr(0644,root,root) %{_mandir}/man8/dhcpd.8.gz
-%attr(0644,root,root) %{_mandir}/man8/dhcrelay.8.gz
 %if %sdt
 %{tapsetdir}/*.stp
 %endif
+
+%files relay
+%{_sbindir}/dhcrelay
+%attr(0644,root,root) %{_unitdir}/dhcrelay.service
+%attr(0644,root,root) %{_mandir}/man8/dhcrelay.8.gz
+
+%files compat
 
 %files -n dhclient
 %doc client/dhclient.conf.example client/dhclient6.conf.example README.dhclient.d
@@ -592,6 +643,9 @@ done
 %doc doc/html/
 
 %changelog
+* Mon Jul 28 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.4.b1
+- dhcrelay subpackage
+
 * Tue Jul 22 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.3.b1
 - Use network-online.target instead of network.target (#1120656)
 
