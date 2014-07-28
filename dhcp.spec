@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  0.4.%{prever}%{?dist}
+Release:  0.5.%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -89,6 +89,17 @@ BuildRequires: systemtap-sdt-devel
 %global tapsetdir    /usr/share/systemtap/tapset
 %endif
 
+# In _docdir we ship some perl scripts and module from contrib subdirectory.
+# Because nothing under _docdir is allowed to "require" anything,
+# prevent _docdir from being scanned. (#674058)
+%filter_requires_in %{_docdir}
+%filter_setup
+
+%description
+DHCP (Dynamic Host Configuration Protocol)
+
+%package server
+Summary: Provides the ISC DHCP server.
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Requires(pre): shadow-utils
@@ -97,13 +108,7 @@ Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
 
-# In _docdir we ship some perl scripts and module from contrib subdirectory.
-# Because nothing under _docdir is allowed to "require" anything,
-# prevent _docdir from being scanned. (#674058)
-%filter_requires_in %{_docdir}
-%filter_setup
-
-%description
+%description server
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows
 individual devices on an IP network to get their own network
 configuration information (IP address, subnetmask, broadcast address,
@@ -133,9 +138,8 @@ This package provides the ISC DHCP relay agent.
 %package compat
 Summary: Utility package to help transition
 Obsoletes: dhcp < 12:4.3.1-0.4.b1
-Requires:  dhcp = %{epoch}:%{version}-%{release}
+Requires:  %{name}-server = %{epoch}:%{version}-%{release}
 Requires:  %{name}-relay = %{epoch}:%{version}-%{release}
-
 
 %description compat
 This package only exists to help transition dhcp users to the new
@@ -486,7 +490,7 @@ EOF
 # Don't package libtool *.la files
 find ${RPM_BUILD_ROOT}/%{_libdir} -name '*.la' -exec '/bin/rm' '-f' '{}' ';';
 
-%pre
+%pre server
 # /usr/share/doc/setup/uidgid
 %global gid_uid 177
 getent group dhcpd >/dev/null || groupadd --force --gid %{gid_uid} --system dhcpd
@@ -499,7 +503,7 @@ if ! getent passwd dhcpd >/dev/null ; then
 fi
 exit 0
 
-%post
+%post server
 # Initial installation
 %systemd_post dhcpd.service dhcpd6.service
 
@@ -525,7 +529,7 @@ for servicename in dhcrelay; do
 done
 exit 0
 
-%preun
+%preun server
 # Package removal, not upgrade
 %systemd_preun dhcpd.service dhcpd6.service
 
@@ -534,7 +538,7 @@ exit 0
 %systemd_preun dhcrelay.service
 
 
-%postun
+%postun server
 # Package upgrade, not uninstall
 %systemd_postun_with_restart dhcpd.service dhcpd6.service
 
@@ -570,7 +574,7 @@ for servicename in dhcpd dhcpd6 dhcrelay; do
   fi
 done
 
-%files
+%files server
 %doc server/dhcpd.conf.example server/dhcpd6.conf.example
 %doc contrib/ldap/ contrib/dhcp-lease-list.pl
 %attr(0750,root,root) %dir %{dhcpconfdir}
@@ -643,6 +647,9 @@ done
 %doc doc/html/
 
 %changelog
+* Mon Jul 28 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.5.b1
+- server subpackage
+
 * Mon Jul 28 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.4.b1
 - dhcrelay subpackage
 
