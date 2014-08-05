@@ -720,9 +720,16 @@ case "${reason}" in
         if arping -D -q -c2 -I ${interface} ${new_ip_address}; then
             dhconfig
             exit_with_hooks 0
-        else
-            # DAD failed, i.e. address is already in use
-            exit_with_hooks 1
+        else  # DAD failed, i.e. address is already in use
+            ARP_REPLY=$(arping -D -c2 -I ${interface} ${new_ip_address} | grep reply | awk '{print toupper($5)}' | cut -d "[" -f2 | cut -d "]" -f1)
+            OUR_MACS=$(ip link show | grep link | awk '{print toupper($2)}' | uniq)
+            if [[ "${OUR_MACS}" = *"${ARP_REPLY}"* ]]; then
+                # the reply can come from our system, that's OK (#1116004#c33)
+                dhconfig
+                exit_with_hooks 0
+            else
+                exit_with_hooks 1
+            fi
         fi
         ;;
 

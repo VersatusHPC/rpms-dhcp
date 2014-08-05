@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  0.3.%{prever}%{?dist}
+Release:  0.4.%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -117,7 +117,7 @@ the ISC DHCP service and relay agent.
 %package -n dhclient
 Summary: Provides the ISC DHCP client daemon and dhclient-script
 # dhclient-script requires:
-Requires: coreutils grep hostname initscripts iproute iputils sed
+Requires: coreutils grep hostname initscripts iproute iputils sed gawk
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
@@ -592,6 +592,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Aug 05 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.4.b1
+- dhclient-script: it's OK if the arping reply comes from our system (#1116004)
+
 * Tue Jul 22 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.3.b1
 - Use network-online.target instead of network.target (#1120656)
 
