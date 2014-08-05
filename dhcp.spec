@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  0.5.%{prever}%{?dist}
+Release:  0.6.%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -99,7 +99,7 @@ BuildRequires: systemtap-sdt-devel
 DHCP (Dynamic Host Configuration Protocol)
 
 %package server
-Summary: Provides the ISC DHCP server.
+Summary: Provides the ISC DHCP server
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Requires(pre): shadow-utils
@@ -118,7 +118,7 @@ easier to administer a large network.
 This package provides the ISC DHCP server.
 
 %package relay
-Summary: Provides the ISC DHCP relay agent.
+Summary: Provides the ISC DHCP relay agent
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Requires(post): grep sed
@@ -137,6 +137,7 @@ This package provides the ISC DHCP relay agent.
 
 %package compat
 Summary: Utility package to help transition
+Provides:  dhcp = %{epoch}:%{version}-%{release}
 Obsoletes: dhcp < 12:4.3.1-0.4.b1
 Requires:  %{name}-server = %{epoch}:%{version}-%{release}
 Requires:  %{name}-relay = %{epoch}:%{version}-%{release}
@@ -147,14 +148,16 @@ package split (dhcp -> dhcp & dhcrelay).
 It will be removed after one distribution release cycle, please
 do not reference it or depend on it in any way.
 
-%package -n dhclient
+%package client
 Summary: Provides the ISC DHCP client daemon and dhclient-script
+Provides: dhclient = %{epoch}:%{version}-%{release}
+Obsoletes: dhclient < 12:4.3.1-0.6.b1
 # dhclient-script requires:
 Requires: coreutils grep hostname initscripts iproute iputils sed
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
-%description -n dhclient
+%description client
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows
 individual devices on an IP network to get their own network
 configuration information (IP address, subnetmask, broadcast address,
@@ -607,7 +610,7 @@ done
 
 %files compat
 
-%files -n dhclient
+%files client
 %doc client/dhclient.conf.example client/dhclient6.conf.example README.dhclient.d
 %attr(0750,root,root) %dir %{dhcpconfdir}
 %dir %{dhcpconfdir}/dhclient.d
@@ -647,11 +650,14 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Aug 05 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.6.b1
+- subpackage dhclient -> dhcp-client
+
 * Mon Jul 28 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.5.b1
-- server subpackage
+- dhcp-server subpackage
 
 * Mon Jul 28 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.4.b1
-- dhcrelay subpackage
+- dhcp-relay subpackage
 
 * Tue Jul 22 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.3.b1
 - Use network-online.target instead of network.target (#1120656)
