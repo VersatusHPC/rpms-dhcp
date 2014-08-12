@@ -12,13 +12,13 @@
 %global prever b1
 
 #%%global VERSION %{version}-%{patchver}
-#%%global VERSION %{version}
-%global VERSION %{version}%{prever}
+#%%global VERSION %{version}%{prever}
+%global VERSION %{version}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  0.7.%{prever}%{?dist}
+Release:  1%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -650,6 +650,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Aug 12 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-1
+- 4.3.1
+
 * Tue Aug 05 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.7.b1
 - dhclient-script: it's OK if the arping reply comes from our system (#1116004)
 
