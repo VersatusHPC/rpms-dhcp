@@ -710,6 +710,14 @@ case "${reason}" in
         # so the following is not needed anymore
         #ip -6 addr flush dev ${interface} scope global permanent
 
+        # we need a link-local address to be ready (not tentative)
+        for i in $(seq 50); do
+            # tentative flag == DAD is still not complete
+            tentative=$(ip -6 addr show dev ${interface} scope link | grep tentative)
+            [[ -z "${tentative}" ]] && exit_with_hooks 0
+            sleep 0.1
+        done
+
         exit_with_hooks 0
         ;;
 

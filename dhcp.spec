@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  1%{?dist}
+Release:  2%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -650,6 +650,9 @@ done
 %doc doc/html/
 
 %changelog
+* Thu Aug 14 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-2
+- dhclient-script: PREINIT6: make sure link-local address is available (#1129500)
+
 * Tue Aug 12 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-1
 - 4.3.1
 
