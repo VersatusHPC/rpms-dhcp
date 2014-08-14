@@ -706,9 +706,8 @@ case "${reason}" in
         # ensure interface is up
         ip link set dev ${interface} up
 
-        # aborted client cleans after itself since 4.2.6
-        # so the following is not needed anymore
-        #ip -6 addr flush dev ${interface} scope global permanent
+        # remove any stale addresses from aborted clients
+        ip -6 addr flush dev ${interface} scope global permanent
 
         # we need a link-local address to be ready (not tentative)
         for i in $(seq 50); do
