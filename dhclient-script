@@ -711,9 +711,10 @@ case "${reason}" in
 
         # we need a link-local address to be ready (not tentative)
         for i in $(seq 50); do
-            # tentative flag == DAD is still not complete
-            tentative=$(ip -6 addr show dev ${interface} scope link | grep tentative)
-            [[ -z "${tentative}" ]] && exit_with_hooks 0
+            linklocal=$(ip -6 addr show dev ${interface} scope link)
+            # tentative flag means DAD is still not complete
+            tentative=$(echo "${linklocal}" | grep tentative)
+            [[ -n "${linklocal}" && -z "${tentative}" ]] && exit_with_hooks 0
             sleep 0.1
         done
 
