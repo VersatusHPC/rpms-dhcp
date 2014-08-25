@@ -600,6 +600,8 @@ done
 %changelog
 * Mon Aug 25 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.7-3
 - spec: use -D with 'install'
+- dhclient-script: IPv6 address which fails DAD is auto-removed when it was
+  added with valid_lft/preferred_lft other then 'forever' (#1133465)
 
 * Thu Aug 14 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.7-2
 - dhclient-script: PREINIT6: make sure link-local address is available (#1129500)
