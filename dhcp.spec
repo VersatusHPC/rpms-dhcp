@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.2.7
-Release:  2%{?dist}
+Release:  3%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -375,8 +375,7 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
 %{__rm} -f %{buildroot}%{_sysconfdir}/dhcpd.conf.example
 
 # dhclient-script
-%{__mkdir} -p %{buildroot}%{_sbindir}
-%{__install} -p -m 0755 %{SOURCE1} %{buildroot}%{_sbindir}/dhclient-script
+%{__install} -D -p -m 0755 %{SOURCE1} %{buildroot}%{_sbindir}/dhclient-script
 
 # README.dhclient.d
 %{__install} -p -m 0644 %{SOURCE2} .
@@ -390,8 +389,7 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
 %{__install} -p -m 0755 %{SOURCE4} %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
 
 # pm-utils script to handle suspend/resume and dhclient leases
-%{__mkdir} -p %{buildroot}%{_libdir}/pm-utils/sleep.d
-%{__install} -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/pm-utils/sleep.d
+%{__install} -D -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/pm-utils/sleep.d/56dhclient
 
 # systemd unit files
 mkdir -p %{buildroot}%{_unitdir}
@@ -469,9 +467,7 @@ send dhcp-client-identifier = hardware;
 EOF
 
 # Install dhcp.schema for LDAP configuration
-%{__mkdir} -p %{buildroot}%{_sysconfdir}/openldap/schema
-%{__install} -p -m 0644 -D contrib/ldap/dhcp.schema \
-    %{buildroot}%{_sysconfdir}/openldap/schema
+%{__install} -D -p -m 0644 contrib/ldap/dhcp.schema %{buildroot}%{_sysconfdir}/openldap/schema/dhcp.schema
 
 # Don't package libtool *.la files
 find ${RPM_BUILD_ROOT}/%{_libdir} -name '*.la' -exec '/bin/rm' '-f' '{}' ';';
@@ -602,6 +598,9 @@ done
 
 
 %changelog
+* Mon Aug 25 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.7-3
+- spec: use -D with 'install'
+
 * Thu Aug 14 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.7-2
 - dhclient-script: PREINIT6: make sure link-local address is available (#1129500)
 
