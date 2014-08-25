@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  4%{?dist}
+Release:  5%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -409,8 +409,7 @@ popd
 %{__rm} -f %{buildroot}%{_sysconfdir}/dhcpd.conf.example
 
 # dhclient-script
-%{__mkdir} -p %{buildroot}%{_sbindir}
-%{__install} -p -m 0755 %{SOURCE1} %{buildroot}%{_sbindir}/dhclient-script
+%{__install} -D -p -m 0755 %{SOURCE1} %{buildroot}%{_sbindir}/dhclient-script
 
 # README.dhclient.d
 %{__install} -p -m 0644 %{SOURCE2} .
@@ -424,8 +423,7 @@ popd
 %{__install} -p -m 0755 %{SOURCE4} %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
 
 # pm-utils script to handle suspend/resume and dhclient leases
-%{__mkdir} -p %{buildroot}%{_libdir}/pm-utils/sleep.d
-%{__install} -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/pm-utils/sleep.d
+%{__install} -D -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/pm-utils/sleep.d/56dhclient
 
 # systemd unit files
 mkdir -p %{buildroot}%{_unitdir}
@@ -486,9 +484,7 @@ EOF
 EOF
 
 # Install dhcp.schema for LDAP configuration
-%{__mkdir} -p %{buildroot}%{_sysconfdir}/openldap/schema
-%{__install} -p -m 0644 -D contrib/ldap/dhcp.schema \
-    %{buildroot}%{_sysconfdir}/openldap/schema
+%{__install} -D -p -m 0644 contrib/ldap/dhcp.schema %{buildroot}%{_sysconfdir}/openldap/schema/dhcp.schema
 
 # Don't package libtool *.la files
 find ${RPM_BUILD_ROOT}/%{_libdir} -name '*.la' -exec '/bin/rm' '-f' '{}' ';';
@@ -650,6 +646,9 @@ done
 %doc doc/html/
 
 %changelog
+* Mon Aug 25 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-5
+- spec: use -D with 'install'
+
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 12:4.3.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
