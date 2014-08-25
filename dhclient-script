@@ -575,8 +575,15 @@ add_ipv6_addr_with_DAD() {
                     exit_with_hooks 3
                 fi
                 if [ -z "${tentative}" ] ; then
-                    # DAD is over
-                    return 0
+                    addr=$(ip -6 addr show dev ${interface} \
+                          | grep ${new_ip6_address}/${new_ip6_prefixlen})
+                    if [ -n "${addr}" ]; then
+                        # DAD is over
+                        return 0
+                    else
+                        # address was auto-removed (or not added at all)
+                        exit_with_hooks 3
+                    fi
                 fi
             done
 }

@@ -648,6 +648,8 @@ done
 %changelog
 * Mon Aug 25 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-5
 - spec: use -D with 'install'
+- dhclient-script: IPv6 address which fails DAD is auto-removed when it was
+  added with valid_lft/preferred_lft other then 'forever' (#1133465)
 
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 12:4.3.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
