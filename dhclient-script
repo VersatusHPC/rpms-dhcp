@@ -563,20 +563,20 @@ add_ipv6_addr_with_DAD() {
             for i in $(seq 5); do
                 sleep 1 # give the DAD some time
 
+                addr=$(ip -6 addr show dev ${interface} \
+                       | grep ${new_ip6_address}/${new_ip6_prefixlen})
+
                 # tentative flag == DAD is still not complete
-                tentative=$(ip -6 addr show dev ${interface} tentative \
-                           | grep ${new_ip6_address}/${new_ip6_prefixlen})
+                tentative=$(echo "${addr}" | grep tentative)
                 # dadfailed flag == address is already in use somewhere else
-                dadfailed=$(ip -6 addr show dev ${interface} dadfailed \
-                           | grep ${new_ip6_address}/${new_ip6_prefixlen})
+                dadfailed=$(echo "${addr}" | grep dadfailed)
 
                 if [ -n "${dadfailed}" ] ; then
-                    #ip -6 addr del ${new_ip6_address}/${new_ip6_prefixlen} dev ${interface}
+                    # address was added with valid_lft/preferred_lft 'forever', remove it
+                    ip -6 addr del ${new_ip6_address}/${new_ip6_prefixlen} dev ${interface}
                     exit_with_hooks 3
                 fi
                 if [ -z "${tentative}" ] ; then
-                    addr=$(ip -6 addr show dev ${interface} \
-                          | grep ${new_ip6_address}/${new_ip6_prefixlen})
                     if [ -n "${addr}" ]; then
                         # DAD is over
                         return 0
@@ -586,6 +586,7 @@ add_ipv6_addr_with_DAD() {
                     fi
                 fi
             done
+            return 0
 }
 
 dh6config() {

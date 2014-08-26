@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  5%{?dist}
+Release:  6%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -588,6 +588,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Aug 26 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-6
+- dhclient-script: another improvement of add_ipv6_addr_with_DAD()
+
 * Mon Aug 25 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-5
 - spec: use -D with 'install'
 - dhclient-script: IPv6 address which fails DAD is auto-removed when it was
