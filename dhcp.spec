@@ -663,17 +663,8 @@ done
 * Tue Aug 12 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-1
 - 4.3.1
 
-* Tue Aug 05 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.7.b1
+* Tue Aug 05 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.4.b1
 - dhclient-script: it's OK if the arping reply comes from our system (#1116004)
-
-* Tue Aug 05 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.6.b1
-- subpackage dhclient -> dhcp-client
-
-* Mon Jul 28 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.5.b1
-- dhcp-server subpackage
-
-* Mon Jul 28 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.4.b1
-- dhcp-relay subpackage
 
 * Tue Jul 22 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-0.3.b1
 - Use network-online.target instead of network.target (#1120656)
