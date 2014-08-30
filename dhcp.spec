@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  6%{?dist}
+Release:  7%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -151,7 +151,7 @@ do not reference it or depend on it in any way.
 %package client
 Summary: Provides the ISC DHCP client daemon and dhclient-script
 Provides: dhclient = %{epoch}:%{version}-%{release}
-Obsoletes: dhclient < 12:4.3.1-0.6.b1
+Obsoletes: dhclient < 12:4.3.1-7
 # dhclient-script requires:
 Requires: coreutils grep hostname initscripts iproute iputils sed gawk
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
@@ -646,6 +646,9 @@ done
 %doc doc/html/
 
 %changelog
+* Sat Aug 30 2014 Kalev Lember <kalevlember@gmail.com> - 12:4.3.1-7
+- Fix dhclient obsoletes version
+
 * Tue Aug 26 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-6
 - dhclient-script: another improvement of add_ipv6_addr_with_DAD()
 
