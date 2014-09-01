@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  7%{?dist}
+Release:  8%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -138,7 +138,7 @@ This package provides the ISC DHCP relay agent.
 %package compat
 Summary: Utility package to help transition
 Provides:  dhcp = %{epoch}:%{version}-%{release}
-Obsoletes: dhcp < 12:4.3.1-0.4.b1
+Obsoletes: dhcp < %{epoch}:%{version}-%{release}
 Requires:  %{name}-server = %{epoch}:%{version}-%{release}
 Requires:  %{name}-relay = %{epoch}:%{version}-%{release}
 
@@ -151,7 +151,7 @@ do not reference it or depend on it in any way.
 %package client
 Summary: Provides the ISC DHCP client daemon and dhclient-script
 Provides: dhclient = %{epoch}:%{version}-%{release}
-Obsoletes: dhclient < 12:4.3.1-7
+Obsoletes: dhclient < %{epoch}:%{version}-%{release}
 # dhclient-script requires:
 Requires: coreutils grep hostname initscripts iproute iputils sed gawk
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
@@ -646,6 +646,9 @@ done
 %doc doc/html/
 
 %changelog
+* Mon Sep 01 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-8
+- better obsoletes for server & client
+
 * Sat Aug 30 2014 Kalev Lember <kalevlember@gmail.com> - 12:4.3.1-7
 - Fix dhclient obsoletes version
 
