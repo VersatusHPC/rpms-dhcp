@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  8%{?dist}
+Release:  9%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -73,6 +73,7 @@ Patch33:  dhcp-range6.patch
 Patch34:  dhcp-no-subnet-error2info.patch
 Patch35:  dhcp-ffff-checksum.patch
 Patch36:  dhcp-sd_notify.patch
+Patch37:  dhcp-dhc6-life.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -351,6 +352,10 @@ rm -rf includes/isc-dhcp
 
 # support for sending startup notification to systemd (#1077666)
 %patch36 -p1 -b .sd_notify
+
+# [dhclient -6] infinite preferred/valid lifetime represented as -1 (#1133839)
+# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #37084])
+%patch37 -p1 -b .life
 
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
@@ -646,6 +651,9 @@ done
 %doc doc/html/
 
 %changelog
+* Thu Sep 04 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-9
+- [dhclient -6] infinite preferred/valid lifetime represented as -1 (#1133839)
+
 * Mon Sep 01 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-8
 - better obsoletes for server & client
 
