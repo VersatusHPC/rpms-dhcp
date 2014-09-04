@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.2.7
-Release:  3%{?dist}
+Release:  4%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -66,7 +66,7 @@ Patch33:  dhcp-4.2.6-lpf-ib.patch
 Patch34:  dhcp-4.2.4-improved-xid.patch
 Patch35:  dhcp-4.2.2-gpxe-cid.patch
 Patch36:  dhcp-4.2.6-systemtap.patch
-
+Patch37:  dhcp-dhc6-life.patch
 Patch38:  dhcp-4.2.3-P2-log_perror.patch
 Patch39:  dhcp-4.2.4-getifaddrs.patch
 Patch40:  dhcp-4.2.5-omapi-leak.patch
@@ -281,6 +281,9 @@ rm -rf includes/isc-dhcp
 
 # http://sourceware.org/systemtap/wiki/SystemTap
 %patch36 -p1 -b .systemtap
+
+# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #37084])
+%patch37 -p1 -b .life
 
 # Don't send log messages to the standard error descriptor by default (#790387)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28049])
@@ -598,6 +601,9 @@ done
 
 
 %changelog
+* Thu Sep 04 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.7-4
+- [dhclient -6] infinite preferred/valid lifetime represented as -1 (#1133839)
+
 * Mon Aug 25 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.7-3
 - spec: use -D with 'install'
 - dhclient-script: IPv6 address which fails DAD is auto-removed when it was
