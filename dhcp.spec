@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  9%{?dist}
+Release:  10%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -651,6 +651,9 @@ done
 %doc doc/html/
 
 %changelog
+* Fri Oct 03 2014 Tomas Hozza <thozza@redhat.com> - 12:4.3.1-10
+- rebuild against bind-9.9.6
+
 * Thu Sep 04 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-9
 - [dhclient -6] infinite preferred/valid lifetime represented as -1 (#1133839)
 
