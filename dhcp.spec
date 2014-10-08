@@ -76,6 +76,8 @@ Patch36:  dhcp-sd_notify.patch
 Patch37:  dhcp-dhc6-life.patch
 Patch38:  dhcp-skip-vlan.patch
 
+Patch100: dhcp-bind996.patch
+
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: libtool
@@ -327,6 +329,10 @@ rm -rf includes/isc-dhcp
 # dhcpd generates spurious responses when seeing requests from vlans on plain interface (#1150587)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #37415])
 %patch38 -p1 -b .vlan
+
+
+# to build against bind-9.9.6
+%patch100 -p1 -b .bind996
 
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
