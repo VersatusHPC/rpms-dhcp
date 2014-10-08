@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  10%{?dist}
+Release:  11%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -74,6 +74,9 @@ Patch34:  dhcp-no-subnet-error2info.patch
 Patch35:  dhcp-ffff-checksum.patch
 Patch36:  dhcp-sd_notify.patch
 Patch37:  dhcp-dhc6-life.patch
+Patch38:  dhcp-skip-vlan.patch
+
+Patch100: dhcp-bind996.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -356,6 +359,14 @@ rm -rf includes/isc-dhcp
 # [dhclient -6] infinite preferred/valid lifetime represented as -1 (#1133839)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #37084])
 %patch37 -p1 -b .life
+
+# dhcpd generates spurious responses when seeing requests from vlans on plain interface (#1150587)
+# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #37415])
+%patch38 -p1 -b .vlan
+
+
+# to build against bind-9.9.6
+%patch100 -p1 -b .bind996
 
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
@@ -651,6 +662,10 @@ done
 %doc doc/html/
 
 %changelog
+* Wed Oct 08 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-11
+- dhcpd generates spurious responses when seeing requests
+  from vlans on plain interface (#1150587)
+
 * Fri Oct 03 2014 Tomas Hozza <thozza@redhat.com> - 12:4.3.1-10
 - rebuild against bind-9.9.6
 
