@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  9%{?dist}
+Release:  10%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -75,6 +75,7 @@ Patch35:  dhcp-ffff-checksum.patch
 Patch36:  dhcp-sd_notify.patch
 Patch37:  dhcp-dhc6-life.patch
 Patch38:  dhcp-skip-vlan.patch
+Patch39:  dhcp-relay-hop-limit.patch
 
 Patch100: dhcp-bind996.patch
 
@@ -330,6 +331,9 @@ rm -rf includes/isc-dhcp
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #37415])
 %patch38 -p1 -b .vlan
 
+# Relay-forward Message's Hop Limit should be 32 (#1147240)
+# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #37426])
+%patch39 -p1 -b .hop-limit
 
 # to build against bind-9.9.6
 %patch100 -p1 -b .bind996
@@ -604,6 +608,9 @@ done
 %doc doc/html/
 
 %changelog
+* Fri Oct 10 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-10
+- Relay-forward Message's Hop Limit should be 32 (#1147240)
+
 * Wed Oct 08 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-9
 - dhcpd generates spurious responses when seeing requests
   from vlans on plain interface (#1150587)
