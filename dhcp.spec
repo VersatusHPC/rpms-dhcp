@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  12%{?dist}
+Release:  13%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -372,6 +372,10 @@ rm -rf includes/isc-dhcp
 # to build against bind-9.9.6
 %patch100 -p1 -b .bind996
 
+# DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
+# https://bugzilla.gnome.org/show_bug.cgi?id=656610
+%{__sed} -i -e 's|DHCLIENT_DEFAULT_PREFIX_LEN 64|DHCLIENT_DEFAULT_PREFIX_LEN 128|g' includes/site.h
+
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
             client/dhclient-script.8 client/dhclient.8 ; do
@@ -666,6 +670,9 @@ done
 %doc doc/html/
 
 %changelog
+* Fri Oct 31 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-13
+- redefine DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
+
 * Fri Oct 10 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-12
 - Relay-forward Message's Hop Limit should be 32 (#1147240)
 
