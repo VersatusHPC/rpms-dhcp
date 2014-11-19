@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  10%{?dist}
+Release:  11%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -497,7 +497,8 @@ chown -R dhcpd:dhcpd %{_localstatedir}/lib/dhcpd/
 for servicename in dhcpd dhcpd6 dhcrelay; do
   etcservicefile=%{_sysconfdir}/systemd/system/${servicename}.service
   if [ -f ${etcservicefile} ]; then
-    grep -q Type= ${etcservicefile} || sed -i '/\[Service\]/a Type=notify' ${etcservicefile}
+    grep -q Type= ${etcservicefile} || %{__sed} -i '/\[Service\]/a Type=notify' ${etcservicefile}
+    %{__sed} -i 's/After=network.target/Wants=network-online.target\nAfter=network-online.target/' ${etcservicefile}
   fi
 done
 exit 0
@@ -608,6 +609,9 @@ done
 %doc doc/html/
 
 %changelog
+* Wed Nov 19 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-11
+- amend post scriptlets for #1120656
+
 * Fri Oct 10 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-10
 - Relay-forward Message's Hop Limit should be 32 (#1147240)
 
