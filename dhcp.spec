@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  17%{?dist}
+Release:  18%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -78,6 +78,7 @@ Patch38:  dhcp-skip-vlan.patch
 Patch39:  dhcp-relay-hop-limit.patch
 Patch40:  dhcp-ldapgssapi.patch
 Patch41:  dhcp-option97-pxe-client-id.patch
+Patch42:  dhcp-stateless-DUID-LLT.patch
 Patch100: dhcp-bind996.patch
 
 BuildRequires: autoconf
@@ -376,6 +377,10 @@ rm -rf includes/isc-dhcp
 # option 97 - pxe-client-id (#1058674)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #38110])
 %patch41 -p1 -b .option97
+
+# dhclient: write DUID_LLT even in stateless mode (#1156356)
+# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #38144])
+%patch42 -p1 -b .stateless-DUID-LLT
 
 # to build against bind-9.9.6
 %patch100 -p1 -b .bind996
@@ -680,6 +685,9 @@ done
 %doc doc/html/
 
 %changelog
+* Thu Dec 18 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-18
+- dhclient: write DUID_LLT even in stateless mode (#1156356)
+
 * Wed Dec 17 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-17
 - option 97 - pxe-client-id (#1058674)
 
