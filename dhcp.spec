@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  18%{?dist}
+Release:  19%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -424,7 +424,8 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --with-relay-pid-file=%{_localstatedir}/run/dhcrelay.pid \
     --with-ldap \
     --with-ldapcrypto \
-    --with-libbind=%{_includedir} --with-libbind-libs=%{_libdir} \
+    --with-libbind=%{_includedir}/bind9 \
+    --with-libbind-libs=%{_libdir} \
     --disable-static \
     --enable-log-pid \
 %if %sdt
@@ -685,6 +686,9 @@ done
 %doc doc/html/
 
 %changelog
+* Wed Jan 14 2015 Tomas Hozza <thozza@redhat.com> - 12:4.3.1-19
+- rebuild against bind 9.10.1-P1
+
 * Thu Dec 18 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-18
 - dhclient: write DUID_LLT even in stateless mode (#1156356)
 

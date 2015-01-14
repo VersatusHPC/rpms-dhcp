@@ -551,7 +551,7 @@ diff -up dhcp-4.3.1b1/server/tests/Makefile.am.systemtap dhcp-4.3.1b1/server/tes
 +++ dhcp-4.3.1b1/server/tests/Makefile.am	2014-07-10 18:31:06.034879442 +0200
 @@ -21,6 +21,10 @@ DHCPLIBS = $(top_builddir)/common/libdhc
            $(top_builddir)/dhcpctl/libdhcpctl.la \
-           $(BIND9_LIBDIR) -lirs-export -ldns-export -lisccfg-export -lisc-export
+           $(BIND9_LIBDIR) -lirs -ldns -lisccfg -lisc
  
 +if ENABLE_SYSTEMTAP
 +DHCPLIBS += ../probes.o
