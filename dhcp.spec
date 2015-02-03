@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  11%{?dist}
+Release:  12%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -77,6 +77,7 @@ Patch37:  dhcp-dhc6-life.patch
 Patch38:  dhcp-skip-vlan.patch
 Patch39:  dhcp-relay-hop-limit.patch
 
+Patch40:  dhcp-client-request-release-bind-iface.patch
 Patch100: dhcp-bind996.patch
 
 BuildRequires: autoconf
@@ -334,6 +335,9 @@ rm -rf includes/isc-dhcp
 # Relay-forward Message's Hop Limit should be 32 (#1147240)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #37426])
 %patch39 -p1 -b .hop-limit
+
+# send unicast request/release via correct interface (#800561, #1177351)
+%patch40 -p1 -b .bind-iface
 
 # to build against bind-9.9.6
 %patch100 -p1 -b .bind996
@@ -609,6 +613,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Feb 03 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-12
+- send unicast request/release via correct interface (#800561, #1177351)
+
 * Wed Nov 19 2014 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-11
 - amend post scriptlets for #1120656
 
