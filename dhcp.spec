@@ -337,6 +337,7 @@ rm -rf includes/isc-dhcp
 %patch39 -p1 -b .hop-limit
 
 # send unicast request/release via correct interface (#800561, #1177351)
+# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30544])
 %patch40 -p1 -b .bind-iface
 
 # to build against bind-9.9.6
