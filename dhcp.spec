@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  20%{?dist}
+Release:  21%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -79,6 +79,7 @@ Patch39:  dhcp-relay-hop-limit.patch
 Patch40:  dhcp-ldapgssapi.patch
 Patch41:  dhcp-option97-pxe-client-id.patch
 Patch42:  dhcp-stateless-DUID-LLT.patch
+Patch43:  dhcp-client-request-release-bind-iface.patch
 Patch100: dhcp-bind996.patch
 
 BuildRequires: autoconf
@@ -381,6 +382,9 @@ rm -rf includes/isc-dhcp
 # dhclient: write DUID_LLT even in stateless mode (#1156356)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #38144])
 %patch42 -p1 -b .stateless-DUID-LLT
+
+# send unicast request/release via correct interface (#800561, #1177351)
+%patch43 -p1 -b .bind-iface
 
 # to build against bind-9.9.6
 %patch100 -p1 -b .bind996
@@ -686,6 +690,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Feb 03 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-21
+- send unicast request/release via correct interface (#800561, #1177351)
+
 * Mon Feb 02 2015 Tomas Hozza <thozza@redhat.com> - 12:4.3.1-20
 - rebuild against bind-9.10.2rc1
 
