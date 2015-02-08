@@ -12,13 +12,13 @@
 %global prever b1
 
 #%%global VERSION %{version}-%{patchver}
-#%%global VERSION %{version}%{prever}
-%global VERSION %{version}
+#%%global VERSION %{version}
+%global VERSION %{version}%{prever}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
-Version:  4.3.1
-Release:  21%{?dist}
+Version:  4.3.2
+Release:  0.1%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -45,7 +45,7 @@ Patch5:   dhcp-release-by-ifup.patch
 Patch6:   dhcp-dhclient-decline-backoff.patch
 Patch7:   dhcp-unicast-bootp.patch
 Patch8:   dhcp-default-requested-options.patch
-Patch9:   dhcp-xen-checksum.patch
+
 Patch10:  dhcp-manpages.patch
 Patch11:  dhcp-paths.patch
 Patch12:  dhcp-CLOEXEC.patch
@@ -69,18 +69,12 @@ Patch29:  dhcp-getifaddrs.patch
 Patch30:  dhcp-omapi-leak.patch
 Patch31:  dhcp-failOverPeer.patch
 Patch32:  dhcp-interval.patch
-Patch33:  dhcp-range6.patch
-Patch34:  dhcp-no-subnet-error2info.patch
-Patch35:  dhcp-ffff-checksum.patch
-Patch36:  dhcp-sd_notify.patch
-Patch37:  dhcp-dhc6-life.patch
-Patch38:  dhcp-skip-vlan.patch
-Patch39:  dhcp-relay-hop-limit.patch
-Patch40:  dhcp-ldapgssapi.patch
-Patch41:  dhcp-option97-pxe-client-id.patch
-Patch42:  dhcp-stateless-DUID-LLT.patch
-Patch43:  dhcp-client-request-release-bind-iface.patch
-Patch100: dhcp-bind996.patch
+Patch33:  dhcp-no-subnet-error2info.patch
+Patch34:  dhcp-sd_notify.patch
+Patch35:  dhcp-ldapgssapi.patch
+Patch36:  dhcp-option97-pxe-client-id.patch
+Patch37:  dhcp-stateless-DUID-LLT.patch
+Patch38:  dhcp-client-request-release-bind-iface.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -256,11 +250,6 @@ rm -rf includes/isc-dhcp
 # to the list of default requested DHCP options
 %patch8 -p1 -b .requested
 
-# Handle partial UDP checksums (#221964)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #22806] - by Michael S. Tsirkin)
-# http://comments.gmane.org/gmane.comp.emulators.kvm.devel/65236
-# https://lists.isc.org/pipermail/dhcp-hackers/2010-April/001835.html
-%patch9 -p1 -b .xen
 
 # Various man-page-only fixes
 %patch10 -p1 -b .man
@@ -346,49 +335,26 @@ rm -rf includes/isc-dhcp
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28038])
 %patch32 -p1 -b .interval
 
-# Make sure range6 is correct for subnet6 where it's declared (#902966)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #32453])
-%patch33 -p1 -b .range6
-
 # 'No subnet declaration for <iface>' should be info, not error.
-%patch34 -p1 -b .error2info
-
-# dhcpd rejects the udp packet with checksum=0xffff (#1015997)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #25587])
-%patch35 -p1 -b .ffff
+%patch33 -p1 -b .error2info
 
 # support for sending startup notification to systemd (#1077666)
-%patch36 -p1 -b .sd_notify
-
-# [dhclient -6] infinite preferred/valid lifetime represented as -1 (#1133839)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #37084])
-%patch37 -p1 -b .life
-
-# dhcpd generates spurious responses when seeing requests from vlans on plain interface (#1150587)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #37415])
-%patch38 -p1 -b .vlan
-
-# Relay-forward Message's Hop Limit should be 32 (#1147240)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #37426])
-%patch39 -p1 -b .hop-limit
+%patch34 -p1 -b .sd_notify
 
 # GSSAPI support for ldap authentication (#1150542)
-%patch40 -p1 -b .ldapgssapi
+%patch35 -p1 -b .ldapgssapi
 
 # option 97 - pxe-client-id (#1058674)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #38110])
-%patch41 -p1 -b .option97
+%patch36 -p1 -b .option97
 
 # dhclient: write DUID_LLT even in stateless mode (#1156356)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #38144])
-%patch42 -p1 -b .stateless-DUID-LLT
+%patch37 -p1 -b .stateless-DUID-LLT
 
 # send unicast request/release via correct interface (#800561, #1177351)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30544])
-%patch43 -p1 -b .bind-iface
-
-# to build against bind-9.9.6
-%patch100 -p1 -b .bind996
+%patch38 -p1 -b .bind-iface
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -691,6 +657,9 @@ done
 %doc doc/html/
 
 %changelog
+* Sun Feb 08 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-0.1b1
+- 4.3.2b1
+
 * Tue Feb 03 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-21
 - send unicast request/release via correct interface (#800561, #1177351)
 

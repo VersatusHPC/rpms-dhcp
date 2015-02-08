@@ -1,6 +1,6 @@
-diff -up dhcp-4.3.1b1/client/Makefile.am.uCWMBl dhcp-4.3.1b1/client/Makefile.am
---- dhcp-4.3.1b1/client/Makefile.am.uCWMBl	2014-07-10 17:36:30.484250976 +0200
-+++ dhcp-4.3.1b1/client/Makefile.am	2014-07-10 17:38:10.778828583 +0200
+diff -up dhcp-4.3.2b1/client/Makefile.am.SfzxjY dhcp-4.3.2b1/client/Makefile.am
+--- dhcp-4.3.2b1/client/Makefile.am.SfzxjY	2015-02-08 15:13:29.091275576 +0100
++++ dhcp-4.3.2b1/client/Makefile.am	2015-02-08 15:14:40.970279718 +0100
 @@ -10,7 +10,7 @@ dhclient_SOURCES = clparse.c dhclient.c
  		   scripts/bsdos scripts/freebsd scripts/linux scripts/macos \
  		   scripts/netbsd scripts/nextstep scripts/openbsd \
@@ -10,10 +10,10 @@ diff -up dhcp-4.3.1b1/client/Makefile.am.uCWMBl dhcp-4.3.1b1/client/Makefile.am
  		 $(BIND9_LIBDIR) -lirs -ldns -lisccfg -lisc
  man_MANS = dhclient.8 dhclient-script.8 dhclient.conf.5 dhclient.leases.5
  EXTRA_DIST = $(man_MANS)
-diff -up dhcp-4.3.1b1/common/tests/Makefile.am.uCWMBl dhcp-4.3.1b1/common/tests/Makefile.am
---- dhcp-4.3.1b1/common/tests/Makefile.am.uCWMBl	2014-07-10 17:38:10.779828569 +0200
-+++ dhcp-4.3.1b1/common/tests/Makefile.am	2014-07-10 17:38:21.355678580 +0200
-@@ -13,19 +13,19 @@ ATF_TESTS += alloc_unittest dns_unittest
+diff -up dhcp-4.3.2b1/common/tests/Makefile.am.SfzxjY dhcp-4.3.2b1/common/tests/Makefile.am
+--- dhcp-4.3.2b1/common/tests/Makefile.am.SfzxjY	2015-02-08 15:14:40.971279704 +0100
++++ dhcp-4.3.2b1/common/tests/Makefile.am	2015-02-08 15:15:10.455871224 +0100
+@@ -13,12 +13,12 @@ ATF_TESTS += alloc_unittest dns_unittest
  alloc_unittest_SOURCES = test_alloc.c $(top_srcdir)/tests/t_api_dhcp.c
  alloc_unittest_LDADD = $(ATF_LDFLAGS)
  alloc_unittest_LDADD += ../libdhcp.a  \
@@ -28,17 +28,18 @@ diff -up dhcp-4.3.1b1/common/tests/Makefile.am.uCWMBl dhcp-4.3.1b1/common/tests/
  	../../omapip/libomapi.a \
  	$(BIND9_LIBDIR) -lirs -ldns -lisccfg -lisc
  
- misc_unittest_SOURCES = misc_unittest.c $(top_srcdir)/tests/t_api_dhcp.c
- misc_unittest_LDADD = $(ATF_LDFLAGS)
- misc_unittest_LDADD += ../libdhcp.a  \
+@@ -31,7 +31,7 @@ misc_unittest_LDADD += ../libdhcp.a  \
+ ns_name_unittest_SOURCES = ns_name_test.c $(top_srcdir)/tests/t_api_dhcp.c
+ ns_name_unittest_LDADD = $(ATF_LDFLAGS)
+ ns_name_unittest_LDADD += ../libdhcp.a  \
 -	../../omapip/libomapi.a \
 +	../../omapip/libomapi.la \
  	$(BIND9_LIBDIR) -lirs -ldns -lisccfg -lisc
  check: $(ATF_TESTS)
  	atf-run | atf-report
-diff -up dhcp-4.3.1b1/configure.ac.uCWMBl dhcp-4.3.1b1/configure.ac
---- dhcp-4.3.1b1/configure.ac.uCWMBl	2014-07-10 17:38:10.766828753 +0200
-+++ dhcp-4.3.1b1/configure.ac	2014-07-10 17:38:10.779828569 +0200
+diff -up dhcp-4.3.2b1/configure.ac.SfzxjY dhcp-4.3.2b1/configure.ac
+--- dhcp-4.3.2b1/configure.ac.SfzxjY	2015-02-08 15:14:40.951279981 +0100
++++ dhcp-4.3.2b1/configure.ac	2015-02-08 15:14:40.971279704 +0100
 @@ -39,7 +39,8 @@ fi
  # Use this to define _GNU_SOURCE to pull in the IPv6 Advanced Socket API.
  AC_USE_SYSTEM_EXTENSIONS
@@ -49,9 +50,9 @@ diff -up dhcp-4.3.1b1/configure.ac.uCWMBl dhcp-4.3.1b1/configure.ac
  AC_CONFIG_HEADERS([includes/config.h])
  
  # we sometimes need to know byte order for building packets
-diff -up dhcp-4.3.1b1/dhcpctl/Makefile.am.uCWMBl dhcp-4.3.1b1/dhcpctl/Makefile.am
---- dhcp-4.3.1b1/dhcpctl/Makefile.am.uCWMBl	2014-07-10 17:36:30.485250962 +0200
-+++ dhcp-4.3.1b1/dhcpctl/Makefile.am	2014-07-10 17:38:10.780828554 +0200
+diff -up dhcp-4.3.2b1/dhcpctl/Makefile.am.SfzxjY dhcp-4.3.2b1/dhcpctl/Makefile.am
+--- dhcp-4.3.2b1/dhcpctl/Makefile.am.SfzxjY	2015-02-08 15:13:29.092275562 +0100
++++ dhcp-4.3.2b1/dhcpctl/Makefile.am	2015-02-08 15:14:40.971279704 +0100
 @@ -1,14 +1,14 @@
  bin_PROGRAMS = omshell
 -lib_LIBRARIES = libdhcpctl.a
@@ -71,9 +72,9 @@ diff -up dhcp-4.3.1b1/dhcpctl/Makefile.am.uCWMBl dhcp-4.3.1b1/dhcpctl/Makefile.a
 -cltest_LDADD = libdhcpctl.a ../common/libdhcp.a ../omapip/libomapi.a \
 +cltest_LDADD = libdhcpctl.la ../common/libdhcp.a ../omapip/libomapi.la \
  	       $(BIND9_LIBDIR) -lirs -ldns -lisccfg -lisc
-diff -up dhcp-4.3.1b1/omapip/Makefile.am.uCWMBl dhcp-4.3.1b1/omapip/Makefile.am
---- dhcp-4.3.1b1/omapip/Makefile.am.uCWMBl	2014-07-10 17:36:30.486250948 +0200
-+++ dhcp-4.3.1b1/omapip/Makefile.am	2014-07-10 17:38:10.780828554 +0200
+diff -up dhcp-4.3.2b1/omapip/Makefile.am.SfzxjY dhcp-4.3.2b1/omapip/Makefile.am
+--- dhcp-4.3.2b1/omapip/Makefile.am.SfzxjY	2015-02-08 15:13:29.093275549 +0100
++++ dhcp-4.3.2b1/omapip/Makefile.am	2015-02-08 15:14:40.972279690 +0100
 @@ -1,7 +1,7 @@
 -lib_LIBRARIES = libomapi.a
 +lib_LTLIBRARIES = libomapi.la
@@ -91,9 +92,9 @@ diff -up dhcp-4.3.1b1/omapip/Makefile.am.uCWMBl dhcp-4.3.1b1/omapip/Makefile.am
 -svtest_LDADD = libomapi.a \
 +svtest_LDADD = libomapi.la \
  	       $(BIND9_LIBDIR) -lirs -ldns -lisccfg -lisc
-diff -up dhcp-4.3.1b1/relay/Makefile.am.uCWMBl dhcp-4.3.1b1/relay/Makefile.am
---- dhcp-4.3.1b1/relay/Makefile.am.uCWMBl	2014-07-10 17:36:30.486250948 +0200
-+++ dhcp-4.3.1b1/relay/Makefile.am	2014-07-10 17:38:10.780828554 +0200
+diff -up dhcp-4.3.2b1/relay/Makefile.am.SfzxjY dhcp-4.3.2b1/relay/Makefile.am
+--- dhcp-4.3.2b1/relay/Makefile.am.SfzxjY	2015-02-08 15:13:29.093275549 +0100
++++ dhcp-4.3.2b1/relay/Makefile.am	2015-02-08 15:14:40.972279690 +0100
 @@ -2,7 +2,7 @@ AM_CPPFLAGS = -DLOCALSTATEDIR='"@localst
  
  sbin_PROGRAMS = dhcrelay
@@ -103,9 +104,9 @@ diff -up dhcp-4.3.1b1/relay/Makefile.am.uCWMBl dhcp-4.3.1b1/relay/Makefile.am
  		 $(BIND9_LIBDIR) -lirs -ldns -lisccfg -lisc
  man_MANS = dhcrelay.8
  EXTRA_DIST = $(man_MANS)
-diff -up dhcp-4.3.1b1/server/Makefile.am.uCWMBl dhcp-4.3.1b1/server/Makefile.am
---- dhcp-4.3.1b1/server/Makefile.am.uCWMBl	2014-07-10 17:36:30.486250948 +0200
-+++ dhcp-4.3.1b1/server/Makefile.am	2014-07-10 17:38:10.780828554 +0200
+diff -up dhcp-4.3.2b1/server/Makefile.am.SfzxjY dhcp-4.3.2b1/server/Makefile.am
+--- dhcp-4.3.2b1/server/Makefile.am.SfzxjY	2015-02-08 15:13:29.093275549 +0100
++++ dhcp-4.3.2b1/server/Makefile.am	2015-02-08 15:14:40.972279690 +0100
 @@ -13,7 +13,7 @@ dhcpd_SOURCES = dhcpd.c dhcp.c bootp.c c
  		dhcpv6.c mdb6.c ldap.c ldap_casa.c
  
@@ -115,9 +116,9 @@ diff -up dhcp-4.3.1b1/server/Makefile.am.uCWMBl dhcp-4.3.1b1/server/Makefile.am
  	      $(BIND9_LIBDIR) -lirs -ldns -lisccfg -lisc
  man_MANS = dhcpd.8 dhcpd.conf.5 dhcpd.leases.5
  EXTRA_DIST = $(man_MANS)
-diff -up dhcp-4.3.1b1/server/tests/Makefile.am.uCWMBl dhcp-4.3.1b1/server/tests/Makefile.am
---- dhcp-4.3.1b1/server/tests/Makefile.am.uCWMBl	2014-07-10 17:36:30.486250948 +0200
-+++ dhcp-4.3.1b1/server/tests/Makefile.am	2014-07-10 17:38:10.780828554 +0200
+diff -up dhcp-4.3.2b1/server/tests/Makefile.am.SfzxjY dhcp-4.3.2b1/server/tests/Makefile.am
+--- dhcp-4.3.2b1/server/tests/Makefile.am.SfzxjY	2015-02-08 15:13:29.093275549 +0100
++++ dhcp-4.3.2b1/server/tests/Makefile.am	2015-02-08 15:14:40.972279690 +0100
 @@ -17,8 +17,8 @@ DHCPSRC = ../dhcp.c ../bootp.c ../confpa
            ../ddns.c ../dhcpleasequery.c ../dhcpv6.c ../mdb6.c        \
            ../ldap.c ../ldap_casa.c ../dhcpd.c
