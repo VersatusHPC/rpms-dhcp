@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.1
-Release:  12%{?dist}
+Release:  13%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -614,6 +614,9 @@ done
 %doc doc/html/
 
 %changelog
+* Fri Feb 13 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-13
+- dhclient-script: s/addr add/addr replace/
+
 * Tue Feb 03 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.1-12
 - send unicast request/release via correct interface (#800561, #1177351)
 

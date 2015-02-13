@@ -359,7 +359,7 @@ dhconfig() {
        [ ! "${old_broadcast_address}" = "${new_broadcast_address}" ] ||
        [ ! "${old_routers}" = "${new_routers}" ] ||
        [ ! "${old_interface_mtu}" = "${new_interface_mtu}" ]; then
-        ip -4 addr add ${new_ip_address}/${new_prefix} broadcast ${new_broadcast_address} dev ${interface} \
+        ip -4 addr replace ${new_ip_address}/${new_prefix} broadcast ${new_broadcast_address} dev ${interface} \
            valid_lft ${new_dhcp_lease_time} preferred_lft ${new_dhcp_lease_time} >/dev/null 2>&1
         ip link set dev ${interface} up
 
@@ -497,7 +497,7 @@ dhconfig() {
        [ -n "${alias_ip_address}" ]; then
         # Reset the alias address (fix: this should really only do this on changes)
         ip -4 addr flush dev ${interface} label ${interface}:0 >/dev/null 2>&1
-        ip -4 addr add ${alias_ip_address}/${alias_prefix} broadcast ${alias_broadcast_address} dev ${interface} label ${interface}:0
+        ip -4 addr replace ${alias_ip_address}/${alias_prefix} broadcast ${alias_broadcast_address} dev ${interface} label ${interface}:0
         ip -4 route replace ${alias_ip_address}/32 dev ${interface}
     fi
     
@@ -554,7 +554,7 @@ dhconfig() {
 # the addresses in any IAs it receives in the Reply message before
 # using that address for traffic.
 add_ipv6_addr_with_DAD() {
-            ip -6 addr add ${new_ip6_address}/${new_ip6_prefixlen} \
+            ip -6 addr replace ${new_ip6_address}/${new_ip6_prefixlen} \
                 dev ${interface} scope global valid_lft ${new_max_life} \
                                           preferred_lft ${new_preferred_life}
 
@@ -793,7 +793,7 @@ case "${reason}" in
         remove_old_addr
 
         if [ -n "${alias_ip_address}" ]; then
-            ip -4 addr add ${alias_ip_address}/${alias_prefix} broadcast ${alias_broadcast_address} dev ${interface} label ${interface}:0
+            ip -4 addr replace ${alias_ip_address}/${alias_prefix} broadcast ${alias_broadcast_address} dev ${interface} label ${interface}:0
             ip -4 route replace ${alias_ip_address}/32 dev ${interface}
         fi
 
@@ -806,7 +806,7 @@ case "${reason}" in
                 ip -4 addr flush dev ${interface} label ${interface}:0 >/dev/null 2>&1
             fi
 
-            ip -4 addr add ${new_ip_address}/${new_prefix} \
+            ip -4 addr replace ${new_ip_address}/${new_prefix} \
                 broadcast ${new_broadcast_address} dev ${interface} \
                 valid_lft ${new_dhcp_lease_time} preferred_lft ${new_dhcp_lease_time}
             set ${new_routers}
