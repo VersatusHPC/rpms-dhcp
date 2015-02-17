@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.2
-Release:  0.2%{prever}%{?dist}
+Release:  0.3%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -473,6 +473,23 @@ EOF
 %{__cp} -p doc/examples/dhclient-dhcpv6.conf client/dhclient6.conf.example
 %{__cp} -p doc/examples/dhcpd-dhcpv6.conf server/dhcpd6.conf.example
 
+%{__cat} << EOF > client/dhclient-enter-hooks
+#!/bin/bash
+
+# For dhclient/dhclient-script debugging.
+# Copy this into /etc/dhcp/ and make it executable.
+# Run 'dhclient -d <interface>' to see info passed from dhclient to dhclient-script.
+# See also HOOKS section in dhclient-script(8) man page.
+
+echo "interface: ${interface}"
+echo "reason: ${reason}"
+
+( set -o posix ; set ) | grep "old_"
+( set -o posix ; set ) | grep "new_"
+( set -o posix ; set ) | grep "alias_"
+( set -o posix ; set ) | grep "requested_"
+EOF
+
 # Install default (empty) dhcpd.conf:
 %{__mkdir} -p %{buildroot}%{dhcpconfdir}
 %{__cat} << EOF > %{buildroot}%{dhcpconfdir}/dhcpd.conf
@@ -618,7 +635,8 @@ done
 %files compat
 
 %files client
-%doc client/dhclient.conf.example client/dhclient6.conf.example README.dhclient.d
+%doc README.dhclient.d
+%doc client/dhclient.conf.example client/dhclient6.conf.example client/dhclient-enter-hooks
 %attr(0750,root,root) %dir %{dhcpconfdir}
 %dir %{dhcpconfdir}/dhclient.d
 %dir %{_localstatedir}/lib/dhclient
@@ -657,6 +675,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Feb 17 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-0.3b1
+- doc/dhclient/dhclient-enter-hooks for dhclient-script debugging
+
 * Fri Feb 13 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-0.2b1
 - dhclient-script: s/addr add/addr replace/
 
