@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.2
-Release:  0.3%{prever}%{?dist}
+Release:  0.4%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -675,6 +675,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Feb 17 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-0.4b1
+- dhclient-script: use 'ip addr replace' for both BOUND & RENEW
+
 * Tue Feb 17 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-0.3b1
 - doc/dhclient/dhclient-enter-hooks for dhclient-script debugging
 

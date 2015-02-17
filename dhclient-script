@@ -340,6 +340,13 @@ dhconfig() {
         flush_dev ${interface}
     fi
 
+    # make sure the interface is up
+    ip link set dev ${interface} up
+
+    # replace = add if it doesn't exist or override (update lifetimes) if it's there
+    ip -4 addr replace ${new_ip_address}/${new_prefix} broadcast ${new_broadcast_address} dev ${interface} \
+       valid_lft ${new_dhcp_lease_time} preferred_lft ${new_dhcp_lease_time} >/dev/null 2>&1
+
     if [ "${reason}" = "BOUND" ] || [ "${reason}" = "REBOOT" ] ||
        [ ! "${old_ip_address}" = "${new_ip_address}" ] ||
        [ ! "${old_subnet_mask}" = "${new_subnet_mask}" ] ||
@@ -347,9 +354,6 @@ dhconfig() {
        [ ! "${old_broadcast_address}" = "${new_broadcast_address}" ] ||
        [ ! "${old_routers}" = "${new_routers}" ] ||
        [ ! "${old_interface_mtu}" = "${new_interface_mtu}" ]; then
-        ip -4 addr replace ${new_ip_address}/${new_prefix} broadcast ${new_broadcast_address} dev ${interface} \
-           valid_lft ${new_dhcp_lease_time} preferred_lft ${new_dhcp_lease_time} >/dev/null 2>&1
-        ip link set dev ${interface} up
 
         # The 576 MTU is only used for X.25 and dialup connections
         # where the admin wants low latency.  Such a low MTU can cause
@@ -475,10 +479,6 @@ dhconfig() {
                 fi
             fi
         fi
-
-    else # RENEW||REBIND - only update address lifetimes
-        ip -4 addr change ${new_ip_address}/${new_prefix} broadcast ${new_broadcast_address} dev ${interface} \
-           valid_lft ${new_dhcp_lease_time} preferred_lft ${new_dhcp_lease_time} >/dev/null 2>&1
     fi
 
     if [ ! "${new_ip_address}" = "${alias_ip_address}" ] &&
@@ -600,12 +600,9 @@ dh6config() {
                [[ -n "${new_ip6_prefixlen}" ]]; then
                if [[  ! "${new_ip6_address}" = "${old_ip6_address}" ]]; then
                    [[ -n "${old_ip6_address}" ]] && ip -6 addr del ${old_ip6_address} dev ${interface}
-                   add_ipv6_addr_with_DAD
-               else # only update address lifetimes
-                   ip -6 addr change ${new_ip6_address}/${new_ip6_prefixlen} \
-                      dev ${interface} scope global valid_lft ${new_max_life} \
-                                                preferred_lft ${new_preferred_life}
                fi
+               # call it even if new_ip6_address = old_ip6_address to update lifetimes
+               add_ipv6_addr_with_DAD
             fi
 
             if [ ! "${new_dhcp6_name_servers}" = "${old_dhcp6_name_servers}" ] ||
