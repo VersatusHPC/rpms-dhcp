@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.2
-Release:  0.5%{prever}%{?dist}
+Release:  0.6%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -675,6 +675,9 @@ done
 %doc doc/html/
 
 %changelog
+* Wed Feb 25 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-0.6b1
+- correctly set IB's hw->hlen (#1185075)
+
 * Wed Feb 25 2015 Tomas Hozza <thozza@redhat.com> - 12:4.3.2-0.5b1
 - Rebuild against bind-9.10.2rc2
 
