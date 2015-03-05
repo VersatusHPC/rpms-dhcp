@@ -9,16 +9,16 @@
 
 
 #%%global patchver P2
-%global prever b1
+#%%global prever b1
 
 #%%global VERSION %{version}-%{patchver}
-#%%global VERSION %{version}
-%global VERSION %{version}%{prever}
+#%%global VERSION %{version}%{prever}
+%global VERSION %{version}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.2
-Release:  0.6%{prever}%{?dist}
+Release:  1%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -675,6 +675,9 @@ done
 %doc doc/html/
 
 %changelog
+* Thu Mar 05 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-1
+- 4.3.2
+
 * Wed Feb 25 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-0.6b1
 - correctly set IB's hw->hlen (#1185075)
 
