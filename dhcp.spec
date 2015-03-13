@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.2
-Release:  1%{?dist}
+Release:  2%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -81,7 +81,7 @@ BuildRequires: automake
 BuildRequires: libtool
 BuildRequires: openldap-devel
 BuildRequires: libcap-ng-devel
-BuildRequires: bind-lite-devel >= 32:9.9.5-0.1.b1
+BuildRequires: bind99-devel
 BuildRequires: systemd systemd-devel
 # dhcp-sd_notify.patch
 BuildRequires: pkgconfig(libsystemd)
@@ -395,8 +395,8 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --with-relay-pid-file=%{_localstatedir}/run/dhcrelay.pid \
     --with-ldap \
     --with-ldapcrypto \
-    --with-libbind=%{_includedir}/bind9 \
-    --with-libbind-libs=%{_libdir} \
+    --with-libbind=%{_includedir}/bind99 \
+    --with-libbind-libs=%{_libdir}/bind99 \
     --disable-static \
     --enable-log-pid \
 %if %sdt
@@ -675,6 +675,9 @@ done
 %doc doc/html/
 
 %changelog
+* Fri Mar 13 2015 Tomas Hozza <thozza@redhat.com> - 12:4.3.2-2
+- rebuild against bind99 9.9.7 package
+
 * Thu Mar 05 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-1
 - 4.3.2
 
