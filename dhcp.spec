@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.2
-Release:  2%{?dist}
+Release:  3%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -675,6 +675,9 @@ done
 %doc doc/html/
 
 %changelog
+* Wed Mar 25 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-3
+- dhclient-script: fix shellcheck.net suggestions
+
 * Fri Mar 13 2015 Tomas Hozza <thozza@redhat.com> - 12:4.3.2-2
 - rebuild against bind99 9.9.7 package
 
