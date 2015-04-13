@@ -204,7 +204,7 @@ quad2num() {
 }
 
 ip2num() {
-    IFS="." quad2num "${1}"
+    IFS='.' quad2num ${1}
 }
 
 num2ip() {
@@ -279,11 +279,11 @@ add_default_gateway() {
     router="${1}"
 
     if is_router_reachable "${router}" ; then
-        metric=""
-        if [ $# -gt 1 ] && [ "${2}" -gt 0 ]; then
-            metric="metric ${2}"
+        if [ $# -gt 1 ] && [ -n "${2}" ] && [[ "${2}" -gt 0 ]]; then
+            ip -4 route replace default via "${router}" dev "${interface}" metric "${2}"
+        else
+            ip -4 route replace default via "${router}" dev "${interface}"
         fi
-        ip -4 route replace default via "${router}" dev "${interface}" "${metric}"
         if [ $? -ne 0 ]; then
             logmessage "failed to create default route: ${router} dev ${interface} ${metric}"
             return 1
@@ -428,7 +428,7 @@ dhconfig() {
                         metric="metric ${metric}"
                     fi
 
-                    ip -4 route replace "${target}/${prefix}" proto static via "${gateway}" dev "${interface}" "${metric}" "${scope}"
+                    ip -4 route replace "${target}/${prefix}" proto static via "${gateway}" dev "${interface}" ${metric} ${scope}
 
                     if [ $? -ne 0 ]; then
                         logmessage "failed to create static route: ${target}/${prefix} via ${gateway} dev ${interface} ${metric}"
@@ -459,7 +459,7 @@ dhconfig() {
 
                     if [ -z "${router}" ] ||
                        [ "${added_router}" = "1" ] ||
-                       [ "$(IFS=. ip2num ${router})" -le 0 ] ||
+                       [ "$(IFS='.' ip2num ${router})" -le 0 ] ||
                        [[ ( "${router}" = "${new_broadcast_address}" ) &&
                           ( "${new_subnet_mask}" != "255.255.255.255" ) ]]; then
                         continue
