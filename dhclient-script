@@ -666,6 +666,13 @@ CONFIG="${interface}"
 need_config "${CONFIG}"
 source_config >/dev/null 2>&1
 
+# In case there's some delay in rebinding, it might happen, that the valid_lft drops to 0,
+# address is removed by kernel and then re-added few seconds later by dhclient-script.
+# With this work-around the address lives a minute longer.
+# "4294967235" = infinite (forever) - 60
+[[ "${new_dhcp_lease_time}" -lt "4294967235" ]] && new_dhcp_lease_time=$((new_dhcp_lease_time + 60))
+[[ "${new_max_life}" -lt "4294967235" ]] && new_max_life=$((new_max_life + 60))
+
 new_prefix="$(get_prefix "${new_ip_address}" "${new_subnet_mask}")"
 old_prefix="$(get_prefix "${old_ip_address}" "${old_subnet_mask}")"
 alias_prefix="$(get_prefix "${alias_ip_address}" "${alias_subnet_mask}")"
