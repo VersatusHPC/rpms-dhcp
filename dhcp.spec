@@ -155,7 +155,7 @@ Summary: Provides the ISC DHCP client daemon and dhclient-script
 Provides: dhclient = %{epoch}:%{version}-%{release}
 Obsoletes: dhclient < %{epoch}:%{version}-%{release}
 # dhclient-script requires:
-Requires: coreutils grep hostname initscripts iproute iputils sed gawk
+Requires: coreutils grep hostname initscripts iproute iputils sed gawk /usr/bin/ipcalc
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
