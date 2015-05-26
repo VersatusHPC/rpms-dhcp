@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.2
-Release:  5%{?dist}
+Release:  6%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -675,6 +675,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue May 26 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-6
+- dhclient-script: run also scripts in dhclient-[enter/exit]-hooks.d dir
+
 * Tue Apr 21 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-5
 - dhclient-script: add a minute to address lifetimes (#1188423)
 

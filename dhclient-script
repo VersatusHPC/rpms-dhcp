@@ -182,14 +182,44 @@ make_resolv_conf() {
     fi
 }
 
-exit_with_hooks() {
-    exit_status="${1}"
+# run given script
+run_hook() {
+    local script
+    local exit_status
+    script="${1}"
 
-    if [ -x ${ETCDIR}/dhclient-exit-hooks ]; then
-        . ${ETCDIR}/dhclient-exit-hooks
+    if [ -f ${script} ]; then
+        . ${script}
     fi
 
-    exit "${exit_status}"
+    if [ -n "${exit_status}" ] && [ "${exit_status}" -ne 0 ]; then
+        logmessage "${script} returned non-zero exit status ${exit_status}"
+    fi
+
+    return ${exit_status}
+}
+
+# run scripts in given directory
+run_hookdir() {
+    local dir
+    dir="${1}"
+
+    if [ -d "${dir}" ]; then
+        for script in $(run-parts --list $dir); do
+            run_hook ${script} || return $?
+        done
+    fi
+
+    return 0
+}
+
+exit_with_hooks() {
+    # Source the documented exit-hook script, if it exists
+    run_hook "${ETCDIR}/dhclient-exit-hooks" || exit $?
+    # Now run scripts in the hooks directory.
+    run_hookdir "${ETCDIR}/dhclient-exit-hooks.d" || exit $?
+
+    exit ${1}
 }
 
 quad2num() {
@@ -488,7 +518,7 @@ dhconfig() {
         ip -4 addr replace "${alias_ip_address}/${alias_prefix}" broadcast "${alias_broadcast_address}" dev "${interface}" label "${interface}:0"
         ip -4 route replace "${alias_ip_address}/32" dev "${interface}"
     fi
-    
+
     # After dhclient brings an interface UP with a new IP address, subnet mask, 
     # and routes, in the REBOOT/BOUND states -> search for "dhclient-up-hooks".
     if [ "${reason}" = "BOUND" ] || [ "${reason}" = "REBOOT" ] ||
@@ -498,7 +528,7 @@ dhconfig() {
        [ ! "${old_broadcast_address}" = "${new_broadcast_address}" ] ||
        [ ! "${old_routers}" = "${new_routers}" ] ||
        [ ! "${old_interface_mtu}" = "${new_interface_mtu}" ]; then
-        
+
         if [ -x "${ETCDIR}/dhclient-${interface}-up-hooks" ]; then
             . "${ETCDIR}/dhclient-${interface}-up-hooks"
         elif [ -x ${ETCDIR}/dhclient-up-hooks ]; then
@@ -629,16 +659,9 @@ dh6config() {
 # ### MAIN
 #
 
-if [ -x ${ETCDIR}/dhclient-enter-hooks ]; then
-    exit_status=0
-
-    # dhclient-enter-hooks can abort dhclient-script by setting
-    # the exit_status variable to a non-zero value
-    . ${ETCDIR}/dhclient-enter-hooks
-    if [ ${exit_status} -ne 0 ]; then
-        exit ${exit_status}
-    fi
-fi
+# Invoke the local dhcp client enter hooks, if they exist.
+run_hook "${ETCDIR}/dhclient-enter-hooks" || exit $?
+run_hookdir "${ETCDIR}/dhclient-enter-hooks.d" || exit $?
 
 if [ ! -r /etc/sysconfig/network-scripts/network-functions ]; then
     echo "Missing /etc/sysconfig/network-scripts/network-functions, exiting." >&2
