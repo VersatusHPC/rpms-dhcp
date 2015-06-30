@@ -495,7 +495,7 @@ EOF
 %{__cat} << EOF > %{buildroot}%{dhcpconfdir}/dhcpd.conf
 #
 # DHCP Server Configuration file.
-#   see /usr/share/doc/dhcp/dhcpd.conf.example
+#   see /usr/share/doc/dhcp-server/dhcpd.conf.example
 #   see dhcpd.conf(5) man page
 #
 EOF
@@ -504,7 +504,7 @@ EOF
 %{__cat} << EOF > %{buildroot}%{dhcpconfdir}/dhcpd6.conf
 #
 # DHCPv6 Server Configuration file.
-#   see /usr/share/doc/dhcp/dhcpd6.conf.example
+#   see /usr/share/doc/dhcp-server/dhcpd6.conf.example
 #   see dhcpd.conf(5) man page
 #
 EOF
