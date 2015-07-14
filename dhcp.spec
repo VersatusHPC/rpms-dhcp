@@ -18,14 +18,14 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.2
-Release:  9%{?dist}
+Release:  10%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
 # So we are stuck with it.
 Epoch:    12
 License:  ISC
-URL:      http://isc.org/products/DHCP/
+Url:      http://isc.org/products/DHCP/
 Source0:  ftp://ftp.isc.org/isc/dhcp/%{VERSION}/dhcp-%{VERSION}.tar.gz
 Source1:  dhclient-script
 Source2:  README.dhclient.d
@@ -86,7 +86,7 @@ BuildRequires: systemd systemd-devel
 # dhcp-sd_notify.patch
 BuildRequires: pkgconfig(libsystemd)
 BuildRequires: doxygen
-%if %sdt
+%if %{sdt}
 BuildRequires: systemtap-sdt-devel
 %global tapsetdir    /usr/share/systemtap/tapset
 %endif
@@ -95,7 +95,7 @@ BuildRequires: systemtap-sdt-devel
 # Because nothing under _docdir is allowed to "require" anything,
 # prevent _docdir from being scanned. (#674058)
 %filter_requires_in %{_docdir}
-%filter_setup
+%{filter_setup}
 
 %description
 DHCP (Dynamic Host Configuration Protocol)
@@ -358,25 +358,25 @@ rm -rf includes/isc-dhcp
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
-%{__sed} -i -e 's|DHCLIENT_DEFAULT_PREFIX_LEN 64|DHCLIENT_DEFAULT_PREFIX_LEN 128|g' includes/site.h
+sed -i -e 's|DHCLIENT_DEFAULT_PREFIX_LEN 64|DHCLIENT_DEFAULT_PREFIX_LEN 128|g' includes/site.h
 
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
             client/dhclient-script.8 client/dhclient.8 ; do
-    %{__sed} -i -e 's|CLIENTBINDIR|%{_sbindir}|g' \
+    sed -i -e 's|CLIENTBINDIR|%{_sbindir}|g' \
                 -e 's|RUNDIR|%{_localstatedir}/run|g' \
                 -e 's|DBDIR|%{_localstatedir}/lib/dhclient|g' \
                 -e 's|ETCDIR|%{dhcpconfdir}|g' $page
 done
 
 for page in server/dhcpd.conf.5 server/dhcpd.leases.5 server/dhcpd.8 ; do
-    %{__sed} -i -e 's|CLIENTBINDIR|%{_sbindir}|g' \
+    sed -i -e 's|CLIENTBINDIR|%{_sbindir}|g' \
                 -e 's|RUNDIR|%{_localstatedir}/run|g' \
                 -e 's|DBDIR|%{_localstatedir}/lib/dhcpd|g' \
                 -e 's|ETCDIR|%{dhcpconfdir}|g' $page
 done
 
-%{__sed} -i -e 's|/var/db/|%{_localstatedir}/lib/dhcpd/|g' contrib/dhcp-lease-list.pl
+sed -i -e 's|/var/db/|%{_localstatedir}/lib/dhcpd/|g' contrib/dhcp-lease-list.pl
 
 %build
 #libtoolize --copy --force
@@ -399,40 +399,40 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --with-libbind-libs=%{_libdir}/bind99 \
     --disable-static \
     --enable-log-pid \
-%if %sdt
+%if %{sdt}
     --enable-systemtap \
     --with-tapset-install-dir=%{tapsetdir} \
 %endif
     --enable-paranoia --enable-early-chroot \
     --with-systemd
-%{__make} %{?_smp_mflags}
+make %{?_smp_mflags}
 pushd doc
-%{__make} devel
+make %{?_smp_mflags} devel
 popd
 
 %install
-%{__make} install DESTDIR=%{buildroot}
+make DESTDIR=%{buildroot} install %{?_smp_mflags}
 
 # We don't want example conf files in /etc
-%{__rm} -f %{buildroot}%{_sysconfdir}/dhclient.conf.example
-%{__rm} -f %{buildroot}%{_sysconfdir}/dhcpd.conf.example
+rm -f %{buildroot}%{_sysconfdir}/dhclient.conf.example
+rm -f %{buildroot}%{_sysconfdir}/dhcpd.conf.example
 
 # dhclient-script
-%{__install} -D -p -m 0755 %{SOURCE1} %{buildroot}%{_sbindir}/dhclient-script
+install -D -p -m 0755 %{SOURCE1} %{buildroot}%{_sbindir}/dhclient-script
 
 # README.dhclient.d
-%{__install} -p -m 0644 %{SOURCE2} .
+install -p -m 0644 %{SOURCE2} .
 
 # Empty directory for dhclient.d scripts
-%{__mkdir} -p %{buildroot}%{dhcpconfdir}/dhclient.d
+mkdir -p %{buildroot}%{dhcpconfdir}/dhclient.d
 
 # NetworkManager dispatcher script
-%{__mkdir} -p %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
-%{__install} -p -m 0755 %{SOURCE3} %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
-%{__install} -p -m 0755 %{SOURCE4} %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
+mkdir -p %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
+install -p -m 0755 %{SOURCE3} %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
+install -p -m 0755 %{SOURCE4} %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
 
 # pm-utils script to handle suspend/resume and dhclient leases
-%{__install} -D -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/pm-utils/sleep.d/56dhclient
+install -D -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/pm-utils/sleep.d/56dhclient
 
 # systemd unit files
 mkdir -p %{buildroot}%{_unitdir}
@@ -441,14 +441,14 @@ install -m 644 %{SOURCE7} %{buildroot}%{_unitdir}
 install -m 644 %{SOURCE8} %{buildroot}%{_unitdir}
 
 # Start empty lease databases
-%{__mkdir} -p %{buildroot}%{_localstatedir}/lib/dhcpd/
+mkdir -p %{buildroot}%{_localstatedir}/lib/dhcpd/
 touch %{buildroot}%{_localstatedir}/lib/dhcpd/dhcpd.leases
 touch %{buildroot}%{_localstatedir}/lib/dhcpd/dhcpd6.leases
-%{__mkdir} -p %{buildroot}%{_localstatedir}/lib/dhclient/
+mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 
 # default sysconfig file for dhcpd
-%{__mkdir} -p %{buildroot}%{_sysconfdir}/sysconfig
-%{__cat} <<EOF > %{buildroot}%{_sysconfdir}/sysconfig/dhcpd
+mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
+cat <<EOF > %{buildroot}%{_sysconfdir}/sysconfig/dhcpd
 # WARNING: This file is NOT used anymore.
 
 # If you are here to restrict what interfaces should dhcpd listen on,
@@ -470,10 +470,10 @@ touch %{buildroot}%{_localstatedir}/lib/dhcpd/dhcpd6.leases
 EOF
 
 # Copy sample conf files into position (called by doc macro)
-%{__cp} -p doc/examples/dhclient-dhcpv6.conf client/dhclient6.conf.example
-%{__cp} -p doc/examples/dhcpd-dhcpv6.conf server/dhcpd6.conf.example
+cp -p doc/examples/dhclient-dhcpv6.conf client/dhclient6.conf.example
+cp -p doc/examples/dhcpd-dhcpv6.conf server/dhcpd6.conf.example
 
-%{__cat} << EOF > client/dhclient-enter-hooks
+cat << EOF > client/dhclient-enter-hooks
 #!/bin/bash
 
 # For dhclient/dhclient-script debugging.
@@ -491,8 +491,8 @@ echo "reason: ${reason}"
 EOF
 
 # Install default (empty) dhcpd.conf:
-%{__mkdir} -p %{buildroot}%{dhcpconfdir}
-%{__cat} << EOF > %{buildroot}%{dhcpconfdir}/dhcpd.conf
+mkdir -p %{buildroot}%{dhcpconfdir}
+cat << EOF > %{buildroot}%{dhcpconfdir}/dhcpd.conf
 #
 # DHCP Server Configuration file.
 #   see /usr/share/doc/dhcp-server/dhcpd.conf.example
@@ -501,7 +501,7 @@ EOF
 EOF
 
 # Install default (empty) dhcpd6.conf:
-%{__cat} << EOF > %{buildroot}%{dhcpconfdir}/dhcpd6.conf
+cat << EOF > %{buildroot}%{dhcpconfdir}/dhcpd6.conf
 #
 # DHCPv6 Server Configuration file.
 #   see /usr/share/doc/dhcp-server/dhcpd6.conf.example
@@ -510,10 +510,10 @@ EOF
 EOF
 
 # Install dhcp.schema for LDAP configuration
-%{__install} -D -p -m 0644 contrib/ldap/dhcp.schema %{buildroot}%{_sysconfdir}/openldap/schema/dhcp.schema
+install -D -p -m 0644 contrib/ldap/dhcp.schema %{buildroot}%{_sysconfdir}/openldap/schema/dhcp.schema
 
 # Don't package libtool *.la files
-find ${RPM_BUILD_ROOT}/%{_libdir} -name '*.la' -exec '/bin/rm' '-f' '{}' ';';
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %pre server
 # /usr/share/doc/setup/uidgid
@@ -537,8 +537,8 @@ chown -R dhcpd:dhcpd %{_localstatedir}/lib/dhcpd/
 for servicename in dhcpd dhcpd6; do
   etcservicefile=%{_sysconfdir}/systemd/system/${servicename}.service
   if [ -f ${etcservicefile} ]; then
-    grep -q Type= ${etcservicefile} || %{__sed} -i '/\[Service\]/a Type=notify' ${etcservicefile}
-    %{__sed} -i 's/After=network.target/Wants=network-online.target\nAfter=network-online.target/' ${etcservicefile}
+    grep -q Type= ${etcservicefile} || sed -i '/\[Service\]/a Type=notify' ${etcservicefile}
+    sed -i 's/After=network.target/Wants=network-online.target\nAfter=network-online.target/' ${etcservicefile}
   fi
 done
 exit 0
@@ -550,8 +550,8 @@ exit 0
 for servicename in dhcrelay; do
   etcservicefile=%{_sysconfdir}/systemd/system/${servicename}.service
   if [ -f ${etcservicefile} ]; then
-    grep -q Type= ${etcservicefile} || %{__sed} -i '/\[Service\]/a Type=notify' ${etcservicefile}
-    %{__sed} -i 's/After=network.target/Wants=network-online.target\nAfter=network-online.target/' ${etcservicefile}
+    grep -q Type= ${etcservicefile} || sed -i '/\[Service\]/a Type=notify' ${etcservicefile}
+    sed -i 's/After=network.target/Wants=network-online.target\nAfter=network-online.target/' ${etcservicefile}
   fi
 done
 exit 0
@@ -623,7 +623,7 @@ done
 %attr(0644,root,root) %{_mandir}/man5/dhcpd.conf.5.gz
 %attr(0644,root,root) %{_mandir}/man5/dhcpd.leases.5.gz
 %attr(0644,root,root) %{_mandir}/man8/dhcpd.8.gz
-%if %sdt
+%if %{sdt}
 %{tapsetdir}/*.stp
 %endif
 
@@ -653,7 +653,7 @@ done
 
 %files common
 %{!?_licensedir:%global license %%doc}
-%license LICENSE
+%{license} LICENSE
 %doc README RELNOTES doc/References.txt
 %attr(0644,root,root) %{_mandir}/man5/dhcp-options.5.gz
 %attr(0644,root,root) %{_mandir}/man5/dhcp-eval.5.gz
@@ -675,6 +675,9 @@ done
 %doc doc/html/
 
 %changelog
+* Thu Jul 09 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-10
+- spec cleanup
+
 * Thu Jul 02 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-9
 - test upstream fix for #866714 (paranoia.patch)
 
