@@ -677,6 +677,7 @@ done
 %changelog
 * Tue Jul 14 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-11
 - remove dependency on initscripts (#1098172)
+- make path to resolv.conf configurable (#1086425)
 
 * Thu Jul 09 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-10
 - spec cleanup

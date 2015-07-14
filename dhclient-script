@@ -39,6 +39,8 @@ LOGLEVEL="notice"
 
 ETCDIR="/etc/dhcp"
 
+RESOLVCONF="/etc/resolv.conf"
+
 logmessage() {
     msg="${1}"
     logger -p "${LOGFACILITY}.${LOGLEVEL}" -t "NET" "dhclient: ${msg}"
@@ -84,7 +86,7 @@ eventually_add_hostnames_domain_to_search() {
 
        if [ "${is_in}" = "false" ]; then
           # Add domain name to search list (#637763)
-          sed -i -e "s/${search}/${search} ${domain}/" /etc/resolv.conf
+          sed -i -e "s/${search}/${search} ${domain}/" "${RESOLVCONF}"
        fi
     fi
 }
@@ -659,31 +661,32 @@ dh6config() {
 need_hostname ()
 {
     CHECK_HOSTNAME=$(hostname)
-    if [ "$CHECK_HOSTNAME" = "(none)" -o "$CHECK_HOSTNAME" = "localhost" -o \
-	"$CHECK_HOSTNAME" = "localhost.localdomain" ]; then
-	return 0
+    if [[ "${CHECK_HOSTNAME}" = "(none)" ]] ||
+       [[ "${CHECK_HOSTNAME}" = "localhost" ]] ||
+       [[ "${CHECK_HOSTNAME}" = "localhost.localdomain" ]]; then
+        return 0
     else
-	return 1
+        return 1
     fi
 }
 
+# Takes one argument - temporary resolv.conf file
 change_resolv_conf ()
 {
-    s=$(grep '^[\ \	]*option' /etc/resolv.conf 2>/dev/null);
-    if [ $# -eq 1 ]; then
-       if [ "x$s" != "x" ]; then
-	  s="$s"$'\n'$(grep -vF "$s" $1);
-       else
-	  s=$(cat $1);
-       fi;
+    options=$(grep '^[\ \	]*option' "${RESOLVCONF}" 2>/dev/null);
+    if [[ -n "${options}" ]]; then
+       # merge options from existing resolv.conf with specified resolv.conf content
+       newres="${options}"$'\n'$(grep -vF "${options}" "${1}");
+    else
+       newres=$(cat "${1}");
     fi;
-    (echo "$s" > /etc/resolv.conf;) >/dev/null 2>&1;
-    r=$?;
-    if [ $r -eq 0 ]; then
-	logger -p local7.notice -t "NET" -i "$0 : updated /etc/resolv.conf";
-	[ -e /var/run/nscd/socket ] && /usr/sbin/nscd -i hosts; # invalidate cache
+
+    eval $(echo "${newres}" > "${RESOLVCONF}"; echo "status=$?")
+    if [[ $status -eq 0 ]]; then
+        logger -p local7.notice -t "NET" -i "${0} : updated ${RESOLVCONF}";
+        [[ -e /var/run/nscd/socket ]] && /usr/sbin/nscd -i hosts; # invalidate cache
     fi;
-    return $r;
+    return $status;
 }
 
 need_config ()
