@@ -654,6 +654,53 @@ dh6config() {
     execute_client_side_configuration_scripts "config"
 }
 
+# Functions from /etc/sysconfig/network-scripts/network-functions
+
+need_hostname ()
+{
+    CHECK_HOSTNAME=$(hostname)
+    if [ "$CHECK_HOSTNAME" = "(none)" -o "$CHECK_HOSTNAME" = "localhost" -o \
+	"$CHECK_HOSTNAME" = "localhost.localdomain" ]; then
+	return 0
+    else
+	return 1
+    fi
+}
+
+change_resolv_conf ()
+{
+    s=$(grep '^[\ \	]*option' /etc/resolv.conf 2>/dev/null);
+    if [ $# -eq 1 ]; then
+       if [ "x$s" != "x" ]; then
+	  s="$s"$'\n'$(grep -vF "$s" $1);
+       else
+	  s=$(cat $1);
+       fi;
+    fi;
+    (echo "$s" > /etc/resolv.conf;) >/dev/null 2>&1;
+    r=$?;
+    if [ $r -eq 0 ]; then
+	logger -p local7.notice -t "NET" -i "$0 : updated /etc/resolv.conf";
+	[ -e /var/run/nscd/socket ] && /usr/sbin/nscd -i hosts; # invalidate cache
+    fi;
+    return $r;
+}
+
+need_config ()
+{
+    # Do we really need this ?
+    # The original one from /etc/sysconfig/network-scripts/network-functions
+    # seems to set CONFIG variable, which we don't use anywhere AFAICT.
+    :
+}
+
+source_config ()
+{
+    # Do we really need to source /etc/sysconfig/network-scripts/$CONFIG ?
+    # I don't think we use for example
+    # DEVNAME, DEVICE, DEVICETYPE, HWADDR, MACADDR, ISALIAS or UUID anywhere.
+    :
+}
 
 #
 # ### MAIN
@@ -662,19 +709,6 @@ dh6config() {
 # Invoke the local dhcp client enter hooks, if they exist.
 run_hook "${ETCDIR}/dhclient-enter-hooks" || exit $?
 run_hookdir "${ETCDIR}/dhclient-enter-hooks.d" || exit $?
-
-if [ ! -r /etc/sysconfig/network-scripts/network-functions ]; then
-    echo "Missing /etc/sysconfig/network-scripts/network-functions, exiting." >&2
-    exit 1
-fi
-
-if [ ! -r /etc/rc.d/init.d/functions ]; then
-    echo "Missing /etc/rc.d/init.d/functions, exiting." >&2
-    exit 1
-fi
-
-. /etc/sysconfig/network-scripts/network-functions
-. /etc/rc.d/init.d/functions
 
 if [ -f /etc/sysconfig/network ]; then
     . /etc/sysconfig/network

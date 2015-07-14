@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.2
-Release:  10%{?dist}
+Release:  11%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -155,7 +155,7 @@ Summary: Provides the ISC DHCP client daemon and dhclient-script
 Provides: dhclient = %{epoch}:%{version}-%{release}
 Obsoletes: dhclient < %{epoch}:%{version}-%{release}
 # dhclient-script requires:
-Requires: coreutils grep hostname initscripts iproute iputils sed gawk /usr/bin/ipcalc
+Requires: coreutils grep sed gawk hostname iproute iputils /bin/ipcalc
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
@@ -675,6 +675,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Jul 14 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-11
+- remove dependency on initscripts (#1098172)
+
 * Thu Jul 09 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-10
 - spec cleanup
 
