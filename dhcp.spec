@@ -9,16 +9,16 @@
 
 
 #%%global patchver P2
-#%%global prever b1
+%global prever b1
 
 #%%global VERSION %{version}-%{patchver}
-#%%global VERSION %{version}%{prever}
-%global VERSION %{version}
+#%%global VERSION %{version}
+%global VERSION %{version}%{prever}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
-Version:  4.3.2
-Release:  12%{?dist}
+Version:  4.3.3
+Release:  0.1%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -37,7 +37,7 @@ Source7:  dhcpd6.service
 Source8:  dhcrelay.service
 
 Patch0:   dhcp-remove-bind.patch
-Patch1:   dhcp-remove-dst.patch
+
 Patch2:   dhcp-sharedlib.patch
 Patch3:   dhcp-errwarn-message.patch
 Patch4:   dhcp-dhclient-options.patch
@@ -53,12 +53,12 @@ Patch13:  dhcp-garbage-chars.patch
 Patch14:  dhcp-add_timeout_when_NULL.patch
 Patch15:  dhcp-64_bit_lease_parse.patch
 Patch16:  dhcp-capability.patch
-Patch17:  dhcp-UseMulticast.patch
+
 Patch18:  dhcp-sendDecline.patch
 Patch19:  dhcp-rfc3442-classless-static-routes.patch
 Patch20:  dhcp-honor-expired.patch
 Patch21:  dhcp-PPP.patch
-Patch22:  dhcp-paranoia.patch
+
 Patch23:  dhcp-lpf-ib.patch
 Patch24:  dhcp-IPoIB-log-id.patch
 Patch25:  dhcp-improved-xid.patch
@@ -67,11 +67,11 @@ Patch27:  dhcp-duidv4.patch
 Patch28:  dhcp-systemtap.patch
 Patch29:  dhcp-getifaddrs.patch
 Patch30:  dhcp-omapi-leak.patch
-Patch31:  dhcp-failOverPeer.patch
+
 Patch32:  dhcp-interval.patch
 Patch33:  dhcp-no-subnet-error2info.patch
 Patch34:  dhcp-sd_notify.patch
-Patch35:  dhcp-ldapgssapi.patch
+
 Patch36:  dhcp-option97-pxe-client-id.patch
 Patch37:  dhcp-stateless-DUID-LLT.patch
 Patch38:  dhcp-client-request-release-bind-iface.patch
@@ -212,16 +212,8 @@ This package contains doxygen-generated documentation.
 # Remove bundled BIND source
 rm bind/bind.tar.gz
 
-# Remove libdst
-rm -rf dst/
-rm -rf includes/isc-dhcp
-
 # Fire away bundled BIND source.
 %patch0 -p1 -b .remove-bind %{?_rawbuild}
-
-# Fire away libdst
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30692])
-%patch1 -p1 -b .remove-dst %{?_rawbuild}
 
 #Build dhcp's libraries as shared libs instead of static libs.
 %patch2 -p1 -b .sharedlib
@@ -277,12 +269,6 @@ rm -rf includes/isc-dhcp
 # dhclient (#517649, #546765), dhcpd/dhcrelay (#699713)
 %patch16 -p1 -b .capability
 
-# Discard unicast Request/Renew/Release/Decline message
-# (unless we set unicast option) and respond with Reply
-# with UseMulticast Status Code option (#573090)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #21235])
-%patch17 -p1 -b .UseMulticast
-
 # If any of the bound addresses are found to be in use on the link,
 # the dhcpv6 client sends a Decline message to the server
 # as described in section 18.1.7 of RFC-3315 (#559147)
@@ -300,10 +286,6 @@ rm -rf includes/isc-dhcp
 
 # DHCPv6 over PPP support (#626514)
 %patch21 -p1 -b .PPP
-
-# dhcpd: BEFORE changing of the effective user/group ID:
-#  - chown leases file (#866714)
-%patch22 -p1 -b .paranoia
 
 # IPoIB support (#660681)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24249])
@@ -327,10 +309,6 @@ rm -rf includes/isc-dhcp
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #33990])
 %patch30 -p1 -b .leak
 
-# Dhcpd does not correctly follow DhcpFailOverPeerDN (#838400)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30402])
-%patch31 -p1 -b .failOverPeer
-
 # isc_time_nowplusinterval() is not safe with 64-bit time_t (#662254, #789601)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28038])
 %patch32 -p1 -b .interval
@@ -340,9 +318,6 @@ rm -rf includes/isc-dhcp
 
 # support for sending startup notification to systemd (#1077666)
 %patch34 -p1 -b .sd_notify
-
-# GSSAPI support for ldap authentication (#1150542)
-%patch35 -p1 -b .ldapgssapi
 
 # option 97 - pxe-client-id (#1058674)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #38110])
@@ -515,6 +490,8 @@ install -D -p -m 0644 contrib/ldap/dhcp.schema %{buildroot}%{_sysconfdir}/openld
 # Don't package libtool *.la files
 find %{buildroot} -type f -name "*.la" -delete -print
 
+rm %{buildroot}%{_includedir}/isc-dhcp/dst.h
+
 %pre server
 # /usr/share/doc/setup/uidgid
 %global gid_uid 177
@@ -675,6 +652,9 @@ done
 %doc doc/html/
 
 %changelog
+* Mon Aug 10 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-0.1b1
+- 4.3.3b1
+
 * Wed Jul 15 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-12
 - fix ipcalc requires
 
