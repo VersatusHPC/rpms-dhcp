@@ -80,6 +80,8 @@ BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: libtool
 BuildRequires: openldap-devel
+# --with-ldap-gssapi
+BuildRequires: krb5-devel
 BuildRequires: libcap-ng-devel
 BuildRequires: bind99-devel
 BuildRequires: systemd systemd-devel
@@ -368,10 +370,11 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --with-cli-pid-file=%{_localstatedir}/run/dhclient.pid \
     --with-cli6-pid-file=%{_localstatedir}/run/dhclient6.pid \
     --with-relay-pid-file=%{_localstatedir}/run/dhcrelay.pid \
-    --with-ldap \
-    --with-ldapcrypto \
     --with-libbind=%{_includedir}/bind99 \
     --with-libbind-libs=%{_libdir}/bind99 \
+    --with-ldap \
+    --with-ldapcrypto \
+    --with-ldap-gssapi \
     --disable-static \
     --enable-log-pid \
 %if %{sdt}
@@ -379,6 +382,7 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --with-tapset-install-dir=%{tapsetdir} \
 %endif
     --enable-paranoia --enable-early-chroot \
+    --enable-binary-leases \
     --with-systemd
 make %{?_smp_mflags}
 pushd doc
@@ -654,6 +658,8 @@ done
 %changelog
 * Mon Aug 10 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-0.1b1
 - 4.3.3b1
+- enable krb5/gssapi authentication for OpenLDAP
+- enable support for binary insertion of leases
 
 * Wed Jul 15 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-12
 - fix ipcalc requires
