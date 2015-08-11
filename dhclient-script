@@ -409,11 +409,12 @@ dhconfig() {
             for((i=0; i<${#static_routes[@]}; i+=2)); do
                 target=${static_routes[$i]}
                 if [ -n "${new_classless_static_routes}" ]; then
+                    # If the DHCP server returns both a Classless Static Routes option and
+                    # a Router option, the DHCP client MUST ignore the Router option. (RFC3442)
+                    new_routers=""
                     if [ "${target}" = "0" ]; then
-                        # If the DHCP server returns both a Classless Static Routes option and
-                        # a Router option, the DHCP client MUST ignore the Router option. (RFC3442)
-                        new_routers=""
-                        prefix="0"
+                        new_routers="${static_routes[$i+1]}"
+                        continue
                     else
                         prefix=${target%%.*}
                         target=${target#*.}
