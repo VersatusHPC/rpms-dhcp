@@ -11,14 +11,14 @@
 #%%global patchver P2
 %global prever b1
 
-#%%global VERSION %{version}-%{patchver}
-#%%global VERSION %{version}%{prever}
+#%%global VERSION %%{version}-%%{patchver}
+#%%global VERSION %%{version}%%{prever}
 %global VERSION %{version}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.3
-Release:  1%{?dist}
+Release:  2%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -71,7 +71,7 @@ Patch30:  dhcp-omapi-leak.patch
 Patch32:  dhcp-interval.patch
 Patch33:  dhcp-no-subnet-error2info.patch
 Patch34:  dhcp-sd_notify.patch
-
+Patch35:  dhcp-VLAN-ID.patch
 Patch36:  dhcp-option97-pxe-client-id.patch
 Patch37:  dhcp-stateless-DUID-LLT.patch
 Patch38:  dhcp-client-request-release-bind-iface.patch
@@ -320,6 +320,10 @@ rm bind/bind.tar.gz
 
 # support for sending startup notification to systemd (#1077666)
 %patch34 -p1 -b .sd_notify
+
+# VLAN ID is only bottom 12-bits of TCI (#1259552)
+# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #40591])
+%patch35 -p1 -b .vlanid
 
 # option 97 - pxe-client-id (#1058674)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #38110])
@@ -656,6 +660,9 @@ done
 %doc doc/html/
 
 %changelog
+* Mon Sep 07 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-2
+- VLAN ID is only bottom 12-bits of TCI (#1259552)
+
 * Fri Sep 04 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-1
 - 4.3.3
 

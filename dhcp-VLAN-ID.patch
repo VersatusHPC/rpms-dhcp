@@ -1,0 +1,35 @@
+From 7a1862a392038407371d6889e49b06848efa637f Mon Sep 17 00:00:00 2001
+From: Jiri Popelka <jpopelka@redhat.com>
+Date: Thu, 3 Sep 2015 18:25:42 +0200
+Subject: [PATCH] VLAN ID is only bottom 12-bits of TCI
+
+The upper 4 bits contain metadata used for quality of service
+management.
+
+TCI(16b) = PCP(3b) + DEI(1b) + VID(12b)
+
+TCI = Tag control information
+PCP = Priority code point
+DEI = Drop eligible indicator
+VID = VLAN identifier
+---
+ common/lpf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/common/lpf.c b/common/lpf.c
+index 7889b6b..4c835e6 100644
+--- a/common/lpf.c
++++ b/common/lpf.c
+@@ -425,7 +425,8 @@ ssize_t receive_packet (interface, buf, len, from, hfrom)
+ 			/* Discard packets with stripped vlan id */
+ 
+ #ifdef VLAN_TCI_PRESENT
+-			if (aux->tp_vlan_tci != 0)
++			/* VLAN ID is only bottom 12-bits of TCI */
++			if (aux->tp_vlan_tci & 0x0fff)
+ 				return 0;
+ #endif
+ 
+-- 
+2.5.0
+
