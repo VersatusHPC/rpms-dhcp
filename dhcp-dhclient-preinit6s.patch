@@ -47,7 +47,7 @@ diff -up dhcp-4.3.3/client/dhclient.c.preinit6s dhcp-4.3.3/client/dhclient.c
 +				   INTERFACE_AUTOMATIC)) !=
 +		     INTERFACE_REQUESTED))
 +			continue;
-+		script_init(ip->client, "PREINIT6S", NULL);
++		script_init(ip->client, "PREINIT6", NULL);
 +		script_go(ip->client);
 +	}
 +

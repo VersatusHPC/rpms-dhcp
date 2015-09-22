@@ -777,17 +777,13 @@ case "${reason}" in
         # ensure interface is up
         ip link set dev "${interface}" up
 
-        # remove any stale addresses from aborted clients
-        ip -6 addr flush dev "${interface}" scope global permanent
+        # Removing stale addresses from aborted clients shouldn't be needed
+        # since we've been adding addresses with lifetimes.
+        # Which means that kernel eventually removes them automatically.
+        # ip -6 addr flush dev "${interface}" scope global permanent
 
         wait_for_link_local
 
-        exit_with_hooks 0
-        ;;
-
-    PREINIT6S)  # stateless
-        ip link set dev "${interface}" up
-        wait_for_link_local
         exit_with_hooks 0
         ;;
 
