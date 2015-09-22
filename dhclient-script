@@ -569,6 +569,17 @@ dhconfig() {
     execute_client_side_configuration_scripts "config"
 }
 
+wait_for_link_local() {
+    # we need a link-local address to be ready (not tentative)
+    for i in $(seq 50); do
+        linklocal=$(ip -6 addr show dev "${interface}" scope link)
+        # tentative flag means DAD is still not complete
+        tentative=$(echo "${linklocal}" | grep tentative)
+        [[ -n "${linklocal}" && -z "${tentative}" ]] && exit_with_hooks 0
+        sleep 0.1
+    done
+}
+
 # Section 18.1.8. (Receipt of Reply Messages) of RFC 3315 says:
 # The client SHOULD perform duplicate address detection on each of
 # the addresses in any IAs it receives in the Reply message before
@@ -769,15 +780,14 @@ case "${reason}" in
         # remove any stale addresses from aborted clients
         ip -6 addr flush dev "${interface}" scope global permanent
 
-        # we need a link-local address to be ready (not tentative)
-        for i in $(seq 50); do
-            linklocal=$(ip -6 addr show dev "${interface}" scope link)
-            # tentative flag means DAD is still not complete
-            tentative=$(echo "${linklocal}" | grep tentative)
-            [[ -n "${linklocal}" && -z "${tentative}" ]] && exit_with_hooks 0
-            sleep 0.1
-        done
+        wait_for_link_local
 
+        exit_with_hooks 0
+        ;;
+
+    PREINIT6S)  # stateless
+        ip link set dev "${interface}" up
+        wait_for_link_local
         exit_with_hooks 0
         ;;
 

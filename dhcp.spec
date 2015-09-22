@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.3
-Release:  2%{?dist}
+Release:  3%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -67,14 +67,14 @@ Patch27:  dhcp-duidv4.patch
 Patch28:  dhcp-systemtap.patch
 Patch29:  dhcp-getifaddrs.patch
 Patch30:  dhcp-omapi-leak.patch
-
+Patch31:  dhcp-client-request-release-bind-iface.patch
 Patch32:  dhcp-interval.patch
 Patch33:  dhcp-no-subnet-error2info.patch
 Patch34:  dhcp-sd_notify.patch
 Patch35:  dhcp-VLAN-ID.patch
 Patch36:  dhcp-option97-pxe-client-id.patch
 Patch37:  dhcp-stateless-DUID-LLT.patch
-Patch38:  dhcp-client-request-release-bind-iface.patch
+Patch38:  dhcp-dhclient-preinit6s.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -311,6 +311,10 @@ rm bind/bind.tar.gz
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #33990])
 %patch30 -p1 -b .leak
 
+# send unicast request/release via correct interface (#800561, #1177351)
+# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30544])
+%patch31 -p1 -b .bind-iface
+
 # isc_time_nowplusinterval() is not safe with 64-bit time_t (#662254, #789601)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28038])
 %patch32 -p1 -b .interval
@@ -333,9 +337,8 @@ rm bind/bind.tar.gz
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #38144])
 %patch37 -p1 -b .stateless-DUID-LLT
 
-# send unicast request/release via correct interface (#800561, #1177351)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30544])
-%patch38 -p1 -b .bind-iface
+# dhclient: make sure link-local address is ready in stateless mode (#1263466)
+%patch38 -p1 -b .preinit6s
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -660,6 +663,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Sep 22 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-3
+- dhclient: make sure link-local address is ready in stateless mode (#1263466)
+
 * Mon Sep 07 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-2
 - VLAN ID is only bottom 12-bits of TCI (#1259552)
 
