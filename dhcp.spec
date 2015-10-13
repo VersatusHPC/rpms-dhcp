@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.3
-Release:  3%{?dist}
+Release:  4%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -663,6 +663,10 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Oct 13 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-4
+- dhclient-script: make_resolv_conf(): keep old nameservers
+  if server sends domain-name/search, but no nameservers (#1269595)
+
 * Tue Sep 22 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-3
 - dhclient: make sure link-local address is ready in stateless mode (#1263466)
 
