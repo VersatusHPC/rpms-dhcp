@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.3
-Release:  4%{?dist}
+Release:  5%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -663,6 +663,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Oct 13 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-5
+- dhclient-script: fix for gateway not in the end of rfc3442 routes list (#1251644)
+
 * Tue Oct 13 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-4
 - dhclient-script: make_resolv_conf(): keep old nameservers
   if server sends domain-name/search, but no nameservers (#1269595)
