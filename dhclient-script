@@ -709,20 +709,74 @@ change_resolv_conf ()
     return $status;
 }
 
-need_config ()
+get_config_by_name ()
 {
-    # Do we really need this ?
-    # The original one from /etc/sysconfig/network-scripts/network-functions
-    # seems to set CONFIG variable, which we don't use anywhere AFAICT.
-    :
+    LANG=C grep -E -i -l \
+        "^[[:space:]]*NAME=\"(Auto |System )?${1}\"" \
+        /etc/sysconfig/network-scripts/ifcfg-* \
+        | LC_ALL=C sed -e "$__sed_discard_ignored_files"
 }
 
+get_hwaddr ()
+{
+    if [ -f /sys/class/net/${1}/address ]; then
+        awk '{ print toupper($0) }' < /sys/class/net/${1}/address
+    elif [ -d "/sys/class/net/${1}" ]; then
+        LC_ALL= LANG= ip -o link show ${1} 2>/dev/null | \
+            awk '{ print toupper(gensub(/.*link\/[^ ]* ([[:alnum:]:]*).*/,
+                                        "\\1", 1)); }'
+    fi
+}
+
+get_config_by_hwaddr ()
+{
+    LANG=C grep -il "^[[:space:]]*HWADDR=\"\?${1}\"\?\([[:space:]#]\|$\)" /etc/sysconfig/network-scripts/ifcfg-* \
+      | LC_ALL=C sed -e "$__sed_discard_ignored_files"
+}
+
+get_config_by_device ()
+{
+    LANG=C grep -l "^[[:space:]]*DEVICE=\"\?${1}\"\?\([[:space:]#]\|$\)" \
+        /etc/sysconfig/network-scripts/ifcfg-* \
+        | LC_ALL=C sed -e "$__sed_discard_ignored_files"
+}
+
+need_config ()
+{
+    # A sed expression to filter out the files that is_ignored_file recognizes
+    __sed_discard_ignored_files='/\(~\|\.bak\|\.orig\|\.rpmnew\|\.rpmorig\|\.rpmsave\)$/d'
+
+    local nconfig
+
+    CONFIG="ifcfg-${1}"
+    [ -f "${CONFIG}" ] && return
+    CONFIG="${1##*/}"
+    [ -f "${CONFIG}" ] && return
+    nconfig=$(get_config_by_name "${1}")
+    if [ -n "$nconfig" ] && [ -f "$nconfig" ]; then
+      CONFIG=${nconfig##*/}
+      return
+    fi
+    local addr=$(get_hwaddr ${1})
+    if [ -n "$addr" ]; then
+      nconfig=$(get_config_by_hwaddr ${addr})
+      if [ -n "$nconfig" ] ; then
+        CONFIG=${nconfig##*/}
+        [ -f "${CONFIG}" ] && return
+      fi
+    fi
+    nconfig=$(get_config_by_device ${1})
+    if [ -n "$nconfig" ] && [ -f "$nconfig" ]; then
+      CONFIG=${nconfig##*/}
+      return
+    fi
+}
+
+# We need this because of PEERDNS
 source_config ()
 {
-    # Do we really need to source /etc/sysconfig/network-scripts/$CONFIG ?
-    # I don't think we use for example
-    # DEVNAME, DEVICE, DEVICETYPE, HWADDR, MACADDR, ISALIAS or UUID anywhere.
-    :
+    CONFIG=${CONFIG##*/}
+    . /etc/sysconfig/network-scripts/$CONFIG
 }
 
 #
