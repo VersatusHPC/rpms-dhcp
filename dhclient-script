@@ -48,7 +48,7 @@ logmessage() {
 
 eventually_add_hostnames_domain_to_search() {
 # For the case when hostname for this machine has a domain that is not in domain_search list
-# 1) get a hostname with `ipcalc --hostname` or `hostname`
+# 1) get a hostname with `ipcalc --hostname` or `hostnamectl --transient`
 # 2) get the domain from this hostname
 # 3) add this domain to search line in resolv.conf if it's not already
 #    there (domain list that we have recently added there is a parameter of this function)
@@ -68,7 +68,7 @@ eventually_add_hostnames_domain_to_search() {
             domain=$(echo "${HOSTNAME}" | cut -s -d "." -f 2-)
         fi
     else
-          domain=$(hostname 2>/dev/null | cut -s -d "." -f 2-)
+          domain=$(hostnamectl --transient 2>/dev/null | cut -s -d "." -f 2-)
     fi
 
     if [ -n "${domain}" ] &&
@@ -550,7 +550,7 @@ dhconfig() {
     make_resolv_conf
 
     if [ -n "${new_host_name}" ] && need_hostname; then
-        hostname "${new_host_name}" || echo "See -nc option in dhclient(8) man page."
+        hostnamectl set-hostname --transient --no-ask-password "${new_host_name}"
     fi
 
     if [[ ( "${DHCP_TIME_OFFSET_SETS_TIMEZONE}" = [yY1]* ) &&
@@ -680,7 +680,7 @@ dh6config() {
 
 need_hostname ()
 {
-    CHECK_HOSTNAME=$(hostname)
+    CHECK_HOSTNAME=$(hostnamectl --transient)
     if [[ "${CHECK_HOSTNAME}" = "(none)" ]] ||
        [[ "${CHECK_HOSTNAME}" = "localhost" ]] ||
        [[ "${CHECK_HOSTNAME}" = "localhost.localdomain" ]]; then
