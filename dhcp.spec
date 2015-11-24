@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.3
-Release:  7%{?dist}
+Release:  8%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -663,6 +663,9 @@ done
 %doc doc/html/
 
 %changelog
+* Tue Nov 24 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-8
+- dispatcher.d/12-dhcpd: use reset-failed command
+
 * Mon Nov 23 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-7
 - dhclient-script: hostname -> hostnamectl --transient
 
