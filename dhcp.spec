@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.3
-Release:  8%{?dist}
+Release:  9%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -62,8 +62,9 @@ Patch21:  dhcp-PPP.patch
 Patch23:  dhcp-lpf-ib.patch
 Patch24:  dhcp-IPoIB-log-id.patch
 Patch25:  dhcp-improved-xid.patch
-Patch26:  dhcp-gpxe-cid.patch
-Patch27:  dhcp-duidv4.patch
+#Patch26:  dhcp-gpxe-cid.patch
+Patch26:  dhcp-duidv4.patch
+Patch27:  dhcp-duid_uuid.patch
 Patch28:  dhcp-systemtap.patch
 Patch29:  dhcp-getifaddrs.patch
 Patch30:  dhcp-omapi-leak.patch
@@ -295,10 +296,13 @@ rm bind/bind.tar.gz
 # add GUID/DUID to dhcpd logs (#1064416)
 %patch24 -p1 -b .IPoIB-log-id
 %patch25 -p1 -b .improved-xid
+
 # create client identifier per rfc4390
 #%%patch26 -p1 -b .gpxe-cid (not needed as we use DUIDs - see next patch)
 # Turn on creating/sending of DUID as client identifier with DHCPv4 clients (#560361c#40, rfc4361)
-%patch27 -p1 -b .duidv4
+%patch26 -p1 -b .duidv4
+# Implement DUID-UUID (RFC 6355) and make it default DUID type (#560361#60)
+%patch27 -p1 -b .duid_uuid
 
 # http://sourceware.org/systemtap/wiki/SystemTap
 %patch28 -p1 -b .systemtap
@@ -663,6 +667,9 @@ done
 %doc doc/html/
 
 %changelog
+* Mon Dec 14 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-9
+- implement DUID-UUID (RFC 6355) and make it default DUID type (#560361#60)
+
 * Tue Nov 24 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-8
 - dispatcher.d/12-dhcpd: use reset-failed command
 
