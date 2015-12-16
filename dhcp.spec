@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.3
-Release:  6%{?dist}
+Release:  7%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -663,6 +663,9 @@ done
 %doc doc/html/
 
 %changelog
+* Wed Dec 16 2015 Tomas Hozza <thozza@redhat.com> - 12:4.3.3-7
+- Rebuild against bind-9.9.8-P2
+
 * Tue Nov 03 2015 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-6
 - dhclient-script: source ifcfg-* because of PEERDNS (#1277253)
 
