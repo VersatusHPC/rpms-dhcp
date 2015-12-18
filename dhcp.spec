@@ -83,6 +83,7 @@ BuildRequires: openldap-devel
 # --with-ldap-gssapi
 BuildRequires: krb5-devel
 BuildRequires: libcap-ng-devel
+# https://fedorahosted.org/fpc/ticket/502#comment:3
 BuildRequires: bind99-devel
 BuildRequires: systemd systemd-devel
 # dhcp-sd_notify.patch
