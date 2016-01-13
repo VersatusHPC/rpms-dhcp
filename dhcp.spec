@@ -8,17 +8,17 @@
 %global dhcpconfdir %{_sysconfdir}/dhcp
 
 
-#%%global patchver P2
-%global prever b1
+#%%global prever b1
+%global patchver P1
 
-#%%global VERSION %%{version}-%%{patchver}
 #%%global VERSION %%{version}%%{prever}
-%global VERSION %{version}
+#%%global VERSION %{version}
+%global VERSION %%{version}-%%{patchver}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.3
-Release:  10%{?dist}
+Release:  11.%{patchver}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -668,6 +668,9 @@ done
 %doc doc/html/
 
 %changelog
+* Wed Jan 13 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-11.P1
+- 4.3.3-P1 - fix for CVE-2015-8605 (#1298077)
+
 * Wed Dec 16 2015 Tomas Hozza <thozza@redhat.com> - 12:4.3.3-10
 - Rebuild against bind-9.9.8-P2
 
