@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.2
-Release:  6%{?dist}
+Release:  7%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -75,6 +75,7 @@ Patch35:  dhcp-ldapgssapi.patch
 Patch36:  dhcp-option97-pxe-client-id.patch
 Patch37:  dhcp-stateless-DUID-LLT.patch
 Patch38:  dhcp-client-request-release-bind-iface.patch
+Patch39:  dhcp-CVE-2015-8605.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -355,6 +356,9 @@ rm -rf includes/isc-dhcp
 # send unicast request/release via correct interface (#800561, #1177351)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30544])
 %patch38 -p1 -b .bind-iface
+
+# CVE-2015-8605 (#1298077)
+%patch39 -p1 -b .CVE-2015-8605
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -675,6 +679,9 @@ done
 %doc doc/html/
 
 %changelog
+* Wed Jan 13 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-7
+- CVE-2015-8605 (#1298077)
+
 * Wed Dec 16 2015 Tomas Hozza <thozza@redhat.com> - 12:4.3.2-6
 - Rebuild against bind-9.9.8-P2
 
