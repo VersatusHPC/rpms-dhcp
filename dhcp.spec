@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.3
-Release:  11.%{patchver}%{?dist}
+Release:  12.%{patchver}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -668,6 +668,9 @@ done
 %doc doc/html/
 
 %changelog
+* Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 12:4.3.3-12.P1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
 * Wed Jan 13 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-11.P1
 - 4.3.3-P1 - fix for CVE-2015-8605 (#1298077)
 
