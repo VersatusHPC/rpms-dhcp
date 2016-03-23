@@ -10,7 +10,7 @@ for that component (e.g., NTP options belong in a handler in the ntp
 package).
 
 To make maintenance easier, application specific DHCP options can be handled
-by creating a script with two functions and placing it in /etc/dhcp/dhclient.d
+by creating a bash script with two functions and placing it in /etc/dhcp/dhclient.d
 
 The script must follow a specific form:
 
