@@ -397,9 +397,9 @@ diff -up dhcp-4.3.4/includes/dhctoken.h.rfc3442 dhcp-4.3.4/includes/dhctoken.h
  	LEASE_ID_FORMAT = 676,
  	TOKEN_HEX = 677,
  	TOKEN_OCTAL = 678,
--        BOOTP_BROADCAST_ALWAYS = 679
-+        BOOTP_BROADCAST_ALWAYS = 679,
-+        DESTINATION_DESCRIPTOR = 674
+-	BOOTP_BROADCAST_ALWAYS = 679
++	BOOTP_BROADCAST_ALWAYS = 679,
++	DESTINATION_DESCRIPTOR = 680
  };
  
  #define is_identifier(x)	((x) >= FIRST_TOKEN &&	\
