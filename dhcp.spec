@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.2
-Release:  7%{?dist}
+Release:  8%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -76,6 +76,7 @@ Patch36:  dhcp-option97-pxe-client-id.patch
 Patch37:  dhcp-stateless-DUID-LLT.patch
 Patch38:  dhcp-client-request-release-bind-iface.patch
 Patch39:  dhcp-CVE-2015-8605.patch
+Patch40:  dhcp-CVE-2016-2774.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -359,6 +360,9 @@ rm -rf includes/isc-dhcp
 
 # CVE-2015-8605 (#1298077)
 %patch39 -p1 -b .CVE-2015-8605
+
+# CVE-2016-2774 (#1315614)
+%patch40 -p1 -b .CVE-2016-2774
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -679,6 +683,9 @@ done
 %doc doc/html/
 
 %changelog
+* Mon May 02 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-8
+- CVE-2016-2774 (#1315614)
+
 * Wed Jan 13 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.2-7
 - CVE-2015-8605 (#1298077)
 
