@@ -1,7 +1,7 @@
-diff -up dhcp-4.3.3b1/configure.ac.sd_notify dhcp-4.3.3b1/configure.ac
---- dhcp-4.3.3b1/configure.ac.sd_notify	2015-08-10 11:57:24.955325674 +0200
-+++ dhcp-4.3.3b1/configure.ac	2015-08-10 11:58:20.024113933 +0200
-@@ -777,6 +777,17 @@ if test x$ldap = xyes || test x$ldapcryp
+diff -up dhcp-4.3.4/configure.ac.sd_notify dhcp-4.3.4/configure.ac
+--- dhcp-4.3.4/configure.ac.sd_notify	2016-04-29 13:08:52.813287060 +0200
++++ dhcp-4.3.4/configure.ac	2016-04-29 13:08:52.872287075 +0200
+@@ -832,6 +832,17 @@ if test x$ldap = xyes || test x$ldapcryp
      AC_SUBST(LDAP_CFLAGS, [$LDAP_CFLAGS])
  fi
  
@@ -19,10 +19,10 @@ diff -up dhcp-4.3.3b1/configure.ac.sd_notify dhcp-4.3.3b1/configure.ac
  # Append selected warning levels to CFLAGS before substitution (but after
  # AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[],[]) & etc).
  CFLAGS="$CFLAGS $STD_CWARNINGS"
-diff -up dhcp-4.3.3b1/relay/dhcrelay.c.sd_notify dhcp-4.3.3b1/relay/dhcrelay.c
---- dhcp-4.3.3b1/relay/dhcrelay.c.sd_notify	2015-08-10 11:57:24.901325882 +0200
-+++ dhcp-4.3.3b1/relay/dhcrelay.c	2015-08-10 11:57:24.956325670 +0200
-@@ -36,6 +36,10 @@
+diff -up dhcp-4.3.4/relay/dhcrelay.c.sd_notify dhcp-4.3.4/relay/dhcrelay.c
+--- dhcp-4.3.4/relay/dhcrelay.c.sd_notify	2016-04-29 13:08:52.814287061 +0200
++++ dhcp-4.3.4/relay/dhcrelay.c	2016-04-29 13:08:52.872287075 +0200
+@@ -37,6 +37,10 @@
     int keep_capabilities = 0;
  #endif
  
@@ -33,7 +33,7 @@ diff -up dhcp-4.3.3b1/relay/dhcrelay.c.sd_notify dhcp-4.3.3b1/relay/dhcrelay.c
  TIME default_lease_time = 43200; /* 12 hours... */
  TIME max_lease_time = 86400; /* 24 hours... */
  struct tree_cache *global_options[256];
-@@ -627,6 +631,14 @@ main(int argc, char **argv) {
+@@ -709,6 +713,14 @@ main(int argc, char **argv) {
  	}
  #endif
  
@@ -48,23 +48,23 @@ diff -up dhcp-4.3.3b1/relay/dhcrelay.c.sd_notify dhcp-4.3.3b1/relay/dhcrelay.c
  	/* Start dispatching packets and timeouts... */
  	dispatch();
  
-diff -up dhcp-4.3.3b1/server/dhcpd.c.sd_notify dhcp-4.3.3b1/server/dhcpd.c
---- dhcp-4.3.3b1/server/dhcpd.c.sd_notify	2015-08-10 11:57:24.937325743 +0200
-+++ dhcp-4.3.3b1/server/dhcpd.c	2015-08-10 11:57:24.956325670 +0200
-@@ -58,6 +58,10 @@ gid_t set_gid = 0;
- 
- #include "trace.h"
+diff -up dhcp-4.3.4/server/dhcpd.c.sd_notify dhcp-4.3.4/server/dhcpd.c
+--- dhcp-4.3.4/server/dhcpd.c.sd_notify	2016-04-29 13:08:52.873287075 +0200
++++ dhcp-4.3.4/server/dhcpd.c	2016-04-29 13:12:00.655333096 +0200
+@@ -57,6 +57,10 @@ uid_t set_uid = 0;
+ gid_t set_gid = 0;
+ #endif /* PARANOIA */
  
 +#ifdef HAVE_LIBSYSTEMD
 +#include <systemd/sd-daemon.h>
 +#endif
 +
- #ifndef UNIT_TEST
- static void usage(void);
- #endif
-@@ -820,6 +824,13 @@ main(int argc, char **argv) {
+ struct iaddr server_identifier;
+ int server_identifier_matched;
  
- 	TRACE(DHCPD_MAIN());
+@@ -931,6 +935,14 @@ main(int argc, char **argv) {
+ 	/* Log that we are about to start working */
+ 	log_info("Server starting service.");
  
 +#ifdef HAVE_LIBSYSTEMD
 +        /* We are ready to process incomming packets. Let's notify systemd */
@@ -73,6 +73,7 @@ diff -up dhcp-4.3.3b1/server/dhcpd.c.sd_notify dhcp-4.3.3b1/server/dhcpd.c
 +                   "MAINPID=%lu",
 +                   (unsigned long) getpid());
 +#endif
++
  	/*
  	 * Receive packets and dispatch them...
  	 * dispatch() will never return.

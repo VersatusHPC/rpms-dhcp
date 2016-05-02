@@ -1,7 +1,7 @@
-diff -up dhcp-4.3.3/client/dhclient.c.duid_uuid dhcp-4.3.3/client/dhclient.c
---- dhcp-4.3.3/client/dhclient.c.duid_uuid	2015-12-14 12:10:54.694082625 +0100
-+++ dhcp-4.3.3/client/dhclient.c	2015-12-14 12:13:19.538018362 +0100
-@@ -3328,6 +3328,59 @@ write_options(struct client_state *clien
+diff -up dhcp-4.3.4/client/dhclient.c.duid_uuid dhcp-4.3.4/client/dhclient.c
+--- dhcp-4.3.4/client/dhclient.c.duid_uuid	2016-04-29 12:58:14.846150838 +0200
++++ dhcp-4.3.4/client/dhclient.c	2016-04-29 12:58:14.851150839 +0200
+@@ -3868,6 +3868,59 @@ write_options(struct client_state *clien
  	}
  }
  
@@ -61,7 +61,7 @@ diff -up dhcp-4.3.3/client/dhclient.c.duid_uuid dhcp-4.3.3/client/dhclient.c
  /*
   * The "best" default DUID, since we cannot predict any information
   * about the system (such as whether or not the hardware addresses are
-@@ -3348,6 +3401,7 @@ form_duid(struct data_string *duid, cons
+@@ -3888,6 +3941,7 @@ form_duid(struct data_string *duid, cons
  	struct interface_info *ip;
  	int len;
  	char *str;
@@ -69,7 +69,7 @@ diff -up dhcp-4.3.3/client/dhclient.c.duid_uuid dhcp-4.3.3/client/dhclient.c
  
  	/* For now, just use the first interface on the list. */
  	ip = interfaces;
-@@ -3368,9 +3422,16 @@ form_duid(struct data_string *duid, cons
+@@ -3908,9 +3962,16 @@ form_duid(struct data_string *duid, cons
  	    (ip->hw_address.hlen > sizeof(ip->hw_address.hbuf)))
  		log_fatal("Impossible hardware address length at %s:%d.", MDL);
  
@@ -89,7 +89,7 @@ diff -up dhcp-4.3.3/client/dhclient.c.duid_uuid dhcp-4.3.3/client/dhclient.c
  	/*
  	 * 2 bytes for the 'duid type' field.
  	 * 2 bytes for the 'htype' field.
-@@ -3381,13 +3442,18 @@ form_duid(struct data_string *duid, cons
+@@ -3921,13 +3982,18 @@ form_duid(struct data_string *duid, cons
  	len = 4 + (ip->hw_address.hlen - 1);
  	if (duid_type == DUID_LLT)
  		len += 4;
@@ -109,15 +109,3 @@ diff -up dhcp-4.3.3/client/dhclient.c.duid_uuid dhcp-4.3.3/client/dhclient.c
  		putUShort(duid->buffer->data, DUID_LLT);
  		putUShort(duid->buffer->data + 2, ip->hw_address.hbuf[0]);
  		putULong(duid->buffer->data + 4, cur_time - DUID_TIME_EPOCH);
-diff -up dhcp-4.3.3/includes/dhcp6.h.duid_uuid dhcp-4.3.3/includes/dhcp6.h
---- dhcp-4.3.3/includes/dhcp6.h.duid_uuid	2015-08-26 21:13:14.000000000 +0200
-+++ dhcp-4.3.3/includes/dhcp6.h	2015-12-14 12:12:33.258038895 +0100
-@@ -119,6 +119,8 @@ extern const int dhcpv6_type_name_max;
- #define DUID_LLT	1
- #define DUID_EN		2
- #define DUID_LL		3
-+/* RFC6355 */
-+#define DUID_UUID	4
- 
- /* Offsets into IA_*'s where Option spaces commence.  */
- #define IA_NA_OFFSET 12 /* IAID, T1, T2, all 4 octets each */

@@ -1,16 +1,16 @@
-diff -up dhcp-4.3.3b1/client/dhclient.c.lpf-ib dhcp-4.3.3b1/client/dhclient.c
---- dhcp-4.3.3b1/client/dhclient.c.lpf-ib	2015-08-10 10:58:17.659350415 +0200
-+++ dhcp-4.3.3b1/client/dhclient.c	2015-08-10 11:44:15.428321587 +0200
-@@ -117,6 +117,8 @@ static int check_option_values(struct un
- static void dhclient_ddns_cb_free(dhcp_ddns_cb_t *ddns_cb,
-                                    char* file, int line);
+diff -up dhcp-4.3.4/client/dhclient.c.lpf-ib dhcp-4.3.4/client/dhclient.c
+--- dhcp-4.3.4/client/dhclient.c.lpf-ib	2016-05-02 14:37:36.945128001 +0200
++++ dhcp-4.3.4/client/dhclient.c	2016-05-02 14:37:36.952128005 +0200
+@@ -163,6 +163,8 @@ static const char use_noarg[] = "No argu
+ static const char use_v6command[] = "Command not used for DHCPv4: %s";
+ #endif
  
 +static void setup_ib_interface(struct interface_info *ip);
 +
- #ifndef UNIT_TEST
- int
- main(int argc, char **argv) {
-@@ -940,6 +942,13 @@ main(int argc, char **argv) {
+ static void
+ usage(const char *sfmt, const char *sarg)
+ {
+@@ -1066,6 +1068,13 @@ main(int argc, char **argv) {
  	}
  	srandom(seed + cur_time + (unsigned)getpid());
  
@@ -24,7 +24,7 @@ diff -up dhcp-4.3.3b1/client/dhclient.c.lpf-ib dhcp-4.3.3b1/client/dhclient.c
  
  	/*
  	 * Establish a default DUID.  We always do so for v6 and
-@@ -1231,6 +1240,29 @@ int find_subnet (struct subnet **sp,
+@@ -1361,6 +1370,29 @@ int find_subnet (struct subnet **sp,
  	return 0;
  }
  
@@ -54,10 +54,10 @@ diff -up dhcp-4.3.3b1/client/dhclient.c.lpf-ib dhcp-4.3.3b1/client/dhclient.c
  /* Individual States:
   *
   * Each routine is called from the dhclient_state_machine() in one of
-diff -up dhcp-4.3.3b1/common/bpf.c.lpf-ib dhcp-4.3.3b1/common/bpf.c
---- dhcp-4.3.3b1/common/bpf.c.lpf-ib	2015-08-10 10:58:17.659350415 +0200
-+++ dhcp-4.3.3b1/common/bpf.c	2015-08-10 10:58:17.668350384 +0200
-@@ -199,11 +199,44 @@ struct bpf_insn dhcp_bpf_filter [] = {
+diff -up dhcp-4.3.4/common/bpf.c.lpf-ib dhcp-4.3.4/common/bpf.c
+--- dhcp-4.3.4/common/bpf.c.lpf-ib	2016-05-02 14:37:36.946128001 +0200
++++ dhcp-4.3.4/common/bpf.c	2016-05-02 14:37:36.952128005 +0200
+@@ -198,11 +198,43 @@ struct bpf_insn dhcp_bpf_filter [] = {
  	BPF_STMT(BPF_RET+BPF_K, 0),
  };
  
@@ -93,18 +93,38 @@ diff -up dhcp-4.3.3b1/common/bpf.c.lpf-ib dhcp-4.3.3b1/common/bpf.c
 +};
 +
  #if defined (DEC_FDDI)
- struct bpf_insn *bpf_fddi_filter;
+ struct bpf_insn *bpf_fddi_filter = NULL;
  #endif
  
  int dhcp_bpf_filter_len = sizeof dhcp_bpf_filter / sizeof (struct bpf_insn);
 +int dhcp_ib_bpf_filter_len = sizeof dhcp_ib_bpf_filter / sizeof (struct bpf_insn);
-+
  #if defined (HAVE_TR_SUPPORT)
  struct bpf_insn dhcp_bpf_tr_filter [] = {
          /* accept all token ring packets due to variable length header */
-diff -up dhcp-4.3.3b1/common/lpf.c.lpf-ib dhcp-4.3.3b1/common/lpf.c
---- dhcp-4.3.3b1/common/lpf.c.lpf-ib	2015-08-10 10:58:17.660350412 +0200
-+++ dhcp-4.3.3b1/common/lpf.c	2015-08-10 11:45:17.962084958 +0200
+diff -up dhcp-4.3.4/common/discover.c.lpf-ib dhcp-4.3.4/common/discover.c
+--- dhcp-4.3.4/common/discover.c.lpf-ib	2016-03-22 14:16:51.000000000 +0100
++++ dhcp-4.3.4/common/discover.c	2016-05-02 14:38:08.257147982 +0200
+@@ -1235,7 +1235,7 @@ discover_interfaces(int state) {
+ 				if_register_send(tmp);
+ 			} else {
+ 				/* get_hw_addr() was called by register. */
+-				get_hw_addr(tmp->name, &tmp->hw_address);
++				get_hw_addr(tmp);
+ 			}
+ 			break;
+ #ifdef DHCPv6
+@@ -1248,7 +1248,7 @@ discover_interfaces(int state) {
+ 				   so now we have to call it explicitly
+ 				   to not leave the hardware address unknown
+ 				   (some code expects it cannot be. */
+-				get_hw_addr(tmp->name, &tmp->hw_address);
++				get_hw_addr(tmp);
+ 			} else {
+ 				if_register_linklocal6(tmp);
+ 			}
+diff -up dhcp-4.3.4/common/lpf.c.lpf-ib dhcp-4.3.4/common/lpf.c
+--- dhcp-4.3.4/common/lpf.c.lpf-ib	2016-05-02 14:37:36.947128002 +0200
++++ dhcp-4.3.4/common/lpf.c	2016-05-02 14:37:36.953128006 +0200
 @@ -47,6 +47,17 @@
  #include <sys/ioctl.h>
  #include <sys/socket.h>
@@ -523,9 +543,9 @@ diff -up dhcp-4.3.3b1/common/lpf.c.lpf-ib dhcp-4.3.3b1/common/lpf.c
 +	freeifaddrs(ifaddrs);
  }
  #endif
-diff -up dhcp-4.3.3b1/common/socket.c.lpf-ib dhcp-4.3.3b1/common/socket.c
---- dhcp-4.3.3b1/common/socket.c.lpf-ib	2015-07-30 15:17:16.000000000 +0200
-+++ dhcp-4.3.3b1/common/socket.c	2015-08-10 10:58:17.669350380 +0200
+diff -up dhcp-4.3.4/common/socket.c.lpf-ib dhcp-4.3.4/common/socket.c
+--- dhcp-4.3.4/common/socket.c.lpf-ib	2016-03-22 14:16:51.000000000 +0100
++++ dhcp-4.3.4/common/socket.c	2016-05-02 14:37:36.953128006 +0200
 @@ -328,7 +328,7 @@ void if_register_send (info)
  	info->wfdesc = if_register_socket(info, AF_INET, 0, NULL);
  	/* If this is a normal IPv4 address, get the hardware address. */
@@ -562,10 +582,10 @@ diff -up dhcp-4.3.3b1/common/socket.c.lpf-ib dhcp-4.3.3b1/common/socket.c
  
  	if (!quiet_interface_discovery) {
  		if (info->shared_network != NULL) {
-diff -up dhcp-4.3.3b1/includes/dhcpd.h.lpf-ib dhcp-4.3.3b1/includes/dhcpd.h
---- dhcp-4.3.3b1/includes/dhcpd.h.lpf-ib	2015-08-10 10:58:17.660350412 +0200
-+++ dhcp-4.3.3b1/includes/dhcpd.h	2015-08-10 10:58:17.669350380 +0200
-@@ -476,6 +476,9 @@ struct packet {
+diff -up dhcp-4.3.4/includes/dhcpd.h.lpf-ib dhcp-4.3.4/includes/dhcpd.h
+--- dhcp-4.3.4/includes/dhcpd.h.lpf-ib	2016-05-02 14:37:36.948128002 +0200
++++ dhcp-4.3.4/includes/dhcpd.h	2016-05-02 14:37:36.954128006 +0200
+@@ -482,6 +482,9 @@ struct packet {
  
  #define HARDWARE_ADDR_LEN 20
  
@@ -575,7 +595,7 @@ diff -up dhcp-4.3.3b1/includes/dhcpd.h.lpf-ib dhcp-4.3.3b1/includes/dhcpd.h
  struct hardware {
  	u_int8_t hlen;
  	u_int8_t hbuf[HARDWARE_ADDR_LEN + 1];
-@@ -1324,6 +1327,7 @@ struct interface_info {
+@@ -1343,6 +1346,7 @@ struct interface_info {
  	struct shared_network *shared_network;
  				/* Networks connected to this interface. */
  	struct hardware hw_address;	/* Its physical address. */
@@ -583,12 +603,12 @@ diff -up dhcp-4.3.3b1/includes/dhcpd.h.lpf-ib dhcp-4.3.3b1/includes/dhcpd.h
  	struct in_addr *addresses;	/* Addresses associated with this
  					 * interface.
  					 */
-@@ -2545,7 +2549,7 @@ void print_dns_status (int, struct dhcp_
+@@ -2580,7 +2584,7 @@ void print_dns_status (int, struct dhcp_
  #endif
  const char *print_time(TIME);
  
 -void get_hw_addr(const char *name, struct hardware *hw);
 +void get_hw_addr(struct interface_info *info);
- 
- /* socket.c */
- #if defined (USE_SOCKET_SEND) || defined (USE_SOCKET_RECEIVE) \
+ char *buf_to_hex (const unsigned char *s, unsigned len,
+                    const char *file, int line);
+ char *format_lease_id(const unsigned char *s, unsigned len, int format,
