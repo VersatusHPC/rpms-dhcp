@@ -1,7 +1,7 @@
-diff -up dhcp-4.3.0a1/client/dhc6.c.sendDecline dhcp-4.3.0a1/client/dhc6.c
---- dhcp-4.3.0a1/client/dhc6.c.sendDecline	2013-12-11 01:25:12.000000000 +0100
-+++ dhcp-4.3.0a1/client/dhc6.c	2013-12-19 15:56:18.297660118 +0100
-@@ -96,6 +96,8 @@ void do_select6(void *input);
+diff -up dhcp-4.3.4/client/dhc6.c.sendDecline dhcp-4.3.4/client/dhc6.c
+--- dhcp-4.3.4/client/dhc6.c.sendDecline	2016-03-22 14:16:51.000000000 +0100
++++ dhcp-4.3.4/client/dhc6.c	2016-05-02 14:51:57.916578401 +0200
+@@ -115,6 +115,8 @@ void do_select6(void *input);
  void do_refresh6(void *input);
  static void do_release6(void *input);
  static void start_bound(struct client_state *client);
@@ -10,7 +10,7 @@ diff -up dhcp-4.3.0a1/client/dhc6.c.sendDecline dhcp-4.3.0a1/client/dhc6.c
  static void start_informed(struct client_state *client);
  void informed_handler(struct packet *packet, struct client_state *client);
  void bound_handler(struct packet *packet, struct client_state *client);
-@@ -2017,6 +2019,7 @@ start_release6(struct client_state *clie
+@@ -2314,6 +2316,7 @@ start_release6(struct client_state *clie
  	cancel_timeout(do_select6, client);
  	cancel_timeout(do_refresh6, client);
  	cancel_timeout(do_release6, client);
@@ -18,7 +18,7 @@ diff -up dhcp-4.3.0a1/client/dhc6.c.sendDecline dhcp-4.3.0a1/client/dhc6.c
  	client->state = S_STOPPED;
  
  	/*
-@@ -2650,6 +2653,7 @@ dhc6_check_reply(struct client_state *cl
+@@ -2968,6 +2971,7 @@ dhc6_check_reply(struct client_state *cl
  		break;
  
  	      case S_STOPPED:
@@ -26,7 +26,7 @@ diff -up dhcp-4.3.0a1/client/dhc6.c.sendDecline dhcp-4.3.0a1/client/dhc6.c
  		action = dhc6_stop_action;
  		break;
  
-@@ -2751,6 +2755,7 @@ dhc6_check_reply(struct client_state *cl
+@@ -3084,6 +3088,7 @@ dhc6_check_reply(struct client_state *cl
  		break;
  
  	      case S_STOPPED:
@@ -34,7 +34,7 @@ diff -up dhcp-4.3.0a1/client/dhc6.c.sendDecline dhcp-4.3.0a1/client/dhc6.c
  		/* Nothing critical to do at this stage. */
  		break;
  
-@@ -3741,17 +3746,23 @@ reply_handler(struct packet *packet, str
+@@ -4214,17 +4219,23 @@ reply_handler(struct packet *packet, str
  	cancel_timeout(do_select6, client);
  	cancel_timeout(do_refresh6, client);
  	cancel_timeout(do_release6, client);
@@ -66,7 +66,7 @@ diff -up dhcp-4.3.0a1/client/dhc6.c.sendDecline dhcp-4.3.0a1/client/dhc6.c
  		return;
  	}
  
-@@ -4279,7 +4290,11 @@ start_bound(struct client_state *client)
+@@ -4798,7 +4809,11 @@ start_bound(struct client_state *client)
  			dhc6_marshall_values("new_", client, lease, ia, addr);
  			script_write_requested6(client);
  
@@ -79,7 +79,7 @@ diff -up dhcp-4.3.0a1/client/dhc6.c.sendDecline dhcp-4.3.0a1/client/dhc6.c
  		}
  
  		/* XXX: maybe we should loop on the old values instead? */
-@@ -4327,6 +4342,149 @@ start_bound(struct client_state *client)
+@@ -4851,6 +4866,149 @@ start_bound(struct client_state *client)
  	dhc6_check_times(client);
  }
  
@@ -121,8 +121,8 @@ diff -up dhcp-4.3.0a1/client/dhc6.c.sendDecline dhcp-4.3.0a1/client/dhc6.c
 +{
 +	struct client_state *client;
 +	struct data_string ds;
-+	int send_ret;
 +	struct timeval elapsed, tv;
++	int send_ret, added;
 +
 +	client = input;
 +
@@ -183,13 +183,13 @@ diff -up dhcp-4.3.0a1/client/dhc6.c.sendDecline dhcp-4.3.0a1/client/dhc6.c
 +	/* Append IA's (but don't release temporary addresses). */
 +	if (wanted_ia_na &&
 +	    dhc6_add_ia_na(client, &ds, client->active_lease,
-+			   DHCPV6_DECLINE) != ISC_R_SUCCESS) {
++			   DHCPV6_DECLINE, 0, &added) != ISC_R_SUCCESS) {
 +		data_string_forget(&ds, MDL);
 +		goto decline_done;
 +	}
 +	if (wanted_ia_pd &&
 +	    dhc6_add_ia_pd(client, &ds, client->active_lease,
-+			   DHCPV6_DECLINE) != ISC_R_SUCCESS) {
++			   DHCPV6_DECLINE, 0, &added) != ISC_R_SUCCESS) {
 +		data_string_forget(&ds, MDL);
 +		goto decline_done;
 +	}

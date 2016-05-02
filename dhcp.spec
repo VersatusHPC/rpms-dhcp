@@ -1,5 +1,5 @@
-# SystemTap support is enabled by default
-%{!?sdt:%global sdt 1}
+# SystemTap support is disabled by default
+%{!?sdt:%global sdt 0}
 
 #http://lists.fedoraproject.org/pipermail/devel/2011-August/155358.html
 %global _hardened_build 1
@@ -12,13 +12,13 @@
 %global patchver P1
 
 #%%global VERSION %%{version}%%{prever}
-#%%global VERSION %{version}
-%global VERSION %%{version}-%%{patchver}
+#%%global VERSION %%{version}-%%{patchver}
+%global VERSION %{version}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
-Version:  4.3.3
-Release:  12.%{patchver}%{?dist}
+Version:  4.3.4
+Release:  1%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -65,14 +65,14 @@ Patch25:  dhcp-improved-xid.patch
 #Patch26:  dhcp-gpxe-cid.patch
 Patch26:  dhcp-duidv4.patch
 Patch27:  dhcp-duid_uuid.patch
-Patch28:  dhcp-systemtap.patch
+#Patch28:  dhcp-systemtap.patch
 Patch29:  dhcp-getifaddrs.patch
-Patch30:  dhcp-omapi-leak.patch
+
 Patch31:  dhcp-client-request-release-bind-iface.patch
 Patch32:  dhcp-interval.patch
 Patch33:  dhcp-no-subnet-error2info.patch
 Patch34:  dhcp-sd_notify.patch
-Patch35:  dhcp-VLAN-ID.patch
+
 Patch36:  dhcp-option97-pxe-client-id.patch
 Patch37:  dhcp-stateless-DUID-LLT.patch
 Patch38:  dhcp-dhclient-preinit6s.patch
@@ -306,15 +306,12 @@ rm bind/bind.tar.gz
 %patch27 -p1 -b .duid_uuid
 
 # http://sourceware.org/systemtap/wiki/SystemTap
-%patch28 -p1 -b .systemtap
+#%%patch28 -p1 -b .systemtap
 
 # Use getifaddrs() to scan for interfaces on Linux (#449946)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28761])
 %patch29 -p1 -b .getifaddrs
 
-# Fix several memory leaks in omapi (#978420)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #33990])
-%patch30 -p1 -b .leak
 
 # send unicast request/release via correct interface (#800561, #1177351)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30544])
@@ -329,10 +326,6 @@ rm bind/bind.tar.gz
 
 # support for sending startup notification to systemd (#1077666)
 %patch34 -p1 -b .sd_notify
-
-# VLAN ID is only bottom 12-bits of TCI (#1259552)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #40591])
-%patch35 -p1 -b .vlanid
 
 # option 97 - pxe-client-id (#1058674)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #38110])
@@ -668,6 +661,10 @@ done
 %doc doc/html/
 
 %changelog
+* Fri Apr 29 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.4-1
+- 4.3.4
+- disable systemtap (I don't think anybody ever used it)
+
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 12:4.3.3-12.P1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 

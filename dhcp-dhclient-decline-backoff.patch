@@ -1,7 +1,7 @@
-diff -up dhcp-4.3.1b1/client/dhclient.c.JwFUZj dhcp-4.3.1b1/client/dhclient.c
---- dhcp-4.3.1b1/client/dhclient.c.JwFUZj	2014-07-10 17:38:50.511265091 +0200
-+++ dhcp-4.3.1b1/client/dhclient.c	2014-07-10 17:39:16.164901267 +0200
-@@ -1281,6 +1281,8 @@ void state_init (cpp)
+diff -up dhcp-4.3.4/client/dhclient.c.backoff dhcp-4.3.4/client/dhclient.c
+--- dhcp-4.3.4/client/dhclient.c.backoff	2016-04-29 12:16:26.976245611 +0200
++++ dhcp-4.3.4/client/dhclient.c	2016-04-29 12:16:26.979245609 +0200
+@@ -1423,6 +1423,8 @@ void state_init (cpp)
  	void *cpp;
  {
  	struct client_state *client = cpp;
@@ -10,7 +10,7 @@ diff -up dhcp-4.3.1b1/client/dhclient.c.JwFUZj dhcp-4.3.1b1/client/dhclient.c
  
  	ASSERT_STATE(state, S_INIT);
  
-@@ -1293,9 +1295,18 @@ void state_init (cpp)
+@@ -1435,9 +1437,18 @@ void state_init (cpp)
  	client -> first_sending = cur_time;
  	client -> interval = client -> config -> initial_interval;
  
@@ -32,7 +32,7 @@ diff -up dhcp-4.3.1b1/client/dhclient.c.JwFUZj dhcp-4.3.1b1/client/dhclient.c
  }
  
  /*
-@@ -1592,6 +1603,7 @@ void bind_lease (client)
+@@ -1734,6 +1745,7 @@ void bind_lease (client)
  					 "try (declined).  Exiting.");
  			exit(2);
  		} else {
@@ -40,7 +40,7 @@ diff -up dhcp-4.3.1b1/client/dhclient.c.JwFUZj dhcp-4.3.1b1/client/dhclient.c
  			state_init(client);
  			return;
  		}
-@@ -4059,6 +4071,7 @@ void client_location_changed ()
+@@ -4626,6 +4638,7 @@ void client_location_changed ()
  			      case S_INIT:
  			      case S_REBINDING:
  			      case S_STOPPED:
@@ -48,10 +48,10 @@ diff -up dhcp-4.3.1b1/client/dhclient.c.JwFUZj dhcp-4.3.1b1/client/dhclient.c
  				break;
  			}
  			client -> state = S_INIT;
-diff -up dhcp-4.3.1b1/includes/dhcpd.h.JwFUZj dhcp-4.3.1b1/includes/dhcpd.h
---- dhcp-4.3.1b1/includes/dhcpd.h.JwFUZj	2014-07-10 17:38:26.941599360 +0200
-+++ dhcp-4.3.1b1/includes/dhcpd.h	2014-07-10 17:38:50.526264878 +0200
-@@ -1087,7 +1087,8 @@ enum dhcp_state {
+diff -up dhcp-4.3.4/includes/dhcpd.h.backoff dhcp-4.3.4/includes/dhcpd.h
+--- dhcp-4.3.4/includes/dhcpd.h.backoff	2016-04-29 12:16:26.980245609 +0200
++++ dhcp-4.3.4/includes/dhcpd.h	2016-04-29 12:17:30.893203533 +0200
+@@ -1171,7 +1171,8 @@ enum dhcp_state {
  	S_BOUND = 5,
  	S_RENEWING = 6,
  	S_REBINDING = 7,
@@ -60,4 +60,4 @@ diff -up dhcp-4.3.1b1/includes/dhcpd.h.JwFUZj dhcp-4.3.1b1/includes/dhcpd.h
 +	S_DECLINED = 9
  };
  
- /* Authentication and BOOTP policy possibilities (not all values work
+ /* Possible pending client operations. */
