@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.3
-Release:  8.%{patchver}%{?dist}
+Release:  9.%{patchver}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -75,6 +75,7 @@ Patch35:  dhcp-VLAN-ID.patch
 Patch36:  dhcp-option97-pxe-client-id.patch
 Patch37:  dhcp-stateless-DUID-LLT.patch
 Patch38:  dhcp-dhclient-preinit6s.patch
+Patch40:  dhcp-CVE-2016-2774.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -340,6 +341,9 @@ rm bind/bind.tar.gz
 
 # dhclient: make sure link-local address is ready in stateless mode (#1263466)
 %patch38 -p1 -b .preinit6s
+
+# CVE-2016-2774 (#1315614)
+%patch40 -p1 -b .CVE-2016-2774
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -664,6 +668,9 @@ done
 %doc doc/html/
 
 %changelog
+* Mon May 02 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-9.P1
+- CVE-2016-2774 (#1315614)
+
 * Wed Jan 13 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.3-8.P1
 - 4.3.3-P1 - fix for CVE-2015-8605 (#1298077)
 
