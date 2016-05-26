@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.4
-Release:  1%{?dist}
+Release:  2%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -661,6 +661,9 @@ done
 %doc doc/html/
 
 %changelog
+* Thu May 26 2016 Tomas Hozza <thozza@redhat.com> - 12:4.3.4-2
+- Rebuild against bind99-9.9.9-P1
+
 * Fri Apr 29 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.4-1
 - 4.3.4
 - disable systemtap (I don't think anybody ever used it)
