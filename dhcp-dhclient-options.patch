@@ -58,7 +58,7 @@ diff -up dhcp-4.3.4/client/dhclient.8.options dhcp-4.3.4/client/dhclient.8
 +.I vendor-class-identifier
 +]
 +[
-+.B -R
++.B --request-options
 +.I request-option-list
 +]
 +[
@@ -107,7 +107,7 @@ diff -up dhcp-4.3.4/client/dhclient.8.options dhcp-4.3.4/client/dhclient.8
 +Specify the vendor-class-identifier option to send to the DHCP server.
 +
 +.TP
-+.BI \-R\ <option>[,<option>...]
++.BI \--request-options\ <option>[,<option>...]
 +Specify the list of options the client is to request from the server.  The
 +option list must be a single string consisting of option names separated
 +by at least one command and optional space characters.  The default option
@@ -121,12 +121,12 @@ diff -up dhcp-4.3.4/client/dhclient.8.options dhcp-4.3.4/client/dhclient.8
 +    nis-domain, nis-servers, ntp-servers, interface-mtu
 +
 +.TP
-+.B -R
++.B --request-options
 +option does not append options to the default request, it overrides the
 +default request list.  Keep this in mind if you want to request an
 +additional option besides the default request list.  You will have to
 +specify all option names for the
-+.B -R
++.B --request-options
 +parameter.
 +
 +.TP
@@ -175,7 +175,7 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 +		  "                [-C <dhcp-client-identifier>] [-B]\n"
 +		  "                [-H <host-name> | -F <fqdn.fqdn>] [-timeout <timeout>]\n"
 +		  "                [-V <vendor-class-identifier>]\n"
-+		  "                [-R <request option list>]",
++		  "                [--request-options <request option list>]",
  		  isc_file_basename(progname));
  }
  
@@ -275,7 +275,7 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 +			}
 +
 +			dhcp_vendor_class_identifier_arg = argv[i];
-+		} else if (!strcmp(argv[i], "-R")) {
++		} else if (!strcmp(argv[i], "--request-options")) {
 +			if ((++i == argc) || (argv[i] == NULL) || (*(argv[i])=='\0')) {
 +				usage(use_noarg, argv[i-1]);
 +				exit(1);
@@ -374,14 +374,14 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 +			arg_conf_len = asprintf(&arg_conf,  "request %s;", dhclient_request_options);
 +
 +			if ((arg_conf == 0) || (arg_conf_len <= 0))
-+				log_fatal("Unable to parse -R <request options list> argument");
++				log_fatal("Unable to parse --request-options <request options list> argument");
 +		} else {
 +			char *last_arg_conf = arg_conf;
 +			arg_conf = NULL;
 +			arg_conf_len = asprintf(&arg_conf, "%s\nrequest %s;", last_arg_conf, dhclient_request_options);
 +
 +			if ((arg_conf == 0)  || (arg_conf_len <= 0))
-+				log_fatal("Unable to parse -R <request options list> argument");
++				log_fatal("Unable to parse --request-options <request options list> argument");
 +
 +			free(last_arg_conf);
 +		}
@@ -391,7 +391,7 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 +		if (arg_conf_len == 0)
 +			if ((arg_conf_len = strlen(arg_conf)) == 0)
 +				/* huh ? cannot happen ! */
-+				log_fatal("Unable to process -C/-H/-F/-timeout/-V/-R configuration arguments");
++				log_fatal("Unable to process -C/-H/-F/-timeout/-V/--request-options configuration arguments");
 +
 +		/* parse the extra dhclient.conf configuration arguments
 +		 * into top level config: */
@@ -399,10 +399,10 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 +		const char *val = NULL;
 +		int token;
 +
-+		status = new_parse(&cfile, -1, arg_conf, arg_conf_len, "extra dhclient -C/-H/-F/-timeout/-V/-R configuration arguments", 0);
++		status = new_parse(&cfile, -1, arg_conf, arg_conf_len, "extra dhclient -C/-H/-F/-timeout/-V/--request-options configuration arguments", 0);
 +
 +		if ((status != ISC_R_SUCCESS) || (cfile -> warnings_occurred))
-+			log_fatal("Cannot parse -C/-H/-F/-timeout/-V/-R configuration arguments !");
++			log_fatal("Cannot parse -C/-H/-F/-timeout/-V/--request-options configuration arguments !");
 +		/* more detailed parse failures will be logged */
 +
 +		do {
@@ -414,7 +414,7 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 +		} while (1);
 +
 +		if (cfile -> warnings_occurred)
-+			log_fatal("Cannot parse -C/-H/-F/-timeout/-V/-R configuration arguments !");
++			log_fatal("Cannot parse -C/-H/-F/-timeout/-V/--request-options configuration arguments !");
 +		end_parse(&cfile);
 +
 +		if (timeout_arg) {
