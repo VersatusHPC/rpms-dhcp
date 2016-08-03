@@ -62,7 +62,7 @@ diff -up dhcp-4.3.4/client/dhclient.8.options dhcp-4.3.4/client/dhclient.8
 +.I request-option-list
 +]
 +[
-+.B -timeout
++.B --timeout
 +.I timeout
 +]
 +[
@@ -130,7 +130,7 @@ diff -up dhcp-4.3.4/client/dhclient.8.options dhcp-4.3.4/client/dhclient.8
 +parameter.
 +
 +.TP
-+.BI \-timeout\ <timeout>
++.BI \--timeout\ <timeout>
 +Specify the time after which
 +.B dhclient
 +will decide that no DHCP servers can be contacted when no responses have been
@@ -173,7 +173,7 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 -		  "                [-sf script-file] [interface]*",
 +		  "                [-sf script-file] [interface]*\n"
 +		  "                [-C <dhcp-client-identifier>] [-B]\n"
-+		  "                [-H <host-name> | -F <fqdn.fqdn>] [-timeout <timeout>]\n"
++		  "                [-H <host-name> | -F <fqdn.fqdn>] [--timeout <timeout>]\n"
 +		  "                [-V <vendor-class-identifier>]\n"
 +		  "                [--request-options <request option list>]",
  		  isc_file_basename(progname));
@@ -253,7 +253,7 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 +			}
 +
 +			dhcp_fqdn_arg = argv[i];
-+		} else if (!strcmp(argv[i], "-timeout")) {
++		} else if (!strcmp(argv[i], "--timeout")) {
 +			if ((++i == argc) || (argv[i] == NULL) || (*(argv[i])=='\0')) {
 +				usage(use_noarg, argv[i-1]);
 +				exit(1);
@@ -338,14 +338,14 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 +			arg_conf_len = asprintf(&arg_conf,  "timeout %d;", timeout_arg);
 +
 +			if ((arg_conf == 0) || (arg_conf_len <= 0))
-+				log_fatal("Unable to process -timeout timeout argument");
++				log_fatal("Unable to process --timeout timeout argument");
 +		} else {
 +			char *last_arg_conf = arg_conf;
 +			arg_conf = NULL;
 +			arg_conf_len = asprintf(&arg_conf, "%s\ntimeout %d;", last_arg_conf, timeout_arg);
 +
 +			if ((arg_conf == 0) || (arg_conf_len == 0))
-+				log_fatal("Unable to process -timeout timeout argument");
++				log_fatal("Unable to process --timeout timeout argument");
 +
 +			free(last_arg_conf);
 +		}
@@ -391,7 +391,7 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 +		if (arg_conf_len == 0)
 +			if ((arg_conf_len = strlen(arg_conf)) == 0)
 +				/* huh ? cannot happen ! */
-+				log_fatal("Unable to process -C/-H/-F/-timeout/-V/--request-options configuration arguments");
++				log_fatal("Unable to process -C/-H/-F/--timeout/-V/--request-options configuration arguments");
 +
 +		/* parse the extra dhclient.conf configuration arguments
 +		 * into top level config: */
@@ -399,10 +399,10 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 +		const char *val = NULL;
 +		int token;
 +
-+		status = new_parse(&cfile, -1, arg_conf, arg_conf_len, "extra dhclient -C/-H/-F/-timeout/-V/--request-options configuration arguments", 0);
++		status = new_parse(&cfile, -1, arg_conf, arg_conf_len, "extra dhclient -C/-H/-F/--timeout/-V/--request-options configuration arguments", 0);
 +
 +		if ((status != ISC_R_SUCCESS) || (cfile -> warnings_occurred))
-+			log_fatal("Cannot parse -C/-H/-F/-timeout/-V/--request-options configuration arguments !");
++			log_fatal("Cannot parse -C/-H/-F/--timeout/-V/--request-options configuration arguments !");
 +		/* more detailed parse failures will be logged */
 +
 +		do {
@@ -414,7 +414,7 @@ diff -up dhcp-4.3.4/client/dhclient.c.options dhcp-4.3.4/client/dhclient.c
 +		} while (1);
 +
 +		if (cfile -> warnings_occurred)
-+			log_fatal("Cannot parse -C/-H/-F/-timeout/-V/--request-options configuration arguments !");
++			log_fatal("Cannot parse -C/-H/-F/--timeout/-V/--request-options configuration arguments !");
 +		end_parse(&cfile);
 +
 +		if (timeout_arg) {

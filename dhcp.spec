@@ -663,6 +663,7 @@ done
 %changelog
 * Wed Aug 03 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.4-3
 - [dhclient] rename -R option to --request-options (#1357947)
+- [dhclient] rename -timeout option to --timeout
 
 * Thu May 26 2016 Tomas Hozza <thozza@redhat.com> - 12:4.3.4-2
 - Rebuild against bind99-9.9.9-P1
