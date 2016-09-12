@@ -1,7 +1,7 @@
-diff -up dhcp-4.3.2b1/common/discover.c.getifaddrs dhcp-4.3.2b1/common/discover.c
---- dhcp-4.3.2b1/common/discover.c.getifaddrs	2015-01-29 14:52:57.000000000 +0100
-+++ dhcp-4.3.2b1/common/discover.c	2015-02-08 17:48:39.435651386 +0100
-@@ -373,391 +373,13 @@ end_iface_scan(struct iface_conf_list *i
+diff -up dhcp-4.3.5b1/common/discover.c.getifaddrs dhcp-4.3.5b1/common/discover.c
+--- dhcp-4.3.5b1/common/discover.c.getifaddrs	2016-09-12 17:10:39.585374741 +0200
++++ dhcp-4.3.5b1/common/discover.c	2016-09-12 17:15:56.160628636 +0200
+@@ -373,392 +373,13 @@ end_iface_scan(struct iface_conf_list *i
  	ifaces->sock = -1;
  }
  
@@ -296,7 +296,7 @@ diff -up dhcp-4.3.2b1/common/discover.c.getifaddrs dhcp-4.3.2b1/common/discover.
 -			log_error("IPv6 interface name '%s' too long", name);
 -			return 0;
 -		}
--		strcpy(info->name, name);
+-		strncpy(info->name, name, sizeof(info->name) - 1);
 -
 -#ifdef SKIP_DUMMY_INTERFACES
 -	} while (strncmp(info->name, "dummy", 5) == 0);
@@ -334,7 +334,7 @@ diff -up dhcp-4.3.2b1/common/discover.c.getifaddrs dhcp-4.3.2b1/common/discover.
 -	 * Get our flags.
 -	 */
 -	memset(&tmp, 0, sizeof(tmp));
--	strcpy(tmp.ifr_name, name);
+-	strncpy(tmp.ifr_name, name, sizeof(tmp.ifr_name) - 1);
 -	if (ioctl(ifaces->sock, SIOCGIFFLAGS, &tmp) < 0) {
 -		log_error("Error getting interface flags for '%s'; %m", name);
 -		*err = 1;
@@ -355,6 +355,7 @@ diff -up dhcp-4.3.2b1/common/discover.c.getifaddrs dhcp-4.3.2b1/common/discover.
 - */
 -int
 -next_iface(struct iface_info *info, int *err, struct iface_conf_list *ifaces) {
+-	memset(info, 0, sizeof(struct iface_info));
 -	if (next_iface4(info, err, ifaces)) {
 -		return 1;
 -	}
@@ -394,7 +395,7 @@ diff -up dhcp-4.3.2b1/common/discover.c.getifaddrs dhcp-4.3.2b1/common/discover.
   * function.
   *
   * The getifaddrs() man page describes the use.
-@@ -805,6 +427,8 @@ begin_iface_scan(struct iface_conf_list
+@@ -806,6 +427,8 @@ begin_iface_scan(struct iface_conf_list
   */
  int
  next_iface(struct iface_info *info, int *err, struct iface_conf_list *ifaces) {
@@ -403,10 +404,10 @@ diff -up dhcp-4.3.2b1/common/discover.c.getifaddrs dhcp-4.3.2b1/common/discover.
  	if (ifaces->next == NULL) {
  		*err = 0;
  		return 0;
-@@ -816,8 +440,20 @@ next_iface(struct iface_info *info, int
- 		return 0;
+@@ -818,8 +441,20 @@ next_iface(struct iface_info *info, int
  	}
- 	strcpy(info->name, ifaces->next->ifa_name);
+ 	memset(info, 0, sizeof(struct iface_info));
+ 	strncpy(info->name, ifaces->next->ifa_name, sizeof(info->name) - 1);
 -	memcpy(&info->addr, ifaces->next->ifa_addr, 
 -	       ifaces->next->ifa_addr->sa_len);
 +

@@ -1,11 +1,11 @@
-diff -up dhcp-4.3.1/common/options.c.option97 dhcp-4.3.1/common/options.c
---- dhcp-4.3.1/common/options.c.option97	2014-12-17 10:49:23.364257702 +0100
-+++ dhcp-4.3.1/common/options.c	2014-12-17 10:49:23.458256518 +0100
-@@ -4270,13 +4270,26 @@ int validate_packet(struct packet *packe
+diff -up dhcp-4.3.5b1/common/options.c.option97 dhcp-4.3.5b1/common/options.c
+--- dhcp-4.3.5b1/common/options.c.option97	2016-09-12 17:17:13.972691041 +0200
++++ dhcp-4.3.5b1/common/options.c	2016-09-12 17:19:17.706790276 +0200
+@@ -4434,13 +4434,26 @@ int validate_packet(struct packet *packe
  				"a future version of ISC DHCP will reject this");
  		}
  	} else {
--		/* 
+-		/*
 -		 * If hlen is 0 we don't have any identifier, we warn the user
 -		 * but continue processing the packet as we can.
 -		 */
@@ -35,10 +35,10 @@ diff -up dhcp-4.3.1/common/options.c.option97 dhcp-4.3.1/common/options.c
  		}
  	}
  
-diff -up dhcp-4.3.1/common/tables.c.option97 dhcp-4.3.1/common/tables.c
---- dhcp-4.3.1/common/tables.c.option97	2014-12-17 10:49:23.365257689 +0100
-+++ dhcp-4.3.1/common/tables.c	2014-12-17 10:49:23.459256505 +0100
-@@ -197,8 +197,9 @@ static struct option dhcp_options[] = {
+diff -up dhcp-4.3.5b1/common/tables.c.option97 dhcp-4.3.5b1/common/tables.c
+--- dhcp-4.3.5b1/common/tables.c.option97	2016-09-12 17:17:13.927691005 +0200
++++ dhcp-4.3.5b1/common/tables.c	2016-09-12 17:17:13.972691041 +0200
+@@ -196,8 +196,9 @@ static struct option dhcp_options[] = {
  	/* Defined by RFC 4578 */
  	{ "pxe-system-type", "S",		&dhcp_universe,  93, 1 },
  	{ "pxe-interface-id", "BBB",		&dhcp_universe,  94, 1 },
@@ -49,9 +49,9 @@ diff -up dhcp-4.3.1/common/tables.c.option97 dhcp-4.3.1/common/tables.c
  	{ "uap-servers", "t",			&dhcp_universe,  98, 1 },
  #if defined(RFC4776_OPTIONS)
          { "geoconf-civic", "X",                 &dhcp_universe, 99, 1 },
-diff -up dhcp-4.3.1/includes/dhcp.h.option97 dhcp-4.3.1/includes/dhcp.h
---- dhcp-4.3.1/includes/dhcp.h.option97	2014-12-17 10:49:23.377257538 +0100
-+++ dhcp-4.3.1/includes/dhcp.h	2014-12-17 10:49:23.459256505 +0100
+diff -up dhcp-4.3.5b1/includes/dhcp.h.option97 dhcp-4.3.5b1/includes/dhcp.h
+--- dhcp-4.3.5b1/includes/dhcp.h.option97	2016-09-12 17:17:13.936691013 +0200
++++ dhcp-4.3.5b1/includes/dhcp.h	2016-09-12 17:17:13.972691041 +0200
 @@ -159,6 +159,7 @@ struct dhcp_packet {
  #define DHO_AUTHENTICATE			90  /* RFC3118, was 210 */
  #define DHO_CLIENT_LAST_TRANSACTION_TIME	91
@@ -60,10 +60,10 @@ diff -up dhcp-4.3.1/includes/dhcp.h.option97 dhcp-4.3.1/includes/dhcp.h
  #define DHO_SUBNET_SELECTION			118 /* RFC3011! */
  #define DHO_DOMAIN_SEARCH			119 /* RFC3397 */
  #define DHO_CLASSLESS_STATIC_ROUTES		121 /* RFC3442 */
-diff -up dhcp-4.3.1/server/dhcp.c.option97 dhcp-4.3.1/server/dhcp.c
---- dhcp-4.3.1/server/dhcp.c.option97	2014-12-17 10:49:23.409257135 +0100
-+++ dhcp-4.3.1/server/dhcp.c	2014-12-17 10:49:23.460256492 +0100
-@@ -196,6 +196,10 @@ dhcp (struct packet *packet) {
+diff -up dhcp-4.3.5b1/server/dhcp.c.option97 dhcp-4.3.5b1/server/dhcp.c
+--- dhcp-4.3.5b1/server/dhcp.c.option97	2016-09-12 17:17:13.947691021 +0200
++++ dhcp-4.3.5b1/server/dhcp.c	2016-09-12 17:17:13.973691042 +0200
+@@ -221,6 +221,10 @@ dhcp (struct packet *packet) {
  			oc = lookup_option (&dhcp_universe, packet -> options,
  					    DHO_DHCP_CLIENT_IDENTIFIER);
  			if (!oc)
@@ -74,7 +74,7 @@ diff -up dhcp-4.3.1/server/dhcp.c.option97 dhcp-4.3.1/server/dhcp.c
  				goto nolease;
  
  			memset (&data, 0, sizeof data);
-@@ -764,6 +768,9 @@ void dhcprelease (packet, ms_nulltp)
+@@ -818,6 +822,9 @@ void dhcprelease (packet, ms_nulltp)
  
  	oc = lookup_option (&dhcp_universe, packet -> options,
  			    DHO_DHCP_CLIENT_IDENTIFIER);
@@ -84,7 +84,7 @@ diff -up dhcp-4.3.1/server/dhcp.c.option97 dhcp-4.3.1/server/dhcp.c
  	memset (&data, 0, sizeof data);
  	if (oc &&
  	    evaluate_option_cache (&data, packet, (struct lease *)0,
-@@ -1191,6 +1198,9 @@ void dhcpinform (packet, ms_nulltp)
+@@ -1286,6 +1293,9 @@ void dhcpinform (packet, ms_nulltp)
           */
  	oc = lookup_option(&dhcp_universe, packet->options,
  			   DHO_DHCP_CLIENT_IDENTIFIER);
@@ -94,7 +94,7 @@ diff -up dhcp-4.3.1/server/dhcp.c.option97 dhcp-4.3.1/server/dhcp.c
  	memset(&d1, 0, sizeof(d1));
  	if (oc &&
  	    evaluate_option_cache(&d1, packet, NULL, NULL,
-@@ -2144,6 +2154,9 @@ void ack_lease (packet, lease, offer, wh
+@@ -2381,6 +2391,9 @@ void ack_lease (packet, lease, offer, wh
  		   can be used. */
  		oc = lookup_option (&dhcp_universe, packet -> options,
  				    DHO_DHCP_CLIENT_IDENTIFIER);
@@ -104,7 +104,7 @@ diff -up dhcp-4.3.1/server/dhcp.c.option97 dhcp-4.3.1/server/dhcp.c
  		if (oc &&
  		    evaluate_option_cache (&d1, packet, lease,
  					   (struct client_state *)0,
-@@ -2715,6 +2728,9 @@ void ack_lease (packet, lease, offer, wh
+@@ -2962,6 +2975,9 @@ void ack_lease (packet, lease, offer, wh
  		/* Record the uid, if given... */
  		oc = lookup_option (&dhcp_universe, packet -> options,
  				    DHO_DHCP_CLIENT_IDENTIFIER);
@@ -114,7 +114,7 @@ diff -up dhcp-4.3.1/server/dhcp.c.option97 dhcp-4.3.1/server/dhcp.c
  		if (oc &&
  		    evaluate_option_cache(&d1, packet, lease, NULL,
  					  packet->options, state->options,
-@@ -3812,6 +3828,9 @@ int find_lease (struct lease **lp,
+@@ -4068,6 +4084,9 @@ int find_lease (struct lease **lp,
  	   specified unique client identifier. */
  	oc = lookup_option (&dhcp_universe, packet -> options,
  			    DHO_DHCP_CLIENT_IDENTIFIER);
@@ -124,10 +124,10 @@ diff -up dhcp-4.3.1/server/dhcp.c.option97 dhcp-4.3.1/server/dhcp.c
  	memset (&client_identifier, 0, sizeof client_identifier);
  	if (oc &&
  	    evaluate_option_cache (&client_identifier,
-diff -up dhcp-4.3.1/server/dhcpd.conf.5.option97 dhcp-4.3.1/server/dhcpd.conf.5
---- dhcp-4.3.1/server/dhcpd.conf.5.option97	2014-12-17 10:49:23.325258193 +0100
-+++ dhcp-4.3.1/server/dhcpd.conf.5	2014-12-17 10:49:23.461256480 +0100
-@@ -1559,10 +1559,12 @@ should be a name identifying the host.
+diff -up dhcp-4.3.5b1/server/dhcpd.conf.5.option97 dhcp-4.3.5b1/server/dhcpd.conf.5
+--- dhcp-4.3.5b1/server/dhcpd.conf.5.option97	2016-09-12 17:17:13.885690972 +0200
++++ dhcp-4.3.5b1/server/dhcpd.conf.5	2016-09-12 17:17:13.974691043 +0200
+@@ -1587,10 +1587,12 @@ should be a name identifying the host.
  not specified for the host, \fIhostname\fR is used.
  .PP
  \fIHost\fR declarations are matched to actual DHCP or BOOTP clients
@@ -142,7 +142,7 @@ diff -up dhcp-4.3.1/server/dhcpd.conf.5.option97 dhcp-4.3.1/server/dhcpd.conf.5
  parameter in the \fIhost\fR declaration to the network hardware
  address supplied by the client.  BOOTP clients do not normally
  provide a \fIdhcp-client-identifier\fR, so the hardware address must
-@@ -1574,7 +1576,8 @@ to identify hosts.
+@@ -1602,7 +1604,8 @@ to identify hosts.
  .PP
  Please be aware that
  .B only
@@ -152,10 +152,10 @@ diff -up dhcp-4.3.1/server/dhcpd.conf.5.option97 dhcp-4.3.1/server/dhcpd.conf.5
  used to match a host declaration, or the \fIhost-identifier option\fR
  parameter for DHCPv6 servers.  For example, it is not possible to
  match a host declaration to a \fIhost-name\fR option.  This is
-diff -up dhcp-4.3.1/server/dhcpleasequery.c.option97 dhcp-4.3.1/server/dhcpleasequery.c
---- dhcp-4.3.1/server/dhcpleasequery.c.option97	2014-08-07 00:35:02.000000000 +0200
-+++ dhcp-4.3.1/server/dhcpleasequery.c	2014-12-17 10:49:23.457256530 +0100
-@@ -269,7 +269,7 @@ dhcpleasequery(struct packet *packet, in
+diff -up dhcp-4.3.5b1/server/dhcpleasequery.c.option97 dhcp-4.3.5b1/server/dhcpleasequery.c
+--- dhcp-4.3.5b1/server/dhcpleasequery.c.option97	2016-08-26 20:19:53.000000000 +0200
++++ dhcp-4.3.5b1/server/dhcpleasequery.c	2016-09-12 17:17:13.974691043 +0200
+@@ -273,7 +273,7 @@ dhcpleasequery(struct packet *packet, in
  		 */
  
  		memset(&uid, 0, sizeof(uid));
@@ -164,7 +164,7 @@ diff -up dhcp-4.3.1/server/dhcpleasequery.c.option97 dhcp-4.3.1/server/dhcplease
  			       &dhcp_universe,
  			       packet,
  			       NULL,
-@@ -279,8 +279,20 @@ dhcpleasequery(struct packet *packet, in
+@@ -283,8 +283,20 @@ dhcpleasequery(struct packet *packet, in
  			       packet->options, 
  			       &global_scope,
  			       DHO_DHCP_CLIENT_IDENTIFIER,
@@ -187,10 +187,10 @@ diff -up dhcp-4.3.1/server/dhcpleasequery.c.option97 dhcp-4.3.1/server/dhcplease
  			snprintf(dbg_info, 
  				 sizeof(dbg_info), 
  				 "client-id %s",
-diff -up dhcp-4.3.1/server/failover.c.option97 dhcp-4.3.1/server/failover.c
---- dhcp-4.3.1/server/failover.c.option97	2014-12-17 10:49:23.413257085 +0100
-+++ dhcp-4.3.1/server/failover.c	2014-12-17 10:49:23.462256467 +0100
-@@ -5878,6 +5878,9 @@ int load_balance_mine (struct packet *pa
+diff -up dhcp-4.3.5b1/server/failover.c.option97 dhcp-4.3.5b1/server/failover.c
+--- dhcp-4.3.5b1/server/failover.c.option97	2016-08-26 20:19:53.000000000 +0200
++++ dhcp-4.3.5b1/server/failover.c	2016-09-12 17:17:13.975691044 +0200
+@@ -5957,6 +5957,9 @@ int load_balance_mine (struct packet *pa
  
  	oc = lookup_option(&dhcp_universe, packet->options,
  			   DHO_DHCP_CLIENT_IDENTIFIER);
@@ -200,10 +200,10 @@ diff -up dhcp-4.3.1/server/failover.c.option97 dhcp-4.3.1/server/failover.c
  	memset(&ds, 0, sizeof ds);
  	if (oc &&
  	    evaluate_option_cache(&ds, packet, NULL, NULL,
-diff -up dhcp-4.3.1/server/mdb.c.option97 dhcp-4.3.1/server/mdb.c
---- dhcp-4.3.1/server/mdb.c.option97	2014-08-07 00:35:03.000000000 +0200
-+++ dhcp-4.3.1/server/mdb.c	2014-12-17 10:49:23.463256455 +0100
-@@ -130,8 +130,9 @@ static int find_uid_statement (struct ex
+diff -up dhcp-4.3.5b1/server/mdb.c.option97 dhcp-4.3.5b1/server/mdb.c
+--- dhcp-4.3.5b1/server/mdb.c.option97	2016-08-26 20:19:53.000000000 +0200
++++ dhcp-4.3.5b1/server/mdb.c	2016-09-12 17:17:13.975691044 +0200
+@@ -129,8 +129,9 @@ static int find_uid_statement (struct ex
  	    esp -> data.option &&
  	    (esp -> data.option -> option -> universe ==
  	     &dhcp_universe) &&

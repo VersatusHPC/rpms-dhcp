@@ -8,17 +8,18 @@
 %global dhcpconfdir %{_sysconfdir}/dhcp
 
 
-#%%global prever b1
-%global patchver P1
+%global prever b1
+#%%global patchver P1
 
-#%%global VERSION %%{version}%%{prever}
 #%%global VERSION %%{version}-%%{patchver}
-%global VERSION %{version}
+#%%global VERSION %%{version}
+%global VERSION %{version}%{prever}
+
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
-Version:  4.3.4
-Release:  3%{?dist}
+Version:  4.3.5
+Release:  0.1%{prever}%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -661,6 +662,9 @@ done
 %doc doc/html/
 
 %changelog
+* Mon Sep 12 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.5-0.1b1
+- 4.3.5b1
+
 * Wed Aug 03 2016 Jiri Popelka <jpopelka@redhat.com> - 12:4.3.4-3
 - [dhclient] rename -R option to --request-options (#1357947)
 - [dhclient] rename -timeout option to --timeout

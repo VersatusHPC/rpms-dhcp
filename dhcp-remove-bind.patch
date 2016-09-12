@@ -1,6 +1,6 @@
-diff -up dhcp-4.3.4/client/Makefile.am.remove-bind dhcp-4.3.4/client/Makefile.am
---- dhcp-4.3.4/client/Makefile.am.remove-bind	2016-03-22 14:16:51.000000000 +0100
-+++ dhcp-4.3.4/client/Makefile.am	2016-04-29 14:13:50.335204352 +0200
+diff -up dhcp-4.3.5b1/client/Makefile.am.remove-bind dhcp-4.3.5b1/client/Makefile.am
+--- dhcp-4.3.5b1/client/Makefile.am.remove-bind	2016-08-26 20:19:53.000000000 +0200
++++ dhcp-4.3.5b1/client/Makefile.am	2016-09-12 17:00:22.797902248 +0200
 @@ -4,8 +4,6 @@
  # production code. Sadly, we are not there yet.
  SUBDIRS = . tests
@@ -20,9 +20,9 @@ diff -up dhcp-4.3.4/client/Makefile.am.remove-bind dhcp-4.3.4/client/Makefile.am
 +		 $(BIND9_LIBDIR) -lirs-export -ldns-export -lisccfg-export -lisc-export
  man_MANS = dhclient.8 dhclient-script.8 dhclient.conf.5 dhclient.leases.5
  EXTRA_DIST = $(man_MANS)
-diff -up dhcp-4.3.4/common/tests/Makefile.am.remove-bind dhcp-4.3.4/common/tests/Makefile.am
---- dhcp-4.3.4/common/tests/Makefile.am.remove-bind	2016-03-22 14:16:51.000000000 +0100
-+++ dhcp-4.3.4/common/tests/Makefile.am	2016-04-29 14:13:50.335204352 +0200
+diff -up dhcp-4.3.5b1/common/tests/Makefile.am.remove-bind dhcp-4.3.5b1/common/tests/Makefile.am
+--- dhcp-4.3.5b1/common/tests/Makefile.am.remove-bind	2016-08-26 20:19:53.000000000 +0200
++++ dhcp-4.3.5b1/common/tests/Makefile.am	2016-09-12 17:07:42.168232452 +0200
 @@ -1,7 +1,5 @@
  SUBDIRS = .
  
@@ -65,10 +65,10 @@ diff -up dhcp-4.3.4/common/tests/Makefile.am.remove-bind dhcp-4.3.4/common/tests
 +	$(BIND9_LIBDIR) -lirs-export -ldns-export -lisccfg-export -lisc-export
  
  check: $(ATF_TESTS)
- 	-cp -n $(top_srcdir)/common/tests/Atffile Atffile
-diff -up dhcp-4.3.4/configure.ac.remove-bind dhcp-4.3.4/configure.ac
---- dhcp-4.3.4/configure.ac.remove-bind	2016-03-22 14:19:51.000000000 +0100
-+++ dhcp-4.3.4/configure.ac	2016-04-29 14:13:50.335204352 +0200
+ 	@if test $(top_srcdir) != ${top_builddir}; then \
+diff -up dhcp-4.3.5b1/configure.ac.remove-bind dhcp-4.3.5b1/configure.ac
+--- dhcp-4.3.5b1/configure.ac.remove-bind	2016-08-26 20:24:41.000000000 +0200
++++ dhcp-4.3.5b1/configure.ac	2016-09-12 17:00:22.798902249 +0200
 @@ -682,20 +682,33 @@ AC_CHECK_MEMBER(struct tpacket_auxdata.t
  BINDDIR=
  BINDSRCDIR=
@@ -130,9 +130,9 @@ diff -up dhcp-4.3.4/configure.ac.remove-bind dhcp-4.3.4/configure.ac
  
  case "$host" in
  *-darwin*)
-diff -up dhcp-4.3.4/dhcpctl/Makefile.am.remove-bind dhcp-4.3.4/dhcpctl/Makefile.am
---- dhcp-4.3.4/dhcpctl/Makefile.am.remove-bind	2016-03-22 14:16:51.000000000 +0100
-+++ dhcp-4.3.4/dhcpctl/Makefile.am	2016-04-29 14:13:50.336204352 +0200
+diff -up dhcp-4.3.5b1/dhcpctl/Makefile.am.remove-bind dhcp-4.3.5b1/dhcpctl/Makefile.am
+--- dhcp-4.3.5b1/dhcpctl/Makefile.am.remove-bind	2016-08-26 20:19:53.000000000 +0200
++++ dhcp-4.3.5b1/dhcpctl/Makefile.am	2016-09-12 17:00:22.798902249 +0200
 @@ -1,5 +1,3 @@
 -BINDLIBDIR = @BINDDIR@/lib
 -
@@ -154,9 +154,9 @@ diff -up dhcp-4.3.4/dhcpctl/Makefile.am.remove-bind dhcp-4.3.4/dhcpctl/Makefile.
 -	       $(BINDLIBDIR)/libirs.a $(BINDLIBDIR)/libdns.a \
 -               $(BINDLIBDIR)/libisccfg.a $(BINDLIBDIR)/libisc.a
 +	       $(BIND9_LIBDIR) -lirs-export -ldns-export -lisccfg-export -lisc-export
-diff -up dhcp-4.3.4/Makefile.am.remove-bind dhcp-4.3.4/Makefile.am
---- dhcp-4.3.4/Makefile.am.remove-bind	2016-03-22 14:16:51.000000000 +0100
-+++ dhcp-4.3.4/Makefile.am	2016-04-29 14:14:06.863193261 +0200
+diff -up dhcp-4.3.5b1/Makefile.am.remove-bind dhcp-4.3.5b1/Makefile.am
+--- dhcp-4.3.5b1/Makefile.am.remove-bind	2016-08-26 20:19:53.000000000 +0200
++++ dhcp-4.3.5b1/Makefile.am	2016-09-12 17:00:22.798902249 +0200
 @@ -26,7 +26,13 @@ EXTRA_DIST = RELNOTES LICENSE \
  	     bind/Makefile.in bind/bind.tar.gz bind/version.tmp \
  	     common/tests/Atffile server/tests/Atffile
@@ -172,9 +172,9 @@ diff -up dhcp-4.3.4/Makefile.am.remove-bind dhcp-4.3.4/Makefile.am
  
  nobase_include_HEADERS = dhcpctl/dhcpctl.h
  
-diff -up dhcp-4.3.4/omapip/Makefile.am.remove-bind dhcp-4.3.4/omapip/Makefile.am
---- dhcp-4.3.4/omapip/Makefile.am.remove-bind	2016-03-22 14:16:51.000000000 +0100
-+++ dhcp-4.3.4/omapip/Makefile.am	2016-04-29 14:13:50.336204352 +0200
+diff -up dhcp-4.3.5b1/omapip/Makefile.am.remove-bind dhcp-4.3.5b1/omapip/Makefile.am
+--- dhcp-4.3.5b1/omapip/Makefile.am.remove-bind	2016-08-26 20:19:53.000000000 +0200
++++ dhcp-4.3.5b1/omapip/Makefile.am	2016-09-12 17:00:22.798902249 +0200
 @@ -1,5 +1,3 @@
 -BINDLIBDIR = @BINDDIR@/lib
 -
@@ -190,9 +190,9 @@ diff -up dhcp-4.3.4/omapip/Makefile.am.remove-bind dhcp-4.3.4/omapip/Makefile.am
 +svtest_LDADD = libomapi.a \
 +	       $(BIND9_LIBDIR) -lirs-export -ldns-export -lisccfg-export -lisc-export
  
-diff -up dhcp-4.3.4/relay/Makefile.am.remove-bind dhcp-4.3.4/relay/Makefile.am
---- dhcp-4.3.4/relay/Makefile.am.remove-bind	2016-03-22 14:16:51.000000000 +0100
-+++ dhcp-4.3.4/relay/Makefile.am	2016-04-29 14:13:50.336204352 +0200
+diff -up dhcp-4.3.5b1/relay/Makefile.am.remove-bind dhcp-4.3.5b1/relay/Makefile.am
+--- dhcp-4.3.5b1/relay/Makefile.am.remove-bind	2016-08-26 20:19:53.000000000 +0200
++++ dhcp-4.3.5b1/relay/Makefile.am	2016-09-12 17:00:22.798902249 +0200
 @@ -1,12 +1,9 @@
 -BINDLIBDIR = @BINDDIR@/lib
 -
@@ -207,9 +207,9 @@ diff -up dhcp-4.3.4/relay/Makefile.am.remove-bind dhcp-4.3.4/relay/Makefile.am
  man_MANS = dhcrelay.8
  EXTRA_DIST = $(man_MANS)
  
-diff -up dhcp-4.3.4/server/Makefile.am.remove-bind dhcp-4.3.4/server/Makefile.am
---- dhcp-4.3.4/server/Makefile.am.remove-bind	2016-03-22 14:16:51.000000000 +0100
-+++ dhcp-4.3.4/server/Makefile.am	2016-04-29 14:13:50.336204352 +0200
+diff -up dhcp-4.3.5b1/server/Makefile.am.remove-bind dhcp-4.3.5b1/server/Makefile.am
+--- dhcp-4.3.5b1/server/Makefile.am.remove-bind	2016-08-26 20:19:53.000000000 +0200
++++ dhcp-4.3.5b1/server/Makefile.am	2016-09-12 17:00:22.798902249 +0200
 @@ -4,8 +4,6 @@
  # production code. Sadly, we are not there yet.
  SUBDIRS = . tests
@@ -233,9 +233,9 @@ diff -up dhcp-4.3.4/server/Makefile.am.remove-bind dhcp-4.3.4/server/Makefile.am
  
  man_MANS = dhcpd.8 dhcpd.conf.5 dhcpd.leases.5
  EXTRA_DIST = $(man_MANS)
-diff -up dhcp-4.3.4/server/tests/Makefile.am.remove-bind dhcp-4.3.4/server/tests/Makefile.am
---- dhcp-4.3.4/server/tests/Makefile.am.remove-bind	2016-03-22 14:16:51.000000000 +0100
-+++ dhcp-4.3.4/server/tests/Makefile.am	2016-04-29 14:13:50.336204352 +0200
+diff -up dhcp-4.3.5b1/server/tests/Makefile.am.remove-bind dhcp-4.3.5b1/server/tests/Makefile.am
+--- dhcp-4.3.5b1/server/tests/Makefile.am.remove-bind	2016-08-26 20:19:53.000000000 +0200
++++ dhcp-4.3.5b1/server/tests/Makefile.am	2016-09-12 17:00:22.799902249 +0200
 @@ -1,9 +1,7 @@
  SUBDIRS = .
  
