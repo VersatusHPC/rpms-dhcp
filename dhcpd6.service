@@ -7,7 +7,8 @@ After=time-sync.target
 
 [Service]
 Type=notify
-ExecStart=/usr/sbin/dhcpd -f -6 -cf /etc/dhcp/dhcpd6.conf -user dhcpd -group dhcpd --no-pid
+EnvironmentFile=-/etc/sysconfig/dhcpd6
+ExecStart=/usr/sbin/dhcpd -f -6 -cf /etc/dhcp/dhcpd6.conf -user dhcpd -group dhcpd --no-pid $DHCPDARGS
 StandardError=null
 
 [Install]
