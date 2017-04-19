@@ -19,7 +19,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.5
-Release:  4%{?dist}
+Release:  5%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -90,7 +90,9 @@ BuildRequires: bind99-devel
 BuildRequires: systemd systemd-devel
 # dhcp-sd_notify.patch
 BuildRequires: pkgconfig(libsystemd)
+%if ! 0%{?_module_build}
 BuildRequires: doxygen
+%endif
 %if %{sdt}
 BuildRequires: systemtap-sdt-devel
 %global tapsetdir    /usr/share/systemtap/tapset
@@ -391,9 +393,11 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --enable-binary-leases \
     --with-systemd
 make %{?_smp_mflags}
+if ! 0%{?_module_build}
 pushd doc
 make %{?_smp_mflags} devel
 popd
+%endif
 
 %install
 make DESTDIR=%{buildroot} install %{?_smp_mflags}
@@ -662,6 +666,9 @@ done
 %doc doc/html/
 
 %changelog
+* Wed Apr 19 2017 Dominika Hodovska <dhodovsk@redhat.com> - 12:4.3.5-5
+- don't build doxygen documentation during modular build
+
 * Tue Apr 04 2017 Pavel Zhukov <landgraf@fedoraproject.org> - 12:4.3.5-4
 - Add EnvironmentFile parameter for backward compatibility
 
