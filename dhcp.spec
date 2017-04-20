@@ -393,7 +393,7 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --enable-binary-leases \
     --with-systemd
 make %{?_smp_mflags}
-if ! 0%{?_module_build}
+%if ! 0%{?_module_build}
 pushd doc
 make %{?_smp_mflags} devel
 popd
