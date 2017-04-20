@@ -203,6 +203,7 @@ Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Header files and API documentation for using the ISC DHCP libraries.  The
 libdhcpctl and libomapi static libraries are also included in this package.
 
+%if ! 0%{?_module_build}
 %package devel-doc
 Summary: Developer's Guide for ISC DHCP
 Requires: %{name}-libs = %{epoch}:%{version}-%{release}
@@ -212,6 +213,7 @@ BuildArch: noarch
 This documentation is intended for developers, contributors and other
 programmers that are interested in internal operation of the code.
 This package contains doxygen-generated documentation.
+%endif
 
 %prep
 %setup -q -n dhcp-%{VERSION}
@@ -662,8 +664,10 @@ done
 %attr(0644,root,root) %{_mandir}/man3/dhcpctl.3.gz
 %attr(0644,root,root) %{_mandir}/man3/omapi.3.gz
 
+%if ! 0%{?_module_build}
 %files devel-doc
 %doc doc/html/
+%endif
 
 %changelog
 * Wed Apr 19 2017 Dominika Hodovska <dhodovsk@redhat.com> - 12:4.3.5-5
