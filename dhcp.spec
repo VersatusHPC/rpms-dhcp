@@ -19,7 +19,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.5
-Release:  5%{?dist}
+Release:  7%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -77,6 +77,9 @@ Patch34:  dhcp-sd_notify.patch
 Patch36:  dhcp-option97-pxe-client-id.patch
 Patch37:  dhcp-stateless-DUID-LLT.patch
 Patch38:  dhcp-dhclient-preinit6s.patch
+Patch39:  dhcp-dhclient-ddns_lazy.patch
+
+
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -342,6 +345,9 @@ rm bind/bind.tar.gz
 
 # dhclient: make sure link-local address is ready in stateless mode (#1263466)
 %patch38 -p1 -b .preinit6s
+
+# [ISC-BUGS] #33377.
+%patch39 -p1 -b .ddnsport
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -670,6 +676,9 @@ done
 %endif
 
 %changelog
+* Tue May 23 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.5-7
+- Don't open ddns port until it's needed. Credits to Petr Menšík for the original idea
+
 * Wed Apr 19 2017 Dominika Hodovska <dhodovsk@redhat.com> - 12:4.3.5-5
 - don't build doxygen documentation during modular build
 
