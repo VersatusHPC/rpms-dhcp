@@ -19,7 +19,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.5
-Release:  7%{?dist}
+Release:  8%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -531,7 +531,6 @@ exit 0
 # Initial installation
 %systemd_post dhcpd.service dhcpd6.service
 
-chown -R dhcpd:dhcpd %{_localstatedir}/lib/dhcpd/
 
 for servicename in dhcpd dhcpd6; do
   etcservicefile=%{_sysconfdir}/systemd/system/${servicename}.service
@@ -676,6 +675,9 @@ done
 %endif
 
 %changelog
+* Wed May 31 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.5-8
+- Drop chown from the post section
+
 * Tue May 23 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.5-7
 - Don't open ddns port until it's needed. Credits to Petr Menšík for the original idea
 
