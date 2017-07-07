@@ -19,7 +19,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.5
-Release:  9%{?dist}
+Release:  10%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -675,6 +675,9 @@ done
 %endif
 
 %changelog
+* Fri Jul 07 2017 Igor Gnatenko <ignatenko@redhat.com> - 12:4.3.5-10
+- Rebuild due to bug in RPM (RHBZ #1468476)
+
 * Mon Jul 03 2017 Petr Menšík <pemensik@redhat.com> - 12:4.3.5-9
 - Rebuild for bind 9.9.10
 
