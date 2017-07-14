@@ -11,9 +11,9 @@ diff -up dhcp-4.3.4/client/dhclient.8.capability dhcp-4.3.4/client/dhclient.8
  .B -B
  ]
  [
-@@ -318,6 +321,32 @@ has been added or removed, so that the c
+@@ -318,6 +321,32 @@ program can then be used to notify the c
+ has been added or removed, so that the client can attempt to configure an IP
  address on that interface.
- 
  .TP
 +.BI \-nc
 +Do not drop capabilities.
@@ -41,9 +41,9 @@ diff -up dhcp-4.3.4/client/dhclient.8.capability dhcp-4.3.4/client/dhclient.8
 +was not compiled with libcap-ng support.
 +
 +.TP
- .BI \-B
- Set the BOOTP broadcast flag in request packets so servers will always
- broadcast replies.
+ .BI \-n
+ Do not configure any interfaces.  This is most likely to be useful in
+ combination with the
 diff -up dhcp-4.3.4/client/dhclient.c.capability dhcp-4.3.4/client/dhclient.c
 --- dhcp-4.3.4/client/dhclient.c.capability	2016-04-29 12:19:40.691129307 +0200
 +++ dhcp-4.3.4/client/dhclient.c	2016-04-29 12:21:07.620091930 +0200

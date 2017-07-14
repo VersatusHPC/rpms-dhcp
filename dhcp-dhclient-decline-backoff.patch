@@ -32,8 +32,8 @@ diff -up dhcp-4.3.4/client/dhclient.c.backoff dhcp-4.3.4/client/dhclient.c
  }
  
  /*
-@@ -1734,6 +1745,7 @@ void bind_lease (client)
- 					 "try (declined).  Exiting.");
+@@ -1734,5 +1745,6 @@ void bind_lease (client)
+#endif
  			exit(2);
  		} else {
 +			client -> state = S_DECLINED;

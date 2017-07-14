@@ -12,14 +12,15 @@
 #%%global patchver P1
 
 #%%global VERSION %%{version}-%%{patchver}
-#%%global VERSION %%{version}%%{prever}
-%global VERSION %{version}
+#%global VERSION %%{version}%%{prever}
+#%global VERSION %{version}
 
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
-Version:  4.3.5
-Release:  10%{?dist}
+Version:  4.3.6
+%global VERSION %%{version}%%{prever}
+Release:  1%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -67,18 +68,14 @@ Patch25:  dhcp-improved-xid.patch
 Patch26:  dhcp-duidv4.patch
 Patch27:  dhcp-duid_uuid.patch
 #Patch28:  dhcp-systemtap.patch
-Patch29:  dhcp-getifaddrs.patch
 
 Patch31:  dhcp-client-request-release-bind-iface.patch
-Patch32:  dhcp-interval.patch
 Patch33:  dhcp-no-subnet-error2info.patch
 Patch34:  dhcp-sd_notify.patch
 
 Patch36:  dhcp-option97-pxe-client-id.patch
 Patch37:  dhcp-stateless-DUID-LLT.patch
 Patch38:  dhcp-dhclient-preinit6s.patch
-Patch39:  dhcp-dhclient-ddns_lazy.patch
-
 
 
 BuildRequires: autoconf
@@ -316,18 +313,10 @@ rm bind/bind.tar.gz
 # http://sourceware.org/systemtap/wiki/SystemTap
 #%%patch28 -p1 -b .systemtap
 
-# Use getifaddrs() to scan for interfaces on Linux (#449946)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28761])
-%patch29 -p1 -b .getifaddrs
-
-
 # send unicast request/release via correct interface (#800561, #1177351)
 # (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30544])
 %patch31 -p1 -b .bind-iface
 
-# isc_time_nowplusinterval() is not safe with 64-bit time_t (#662254, #789601)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #28038])
-%patch32 -p1 -b .interval
 
 # 'No subnet declaration for <iface>' should be info, not error.
 %patch33 -p1 -b .error2info
@@ -345,9 +334,6 @@ rm bind/bind.tar.gz
 
 # dhclient: make sure link-local address is ready in stateless mode (#1263466)
 %patch38 -p1 -b .preinit6s
-
-# [ISC-BUGS] #33377.
-%patch39 -p1 -b .ddnsport
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -675,6 +661,9 @@ done
 %endif
 
 %changelog
+* Fri Jul 14 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-1
+- New version 4.3.6
+
 * Fri Jul 07 2017 Igor Gnatenko <ignatenko@redhat.com> - 12:4.3.5-10
 - Rebuild due to bug in RPM (RHBZ #1468476)
 
