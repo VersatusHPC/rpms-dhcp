@@ -85,7 +85,7 @@ eventually_add_hostnames_domain_to_search() {
        done
 
        if [ "${is_in}" = "false" ]; then
-          # Add domain name to search list (#637763)
+           # Add domain name to search list (#637763)
           sed -i -e "s/${search}/${search} ${domain}/" "${RESOLVCONF}"
        fi
     fi
@@ -728,6 +728,20 @@ get_hwaddr ()
     fi
 }
 
+validate_resolv_conf()
+{
+    # It's possible to have broken symbolic link $RESOLVCONF -> <some_nm_dir>
+    # https://bugzilla.redhat.com/1475279
+    # Remove broken link and hope NM will survive
+    if [ -h "${RESOLVCONF}" -a ! -e "${RESOLVCONF}" ];
+    then
+        logmessage "${RESOLVCONF) is broken symlink. Recreating..."
+        unlink "${RESOLVCONF}"
+        touch "${RESOLVCONF}"
+    fi;
+}
+
+
 get_config_by_hwaddr ()
 {
     LANG=C grep -il "^[[:space:]]*HWADDR=\"\?${1}\"\?\([[:space:]#]\|$\)" /etc/sysconfig/network-scripts/ifcfg-* \
@@ -786,6 +800,8 @@ source_config ()
 # Invoke the local dhcp client enter hooks, if they exist.
 run_hook "${ETCDIR}/dhclient-enter-hooks" || exit $?
 run_hookdir "${ETCDIR}/dhclient-enter-hooks.d" || exit $?
+
+[ "${PEERDNS}" = "no" ] || validate_resilv_conf()
 
 if [ -f /etc/sysconfig/network ]; then
     . /etc/sysconfig/network
