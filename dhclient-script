@@ -735,7 +735,7 @@ validate_resolv_conf()
     # Remove broken link and hope NM will survive
     if [ -h "${RESOLVCONF}" -a ! -e "${RESOLVCONF}" ];
     then
-        logmessage "${RESOLVCONF) is broken symlink. Recreating..."
+        logmessage "${RESOLVCONF} is broken symlink. Recreating..."
         unlink "${RESOLVCONF}"
         touch "${RESOLVCONF}"
     fi;
@@ -801,7 +801,7 @@ source_config ()
 run_hook "${ETCDIR}/dhclient-enter-hooks" || exit $?
 run_hookdir "${ETCDIR}/dhclient-enter-hooks.d" || exit $?
 
-[ "${PEERDNS}" = "no" ] || validate_resilv_conf()
+[ "${PEERDNS}" = "no" ] || validate_resolv_conf
 
 if [ -f /etc/sysconfig/network ]; then
     . /etc/sysconfig/network

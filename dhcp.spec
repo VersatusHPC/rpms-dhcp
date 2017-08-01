@@ -20,7 +20,7 @@ Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
 %global VERSION %%{version}%%{prever}
-Release:  3%{?dist}
+Release:  4%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -661,6 +661,9 @@ done
 %endif
 
 %changelog
+* Tue Aug  1 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-4
+- Fix typos in dhclient-script
+
 
 * Thu Jul 27 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-3
 - Recreate /etc/resolv.conf if NetworkManager screwed it up (#1475279)
