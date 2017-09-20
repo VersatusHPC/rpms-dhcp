@@ -58,6 +58,7 @@ eventually_add_hostnames_domain_to_search() {
     search="${1}"
     if need_hostname; then
         status=1
+        OLD_HOSTNAME=$HOSTNAME
         if [ -n "${new_ip_address}" ]; then
             eval $(/usr/bin/ipcalc --silent --hostname "${new_ip_address}" ; echo "status=$?")
         elif [ -n "${new_ip6_address}" ]; then
@@ -67,6 +68,7 @@ eventually_add_hostnames_domain_to_search() {
         if [ ${status} -eq 0 ]; then
             domain=$(echo "${HOSTNAME}" | cut -s -d "." -f 2-)
         fi
+        HOSTNAME=$OLD_HOSTNAME
     else
           domain=$(hostnamectl --transient 2>/dev/null | cut -s -d "." -f 2-)
     fi
