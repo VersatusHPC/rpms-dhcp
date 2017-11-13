@@ -20,7 +20,7 @@ Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
 %global VERSION %%{version}%%{prever}
-Release:  6%{?dist}
+Release:  7%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -76,6 +76,7 @@ Patch34:  dhcp-sd_notify.patch
 Patch36:  dhcp-option97-pxe-client-id.patch
 Patch37:  dhcp-stateless-DUID-LLT.patch
 Patch38:  dhcp-dhclient-preinit6s.patch
+Patch39:  dhcp-handle_ctx_signals.patch
 
 
 BuildRequires: autoconf
@@ -334,6 +335,9 @@ rm bind/bind.tar.gz
 
 # dhclient: make sure link-local address is ready in stateless mode (#1263466)
 %patch38 -p1 -b .preinit6s
+
+# add signal handlers for proper work with share context
+%patch39 -p1 -b .signals
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -661,6 +665,9 @@ done
 %endif
 
 %changelog
+* Thu Nov  9 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-7
+- Add patch for proper signal handling with shared context (#1457871)
+
 * Wed Sep 20 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-6
 - Do now override hostname variable in script
 
