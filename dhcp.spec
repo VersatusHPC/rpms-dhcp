@@ -20,7 +20,7 @@ Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
 %global VERSION %%{version}%%{prever}
-Release:  7%{?dist}
+Release:  8%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -77,6 +77,7 @@ Patch36:  dhcp-option97-pxe-client-id.patch
 Patch37:  dhcp-stateless-DUID-LLT.patch
 Patch38:  dhcp-dhclient-preinit6s.patch
 Patch39:  dhcp-handle_ctx_signals.patch
+Patch40:  dhcp-4.3.6-omapi-leak.patch
 
 
 BuildRequires: autoconf
@@ -338,6 +339,10 @@ rm bind/bind.tar.gz
 
 # add signal handlers for proper work with share context
 %patch39 -p1 -b .signals
+
+# close omapi socker descriptions properly
+# https://bugzilla.redhat.com/1523547 
+%patch40 -p1 -b .omapi-leak
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -665,6 +670,9 @@ done
 %endif
 
 %changelog
+* Fri Dec  8 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-8
+- Fix omapi SD leak (#1523547)
+
 * Thu Nov  9 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-7
 - Add patch for proper signal handling with shared context (#1457871)
 
