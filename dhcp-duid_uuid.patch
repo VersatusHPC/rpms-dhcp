@@ -36,8 +36,8 @@ diff -up dhcp-4.3.4/client/dhclient.c.duid_uuid dhcp-4.3.4/client/dhclient.c
 +		log_debug("Not enough data in %s", id_fname);
 +		return ISC_R_IOERROR;
 +	}
-+
-+	for (int j = 0; j < 16; j++) {
++	int j;
++	for (j = 0; j < 16; j++) {
 +		int a, b;
 +
 +		a = unhexchar(id[j*2]);

@@ -20,7 +20,7 @@ Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
 %global VERSION %%{version}%%{prever}
-Release:  8%{?dist}
+Release:  9%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -670,6 +670,9 @@ done
 %endif
 
 %changelog
+* Wed Dec 20 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.5-9
+- Change duid_uuid patch to not use std99 feature
+
 * Fri Dec  8 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-8
 - Fix omapi SD leak (#1523547)
 
