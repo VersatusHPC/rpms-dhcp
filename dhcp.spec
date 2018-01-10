@@ -9,18 +9,16 @@
 
 
 %global prever b1
-#%%global patchver P1
-
-#%%global VERSION %%{version}-%%{patchver}
-#%global VERSION %%{version}%%{prever}
-#%global VERSION %{version}
+#global patchver P1
+#global VERSION %%{version}-%%{patchver}
+#global VERSION %%{version}%%{prever}
+#global VERSION %{version}
 
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-%global VERSION %%{version}%%{prever}
-Release:  9%{?dist}
+Release:  10%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -670,6 +668,9 @@ done
 %endif
 
 %changelog
+* Wed Jan 10 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-10
+- Use released version
+
 * Wed Dec 20 2017 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.5-9
 - Change duid_uuid patch to not use std99 feature
 
