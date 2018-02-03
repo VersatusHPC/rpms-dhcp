@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  10%{?dist}
+Release:  11%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -564,10 +564,7 @@ exit 0
 # Package upgrade, not uninstall
 %systemd_postun_with_restart dhcrelay.service
 
-
-%post libs -p /sbin/ldconfig
-
-%postun libs -p /sbin/ldconfig
+%ldconfig_scriptlets libs
 
 %triggerun -- dhcp
 # convert DHC*ARGS from /etc/sysconfig/dhc* to /etc/systemd/system/dhc*.service
@@ -668,6 +665,9 @@ done
 %endif
 
 %changelog
+* Sat Feb 03 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 12:4.3.6-11
+- Switch to %%ldconfig_scriptlets
+
 * Wed Jan 10 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-10
 - Use released version
 
