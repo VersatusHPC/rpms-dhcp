@@ -18,7 +18,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  13%{?dist}
+Release:  14%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -86,7 +86,7 @@ BuildRequires: openldap-devel
 BuildRequires: krb5-devel
 BuildRequires: libcap-ng-devel
 # https://fedorahosted.org/fpc/ticket/502#comment:3
-BuildRequires: bind99-devel
+BuildRequires: bind-export-devel
 BuildRequires: systemd systemd-devel
 # dhcp-sd_notify.patch
 BuildRequires: pkgconfig(libsystemd)
@@ -379,8 +379,7 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --with-cli-pid-file=%{_localstatedir}/run/dhclient.pid \
     --with-cli6-pid-file=%{_localstatedir}/run/dhclient6.pid \
     --with-relay-pid-file=%{_localstatedir}/run/dhcrelay.pid \
-    --with-libbind=%{_includedir}/bind99 \
-    --with-libbind-libs=%{_libdir}/bind99 \
+    --with-libbind=/usr/bin/isc-export-config.sh \
     --with-ldap \
     --with-ldapcrypto \
     --with-ldap-gssapi \
@@ -665,6 +664,11 @@ done
 %endif
 
 %changelog
+* Thu Feb 22 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-14
+- Use bind-export-libs package instead of bind99
+- Use isc-config.sh to configure bind libs
+- Change requirement to bind-export-devel
+
 * Thu Feb 22 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-13
 - Do not parse sysconfig/network-scripts if initscripts not installed (#1098172)
 
