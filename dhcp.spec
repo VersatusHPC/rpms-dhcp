@@ -8,17 +8,15 @@
 %global dhcpconfdir %{_sysconfdir}/dhcp
 
 
-%global prever b1
+#global prever b1
 #global patchver P1
-#global VERSION %%{version}-%%{patchver}
-#global VERSION %%{version}%%{prever}
-#global VERSION %{version}
+%global DHCPVERSION %{version}%{?prever}%{?patchver:-%{patchver}}
 
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  14%{?dist}
+Release:  15%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -26,7 +24,7 @@ Release:  14%{?dist}
 Epoch:    12
 License:  ISC
 Url:      http://isc.org/products/DHCP/
-Source0:  ftp://ftp.isc.org/isc/dhcp/%{VERSION}/dhcp-%{VERSION}.tar.gz
+Source0:  ftp://ftp.isc.org/isc/dhcp/%{DHCPVERSION}/dhcp-%{DHCPVERSION}.tar.gz
 Source1:  dhclient-script
 Source2:  README.dhclient.d
 Source3:  11-dhclient
@@ -216,7 +214,7 @@ This package contains doxygen-generated documentation.
 %endif
 
 %prep
-%setup -q -n dhcp-%{VERSION}
+%setup -q -n dhcp-%{DHCPVERSION}
 
 # Remove bundled BIND source
 rm bind/bind.tar.gz
@@ -664,6 +662,9 @@ done
 %endif
 
 %changelog
+* Thu Feb 22 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-15
+- Do not rely on ignoring case sensitivity of VERSION variable
+
 * Thu Feb 22 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-14
 - Use bind-export-libs package instead of bind99
 - Use isc-config.sh to configure bind libs
