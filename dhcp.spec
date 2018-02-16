@@ -16,7 +16,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  15%{?dist}
+Release:  16%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -74,6 +74,7 @@ Patch37:  dhcp-stateless-DUID-LLT.patch
 Patch38:  dhcp-dhclient-preinit6s.patch
 Patch39:  dhcp-handle_ctx_signals.patch
 Patch40:  dhcp-4.3.6-omapi-leak.patch
+Patch41:  dhcp-4.3.6-isc-util.patch
 
 
 BuildRequires: autoconf
@@ -339,6 +340,9 @@ rm bind/bind.tar.gz
 # close omapi socker descriptions properly
 # https://bugzilla.redhat.com/1523547 
 %patch40 -p1 -b .omapi-leak
+
+# include isc/util.h explicitly, is it no longer contained in used headers
+%patch41 -p1 -b .isc-util
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -662,6 +666,9 @@ done
 %endif
 
 %changelog
+* Thu Feb 22 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-16
+- Compile with recent bind includes, that does not include isc/util.h
+
 * Thu Feb 22 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-15
 - Do not rely on ignoring case sensitivity of VERSION variable
 
