@@ -1,4 +1,4 @@
-From 52ede1218eb7426ced8ed51c5c6c00995f92cb5e Mon Sep 17 00:00:00 2001
+From 2698385647a6ebd58b5d25147333e494c3da2409 Mon Sep 17 00:00:00 2001
 From: Petr Mensik <pemensik@redhat.com>
 Date: Fri, 9 Feb 2018 15:24:53 +0100
 Subject: [PATCH] Support for isc-config.sh script on --with-libbind parameter
@@ -11,14 +11,14 @@ Add support for with-libbind=config, Improve help message
 ---
  client/Makefile.am       |  5 ++-
  client/tests/Makefile.am |  8 ++---
- common/tests/Makefile.am | 14 +++------
- configure.ac             | 81 ++++++++++++++++++++++++++++++++++++++++++------
+ common/tests/Makefile.am | 14 +++-----
+ configure.ac             | 84 ++++++++++++++++++++++++++++++++++++++++++------
  dhcpctl/Makefile.am      |  8 ++---
  omapip/Makefile.am       |  5 ++-
  relay/Makefile.am        |  5 ++-
  server/Makefile.am       |  6 ++--
  server/tests/Makefile.am |  9 +++---
- 9 files changed, 95 insertions(+), 46 deletions(-)
+ 9 files changed, 98 insertions(+), 46 deletions(-)
 
 diff --git a/client/Makefile.am b/client/Makefile.am
 index 2cb83d8..b85f5d2 100644
@@ -113,7 +113,7 @@ index f6a43e4..196aa44 100644
  check: $(ATF_TESTS)
  	@if test $(top_srcdir) != ${top_builddir}; then \
 diff --git a/configure.ac b/configure.ac
-index 79325d2..1dead8c 100644
+index cdfa352..ef55f8d 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -688,8 +688,12 @@ AC_CHECK_MEMBER(struct tpacket_auxdata.tp_vlan_tci,
@@ -130,7 +130,7 @@ index 79325d2..1dead8c 100644
  		        (default is ./bind)]),
  	use_libbind="$withval", use_libbind="no")
  case "$use_libbind" in
-@@ -701,23 +705,82 @@ no)
+@@ -701,23 +705,85 @@ no)
  	BINDDIR="\${top_srcdir}/bind"
  	BINDSRCDIR="\${top_srcdir}/bind"
  	;;
@@ -165,8 +165,8 @@ index 79325d2..1dead8c 100644
  	;;
  esac
 +if test -z "$BIND_CONFIG"; then
-+	BIND_CPPFLAGS="-I$BINDDIR/include"
-+	BIND_LIBDIR="$BINDDIR/lib"
++	BIND_CPPFLAGS="-I${BINDDIR}/include"
++	BIND_LIBDIR="${BINDDIR}/lib"
 +	BIND_LIBS="$(BINDLIBDIR)/libirs.a $(BINDLIBDIR)/libdns.a $(BINDLIBDIR)/libisccfg.a  $(BINDLIBDIR)/libisc.a"
 +else
 +	BIND_CPPFLAGS=`$BIND_CONFIG --cflags`
@@ -207,6 +207,9 @@ index 79325d2..1dead8c 100644
 +
 +	if test "x$BIND_EXPORT" != xyes -a "x$BIND_SINGLETHREADED" != xyes
 +	then
++		AC_MSG_RESULT([BIND_CONFIG=${BIND_CONFIG}])
++		AC_MSG_RESULT([BIND_CPPFLAGS=${BIND_CPPFLAGS}])
++		AC_MSG_RESULT([BIND_LIBS=${BIND_LIBS}])
 +		AC_MSG_ERROR([Bind libraries are not useable for dhcp])
 +	fi
 +	CPPFLAGS="$saved_CPPFLAGS"
@@ -220,7 +223,7 @@ index 79325d2..1dead8c 100644
  
  # OpenLDAP support.
  AC_ARG_WITH(ldap,
-@@ -795,7 +858,7 @@ fi
+@@ -795,7 +861,7 @@ fi
  CFLAGS="$CFLAGS $STD_CWARNINGS"
  
  # Try to add the bind and dhcp include directories
