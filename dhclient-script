@@ -813,10 +813,14 @@ if [ -f /etc/sysconfig/networking/network ]; then
     . /etc/sysconfig/networking/network
 fi
 
-cd /etc/sysconfig/network-scripts
-CONFIG="${interface}"
-need_config "${CONFIG}"
-source_config >/dev/null 2>&1
+## it's possible initscripts package is not installed
+## for example in container. Don't flood stderr then
+if [ -d /etc/sysconfig/network-scripts ]; then
+        cd /etc/sysconfig/network-scripts
+        CONFIG="${interface}"
+        need_config "${CONFIG}"
+        source_config >/dev/null 2>&1
+fi;
 
 # In case there's some delay in rebinding, it might happen, that the valid_lft drops to 0,
 # address is removed by kernel and then re-added few seconds later by dhclient-script.
