@@ -16,7 +16,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  16%{?dist}
+Release:  17%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -75,7 +75,8 @@ Patch38:  dhcp-dhclient-preinit6s.patch
 Patch39:  dhcp-handle_ctx_signals.patch
 Patch40:  dhcp-4.3.6-omapi-leak.patch
 Patch41:  dhcp-4.3.6-isc-util.patch
-
+Patch42:  dhcp-4.3.6-options_overflow.patch
+Patch43:  dhcp-4.3.6-reference_count_overflow.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -343,6 +344,10 @@ rm bind/bind.tar.gz
 
 # include isc/util.h explicitly, is it no longer contained in used headers
 %patch41 -p1 -b .isc-util
+
+## https://bugzilla.redhat.com/show_bug.cgi?id=1550246
+%patch42 -p1 
+%patch43 -p1
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -666,6 +671,9 @@ done
 %endif
 
 %changelog
+* Thu Mar  1 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-17
+- Fix CVE-2018-5732 CVE-2018-5733 (#1550246)
+
 * Thu Feb 22 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-16
 - Compile with recent bind includes, that does not include isc/util.h
 
