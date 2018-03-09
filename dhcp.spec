@@ -16,7 +16,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  17%{?dist}
+Release:  18%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -605,6 +605,7 @@ done
 %config(noreplace) %{_sysconfdir}/sysconfig/dhcpd
 %config(noreplace) %{dhcpconfdir}/dhcpd.conf
 %config(noreplace) %{dhcpconfdir}/dhcpd6.conf
+%dir %{_sysconfdir}/openldap/schema
 %config(noreplace) %{_sysconfdir}/openldap/schema/dhcp.schema
 %dir %{_sysconfdir}/NetworkManager
 %dir %{_sysconfdir}/NetworkManager/dispatcher.d
@@ -671,6 +672,9 @@ done
 %endif
 
 %changelog
+* Fri Mar 09 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-18
+- Own ldap schema directory (#1553432)
+
 * Thu Mar  1 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-17
 - Fix CVE-2018-5732 CVE-2018-5733 (#1550246)
 
