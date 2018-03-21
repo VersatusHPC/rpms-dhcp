@@ -217,7 +217,7 @@ run_hookdir() {
     dir="${1}"
 
     if [ -d "${dir}" ]; then
-        for script in $(run-parts --list $dir); do
+        for script in $(find $dir -executable ! -empty); do
             run_hook ${script} || return $?
         done
     fi

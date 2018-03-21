@@ -16,7 +16,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  18%{?dist}
+Release:  19%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -672,6 +672,9 @@ done
 %endif
 
 %changelog
+* Wed Mar 21 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-19
+- Don't use run-parts for hooks discovery (#1558612)
+
 * Fri Mar 09 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-18
 - Own ldap schema directory (#1553432)
 
