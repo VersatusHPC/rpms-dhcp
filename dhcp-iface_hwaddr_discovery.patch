@@ -1,0 +1,13 @@
+diff --git a/common/discover.c b/common/discover.c
+index 26a78ca..ed01e45 100644
+--- a/common/discover.c
++++ b/common/discover.c
+@@ -635,6 +635,8 @@ discover_interfaces(int state) {
+ 			interface_dereference(&tmp, MDL);
+ 			tmp = interfaces; /* XXX */
+ 		}
++		if (tmp != NULL)
++			get_hw_addr(tmp);
+ 
+ 		if (dhcp_interface_discovery_hook) {
+ 			(*dhcp_interface_discovery_hook)(tmp);

@@ -16,7 +16,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  19%{?dist}
+Release:  20%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -77,6 +77,7 @@ Patch40:  dhcp-4.3.6-omapi-leak.patch
 Patch41:  dhcp-4.3.6-isc-util.patch
 Patch42:  dhcp-4.3.6-options_overflow.patch
 Patch43:  dhcp-4.3.6-reference_count_overflow.patch
+Patch44:  dhcp-iface_hwaddr_discovery.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -346,8 +347,12 @@ rm bind/bind.tar.gz
 %patch41 -p1 -b .isc-util
 
 ## https://bugzilla.redhat.com/show_bug.cgi?id=1550246
-%patch42 -p1 
-%patch43 -p1
+%patch42 -p1 -b .options-cve
+%patch43 -p1 -b .refcount-cve
+
+# ISC-Bugs #47353
+# https://bugzilla.redhat.com/1163379
+%patch44 -p1 -b .xid-hwaddr
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -672,6 +677,9 @@ done
 %endif
 
 %changelog
+* Fri Apr  6 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-20
+- Discover hwaddr for all interfaces for xid uniqueness
+
 * Wed Mar 21 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-19
 - Don't use run-parts for hooks discovery (#1558612)
 
