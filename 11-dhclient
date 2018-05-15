@@ -7,7 +7,7 @@ ETCDIR=/etc/dhcp
 interface=$1
 
 eval "$(
-declare | LC_ALL=C grep '^DHCP4_[A-Z_]*=' | while read opt; do
+declare | LC_ALL=C grep '^DHCP4_[A-Z_]*=' | while read -r opt; do
     optname=${opt%%=*}
     optname=${optname,,}
     optname=new_${optname#dhcp4_}
