@@ -16,7 +16,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  21%{?dist}
+Release:  22%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -677,6 +677,9 @@ done
 %endif
 
 %changelog
+* Fri May 18 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-22
+- Get rid of eval in 11-dhclient
+
 * Tue May 15 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-21
 - Fix for CVE-2018-1111
 

@@ -6,15 +6,11 @@ SAVEDIR=/var/lib/dhclient
 ETCDIR=/etc/dhcp
 interface=$1
 
-eval "$(
-declare | LC_ALL=C grep '^DHCP4_[A-Z_]*=' | while read -r opt; do
-    optname=${opt%%=*}
-    optname=${optname,,}
-    optname=new_${optname#dhcp4_}
-    optvalue=${opt#*=}
-    echo "export $optname=$optvalue"
+for optname in "${!DHCP4_@}"; do
+    newoptname=${optname,,};
+    newoptname=new_${newoptname#dhcp4_};
+    export $newoptname="${!optname}";
 done
-)"
 
 [ -f /etc/sysconfig/network ] && . /etc/sysconfig/network
 
