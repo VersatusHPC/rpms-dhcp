@@ -25,6 +25,10 @@ if [ -d $ETCDIR/dhclient.d ]; then
             . "${f}"
             if [ "$2" = "up" ]; then
                 "${subsystem}_config"
+            elif [ "$2" = "dhcp4-change" ]; then
+                if [ "$subsystem" = "chrony" -o "$subsystem" = "ntp" ]; then
+                    "${subsystem}_config"
+                fi
             elif [ "$2" = "down" ]; then
                 "${subsystem}_restore"
             fi
