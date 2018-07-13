@@ -16,7 +16,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  26%{?dist}
+Release:  27%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -677,6 +677,9 @@ done
 %endif
 
 %changelog
+* Fri Jul 13 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-27
+- Update to bind 9.11.4
+
 * Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 12:4.3.6-26
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
