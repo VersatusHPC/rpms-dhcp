@@ -1,0 +1,17 @@
+- hosts: localhost
+  roles:
+    - role: standard-test-beakerlib
+      tags:
+      - classic
+      tests:
+      - client-ipv4-tests
+      - client-ipv6-tests
+      required_packages:
+      - radvd
+      - dnsmasq
+      - python3
+      - wireshark-cli
+      - systemd
+      - iproute
+      - wide-dhcpv6
+      - python3-pyroute2

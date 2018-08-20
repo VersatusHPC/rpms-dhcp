@@ -1,0 +1,10 @@
+[Unit]
+Description=Tshark daemon
+After=multi-user.target network.target
+
+[Service]
+Type=simple
+GuessMainPID=true
+ExecStart=/usr/bin/tshark -w /var/run/dhclient-ci/test-dhclient-tcp-dump.pcap -f "port 67 or port 68"  -i veth-peer -P
+[Install]
+WantedBy=multi-user.target

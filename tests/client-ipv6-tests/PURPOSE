@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/dhcpd-client
+Description: IPv6 tests for dhclient
+Author: Susant Sahani<susant@redhat.com>
