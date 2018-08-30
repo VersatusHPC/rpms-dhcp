@@ -16,7 +16,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  27%{?dist}
+Release:  28%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -78,6 +78,7 @@ Patch41:  dhcp-4.3.6-isc-util.patch
 Patch42:  dhcp-4.3.6-options_overflow.patch
 Patch43:  dhcp-4.3.6-reference_count_overflow.patch
 Patch44:  dhcp-iface_hwaddr_discovery.patch
+Patch45:  dhcp-noreplay.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -353,6 +354,9 @@ rm bind/bind.tar.gz
 # ISC-Bugs #47353
 # https://bugzilla.redhat.com/1163379
 %patch44 -p1 -b .xid-hwaddr
+
+#ISC Bugs #48110
+%patch45 -p1 -b .noreplay
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -677,6 +681,9 @@ done
 %endif
 
 %changelog
+* Thu Aug 30 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-28
+- Do not try to map leases file in memory if not in replay mode
+
 * Fri Jul 13 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-27
 - Update to bind 9.11.4
 
