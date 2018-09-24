@@ -16,7 +16,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  28%{?dist}
+Release:  29%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -677,8 +677,11 @@ done
 %endif
 
 %changelog
-* Mon Sep 24 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-28
+* Mon Sep 24 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-29
 - Resolves: 1632246 - Do not fail if iface has no hwaddr 
+
+* Thu Aug 30 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-28
+- Do not try to map leases file in memory if not in replay mode
 
 * Fri Jul 13 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-27
 - Update to bind 9.11.4
