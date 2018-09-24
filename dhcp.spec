@@ -78,6 +78,7 @@ Patch41:  dhcp-4.3.6-isc-util.patch
 Patch42:  dhcp-4.3.6-options_overflow.patch
 Patch43:  dhcp-4.3.6-reference_count_overflow.patch
 Patch44:  dhcp-iface_hwaddr_discovery.patch
+Patch45:  dhcp-noreplay.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -353,6 +354,10 @@ rm bind/bind.tar.gz
 # ISC-Bugs #47353
 # https://bugzilla.redhat.com/1163379
 %patch44 -p1 -b .xid-hwaddr
+
+#ISC Bugs #48110
+%patch45 -p1 -b .noreplay
+
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
