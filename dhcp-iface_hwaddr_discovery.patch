@@ -7,7 +7,80 @@ index 26a78ca..ed01e45 100644
  			tmp = interfaces; /* XXX */
  		}
 +		if (tmp != NULL)
-+			get_hw_addr(tmp);
++			try_hw_addr(tmp);
  
  		if (dhcp_interface_discovery_hook) {
  			(*dhcp_interface_discovery_hook)(tmp);
+diff --git a/common/lpf.c b/common/lpf.c
+index 4a252ca..467b055 100644
+--- a/common/lpf.c
++++ b/common/lpf.c
+@@ -697,8 +697,22 @@ ioctl_get_ll(char *name)
+ 	return sll;
+ }
+ 
++// define ? 
++void try_hw_addr(struct interface_info *info){
++  get_hw_addr2(info);
++};
++
+ void
+ get_hw_addr(struct interface_info *info)
++{
++  if (get_hw_addr2(info) == ISC_R_NOTFOUND){
++    log_fatal("Unsupported device type for \"%s\"",
++              info->name);
++  }
++}
++
++isc_result_t
++get_hw_addr2(struct interface_info *info)
+ {
+ 	struct hardware *hw = &info->hw_address;
+ 	char *name = info->name;
+@@ -708,7 +722,8 @@ get_hw_addr(struct interface_info *info)
+ 	int sll_allocated = 0;
+ 	char *dup = NULL;
+ 	char *colon = NULL;
+-
++        isc_result_t result = ISC_R_SUCCESS;
++        
+ 	if (getifaddrs(&ifaddrs) == -1)
+ 		log_fatal("Failed to get interfaces");
+ 
+@@ -792,14 +807,16 @@ get_hw_addr(struct interface_info *info)
+ 			hw->hbuf[4] = 0xef;
+ 			break;
+ #endif
+-		default:
+-			freeifaddrs(ifaddrs);
+-			log_fatal("Unsupported device type %hu for \"%s\"",
+-				  sll->sll_hatype, name);
++        default:
++          log_error("Unsupported device type %hu for \"%s\"",
++                      sll->sll_hatype, name);
++          result = ISC_R_NOTFOUND;
++
+ 	}
+ 
+ 	if (sll_allocated)
+ 		dfree(sll, MDL);
+ 	freeifaddrs(ifaddrs);
++        return result;
+ }
+ #endif
+diff --git a/includes/dhcpd.h b/includes/dhcpd.h
+index d534f8c..66a21fb 100644
+--- a/includes/dhcpd.h
++++ b/includes/dhcpd.h
+@@ -2591,7 +2591,10 @@ void print_dns_status (int, struct dhcp_ddns_cb *, isc_result_t);
+ #endif
+ const char *print_time(TIME);
+ 
++
+ void get_hw_addr(struct interface_info *info);
++void try_hw_addr(struct interface_info *info);
++isc_result_t get_hw_addr2(struct interface_info *info);
+ char *buf_to_hex (const unsigned char *s, unsigned len,
+                    const char *file, int line);
+ char *format_lease_id(const unsigned char *s, unsigned len, int format,

@@ -78,7 +78,6 @@ Patch41:  dhcp-4.3.6-isc-util.patch
 Patch42:  dhcp-4.3.6-options_overflow.patch
 Patch43:  dhcp-4.3.6-reference_count_overflow.patch
 Patch44:  dhcp-iface_hwaddr_discovery.patch
-Patch45:  dhcp-noreplay.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -354,9 +353,6 @@ rm bind/bind.tar.gz
 # ISC-Bugs #47353
 # https://bugzilla.redhat.com/1163379
 %patch44 -p1 -b .xid-hwaddr
-
-#ISC Bugs #48110
-%patch45 -p1 -b .noreplay
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
 # https://bugzilla.gnome.org/show_bug.cgi?id=656610
@@ -681,8 +677,8 @@ done
 %endif
 
 %changelog
-* Thu Aug 30 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-28
-- Do not try to map leases file in memory if not in replay mode
+* Mon Sep 24 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-28
+- Resolves: 1632246 - Do not fail if iface has no hwaddr 
 
 * Fri Jul 13 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-27
 - Update to bind 9.11.4
