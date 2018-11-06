@@ -16,7 +16,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  29%{?dist}
+Release:  30%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -79,6 +79,7 @@ Patch42:  dhcp-4.3.6-options_overflow.patch
 Patch43:  dhcp-4.3.6-reference_count_overflow.patch
 Patch44:  dhcp-iface_hwaddr_discovery.patch
 Patch45:  dhcp-noreplay.patch
+Patch46:  dhcp-4.3.6-bind-9.11.5.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -357,6 +358,7 @@ rm bind/bind.tar.gz
 
 #ISC Bugs #48110
 %patch45 -p1 -b .noreplay
+%patch46 -p1 -b .bind
 
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
@@ -682,6 +684,9 @@ done
 %endif
 
 %changelog
+* Tue Nov 06 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-30
+- Compile on BIND 9.11.5
+
 * Mon Sep 24 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-29
 - Resolves: 1632246 - Do not fail if iface has no hwaddr 
 
