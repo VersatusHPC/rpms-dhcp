@@ -16,7 +16,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.3.6
-Release:  30%{?dist}
+Release:  31%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -684,6 +684,9 @@ done
 %endif
 
 %changelog
+* Tue Jan 29 2019 Kalev Lember <klember@redhat.com> - 12:4.3.6-31
+- Rebuild once more now that BIND 9.11.5 is in the build root
+
 * Tue Nov 06 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-30
 - Compile on BIND 9.11.5
 
