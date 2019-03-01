@@ -1,7 +1,19 @@
-diff -up dhcp-4.3.0a1/common/discover.c.error2info dhcp-4.3.0a1/common/discover.c
---- dhcp-4.3.0a1/common/discover.c.error2info	2013-12-20 13:59:15.148553898 +0100
-+++ dhcp-4.3.0a1/common/discover.c	2013-12-20 13:59:15.181553438 +0100
-@@ -779,9 +779,9 @@ discover_interfaces(int state) {
+From 588ead2d9a9cfe70f14569a8e950c6c42f15c1e3 Mon Sep 17 00:00:00 2001
+From: Pavel Zhukov <pzhukov@redhat.com>
+Date: Thu, 21 Feb 2019 10:40:51 +0100
+Subject: [PATCH 18/21] No subnet declaration for <iface>' should be info, not
+ error.
+Cc: pzhukov@redhat.com
+
+---
+ common/discover.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/common/discover.c b/common/discover.c
+index 65881fc..056342c 100644
+--- a/common/discover.c
++++ b/common/discover.c
+@@ -801,9 +801,9 @@ discover_interfaces(int state) {
  
  		/* We must have a subnet declaration for each interface. */
  		if (!tmp->shared_network && (state == DISCOVER_SERVER)) {
@@ -13,7 +25,7 @@ diff -up dhcp-4.3.0a1/common/discover.c.error2info dhcp-4.3.0a1/common/discover.
  					  tmp->name, 
  					  (tmp->addresses == NULL) ?
  					   "no IPv4 addresses" :
-@@ -796,26 +796,26 @@ discover_interfaces(int state) {
+@@ -818,26 +818,26 @@ discover_interfaces(int state) {
  				} else {
  					strcpy(abuf, "no IPv6 addresses");
  				}
@@ -46,3 +58,6 @@ diff -up dhcp-4.3.0a1/common/discover.c.error2info dhcp-4.3.0a1/common/discover.
  				goto next;
  			} else {
  				log_error ("You must write a %s",
+-- 
+2.14.5
+

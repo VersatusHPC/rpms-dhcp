@@ -15,8 +15,8 @@
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
-Version:  4.3.6
-Release:  32%{?dist}
+Version:  4.4.1
+Release:  3%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -34,52 +34,27 @@ Source6:  dhcpd.service
 Source7:  dhcpd6.service
 Source8:  dhcrelay.service
 
-Patch0:   dhcp-remove-bind.patch
-
-Patch2:   dhcp-sharedlib.patch
-Patch3:   dhcp-errwarn-message.patch
-Patch4:   dhcp-dhclient-options.patch
-Patch5:   dhcp-release-by-ifup.patch
-Patch6:   dhcp-dhclient-decline-backoff.patch
-Patch7:   dhcp-unicast-bootp.patch
-Patch8:   dhcp-default-requested-options.patch
-
-Patch10:  dhcp-manpages.patch
-Patch11:  dhcp-paths.patch
-Patch12:  dhcp-CLOEXEC.patch
-Patch13:  dhcp-garbage-chars.patch
-Patch14:  dhcp-add_timeout_when_NULL.patch
-Patch15:  dhcp-64_bit_lease_parse.patch
-Patch16:  dhcp-capability.patch
-
-Patch18:  dhcp-sendDecline.patch
-Patch19:  dhcp-rfc3442-classless-static-routes.patch
-Patch20:  dhcp-honor-expired.patch
-Patch21:  dhcp-PPP.patch
-
-Patch23:  dhcp-lpf-ib.patch
-Patch24:  dhcp-IPoIB-log-id.patch
-Patch25:  dhcp-improved-xid.patch
-#Patch26:  dhcp-gpxe-cid.patch
-Patch26:  dhcp-duidv4.patch
-Patch27:  dhcp-duid_uuid.patch
-#Patch28:  dhcp-systemtap.patch
-
-Patch31:  dhcp-client-request-release-bind-iface.patch
-Patch33:  dhcp-no-subnet-error2info.patch
-Patch34:  dhcp-sd_notify.patch
-
-Patch36:  dhcp-option97-pxe-client-id.patch
-Patch37:  dhcp-stateless-DUID-LLT.patch
-Patch38:  dhcp-dhclient-preinit6s.patch
-Patch39:  dhcp-handle_ctx_signals.patch
-Patch40:  dhcp-4.3.6-omapi-leak.patch
-Patch41:  dhcp-4.3.6-isc-util.patch
-Patch42:  dhcp-4.3.6-options_overflow.patch
-Patch43:  dhcp-4.3.6-reference_count_overflow.patch
-Patch44:  dhcp-iface_hwaddr_discovery.patch
-Patch45:  dhcp-noreplay.patch
-Patch46:  dhcp-4.3.6-bind-9.11.5.patch
+Patch1: 0001-change-bug-url.patch
+Patch2: 0002-additional-dhclient-options.patch
+Patch3: 0003-Handle-releasing-interfaces-requested-by-sbin-ifup.patch
+Patch4: 0004-Support-unicast-BOOTP-for-IBM-pSeries-systems-and-ma.patch
+Patch5: 0005-Change-default-requested-options.patch
+Patch6: 0006-Various-man-page-only-fixes.patch
+Patch7: 0007-Change-paths-to-conform-to-our-standards.patch
+Patch8: 0008-Make-sure-all-open-file-descriptors-are-closed-on-ex.patch
+Patch9: 0009-Fix-garbage-in-format-string-error.patch
+Patch10: 0010-Handle-null-timeout.patch
+Patch11: 0011-Drop-unnecessary-capabilities.patch
+Patch12: 0012-RFC-3442-Classless-Static-Route-Option-for-DHCPv4-51.patch
+Patch13: 0013-DHCPv6-over-PPP-support-626514.patch
+Patch14: 0014-IPoIB-support-660681.patch
+Patch15: 0015-Add-GUID-DUID-to-dhcpd-logs-1064416.patch
+Patch16: 0016-Turn-on-creating-sending-of-DUID.patch
+Patch17: 0017-Send-unicast-request-release-via-correct-interface.patch
+Patch18: 0018-No-subnet-declaration-for-iface-should-be-info-not-e.patch
+Patch19: 0019-dhclient-write-DUID_LLT-even-in-stateless-mode-11563.patch
+Patch20: 0020-Discover-all-hwaddress-for-xid-uniqueness.patch
+Patch21: 0021-Load-leases-DB-in-non-replay-mode-only.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -89,7 +64,6 @@ BuildRequires: openldap-devel
 BuildRequires: krb5-devel
 BuildRequires: libcap-ng-devel
 # https://fedorahosted.org/fpc/ticket/502#comment:3
-BuildRequires: bind-export-devel
 BuildRequires: systemd systemd-devel
 # dhcp-sd_notify.patch
 BuildRequires: pkgconfig(libsystemd)
@@ -191,10 +165,13 @@ easier to administer a large network.
 
 This package provides common files used by dhcp and dhclient package.
 
-%package libs
+%package libs-static
 Summary: Shared libraries used by ISC dhcp client and server
+Provides: %{name}-libs%{?_isa}
+Provides: bundled(bind-export-libs)
+Provides: bundled(bind-libs)
 
-%description libs
+%description libs-static
 This package contains shared libraries used by ISC dhcp client and server
 
 
@@ -219,146 +196,8 @@ This package contains doxygen-generated documentation.
 %endif
 
 %prep
-%setup -q -n dhcp-%{DHCPVERSION}
+%autosetup -p1 -n dhcp-%{DHCPVERSION}
 
-# Remove bundled BIND source
-rm bind/bind.tar.gz
-
-# Fire away bundled BIND source.
-%patch0 -p1 -b .remove-bind %{?_rawbuild}
-
-#Build dhcp's libraries as shared libs instead of static libs.
-%patch2 -p1 -b .sharedlib
-
-# Replace the standard ISC warning message about requesting help with an
-# explanation that this is a patched build of ISC DHCP and bugs should be
-# reported through bugzilla.redhat.com
-%patch3 -p1 -b .errwarn
-
-# Add more dhclient options (-I, -B, -H, -F, -timeout, -V, and -R)
-%patch4 -p1 -b .options
-
-# Handle releasing interfaces requested by /sbin/ifup
-# pid file is assumed to be /var/run/dhclient-$interface.pid
-%patch5 -p1 -b .ifup
-
-# If we receive a DHCP offer in dhclient and it's DECLINEd in dhclient-script,
-# backoff for an amount of time before trying again
-%patch6 -p1 -b .backoff
-
-# Support unicast BOOTP for IBM pSeries systems (and maybe others)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #19146])
-%patch7 -p1 -b .unicast
-
-# Add NIS domain, NIS servers, NTP servers, interface-mtu and domain-search
-# to the list of default requested DHCP options
-%patch8 -p1 -b .requested
-
-
-# Various man-page-only fixes
-%patch10 -p1 -b .man
-
-# Change paths to conform to our standards
-%patch11 -p1 -b .paths
-
-# Make sure all open file descriptors are closed-on-exec for SELinux (#446632)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #19148])
-%patch12 -p1 -b .cloexec
-
-# Fix 'garbage in format string' error (#450042)
-%patch13 -p1 -b .garbage
-
-# Handle cases in add_timeout() where the function is called with a NULL
-# value for the 'when' parameter
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #19867])
-%patch14 -p1 -b .dracut
-
-# Ensure 64-bit platforms parse lease file dates & times correctly (#448615, #628258)
-# (Partly submitted to dhcp-bugs@isc.org - [ISC-Bugs #22033])
-%patch15 -p1 -b .64-bit_lease_parse
-
-# Drop unnecessary capabilities in
-# dhclient (#517649, #546765), dhcpd/dhcrelay (#699713)
-%patch16 -p1 -b .capability
-
-# If any of the bound addresses are found to be in use on the link,
-# the dhcpv6 client sends a Decline message to the server
-# as described in section 18.1.7 of RFC-3315 (#559147)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #21237])
-%patch18 -p1 -b .sendDecline
-
-# RFC 3442 - Classless Static Route Option for DHCPv4 (#516325)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24572])
-%patch19 -p1 -b .rfc3442
-
-# check whether there is any unexpired address in previous lease
-# prior to confirming (INIT-REBOOT) the lease (#585418)
-# (Submitted to dhcp-suggest@isc.org - [ISC-Bugs #22675])
-%patch20 -p1 -b .honor-expired
-
-# DHCPv6 over PPP support (#626514)
-%patch21 -p1 -b .PPP
-
-# IPoIB support (#660681)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24249])
-%patch23 -p1 -b .lpf-ib
-# add GUID/DUID to dhcpd logs (#1064416)
-%patch24 -p1 -b .IPoIB-log-id
-%patch25 -p1 -b .improved-xid
-
-# create client identifier per rfc4390
-#%%patch26 -p1 -b .gpxe-cid (not needed as we use DUIDs - see next patch)
-# Turn on creating/sending of DUID as client identifier with DHCPv4 clients (#560361c#40, rfc4361)
-%patch26 -p1 -b .duidv4
-# Implement DUID-UUID (RFC 6355) and make it default DUID type (#560361#60)
-%patch27 -p1 -b .duid_uuid
-
-# http://sourceware.org/systemtap/wiki/SystemTap
-#%%patch28 -p1 -b .systemtap
-
-# send unicast request/release via correct interface (#800561, #1177351)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30544])
-%patch31 -p1 -b .bind-iface
-
-
-# 'No subnet declaration for <iface>' should be info, not error.
-%patch33 -p1 -b .error2info
-
-# support for sending startup notification to systemd (#1077666)
-%patch34 -p1 -b .sd_notify
-
-# option 97 - pxe-client-id (#1058674)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #38110])
-%patch36 -p1 -b .option97
-
-# dhclient: write DUID_LLT even in stateless mode (#1156356)
-# (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #38144])
-%patch37 -p1 -b .stateless-DUID-LLT
-
-# dhclient: make sure link-local address is ready in stateless mode (#1263466)
-%patch38 -p1 -b .preinit6s
-
-# add signal handlers for proper work with share context
-%patch39 -p1 -b .signals
-
-# close omapi socker descriptions properly
-# https://bugzilla.redhat.com/1523547 
-%patch40 -p1 -b .omapi-leak
-
-# include isc/util.h explicitly, is it no longer contained in used headers
-%patch41 -p1 -b .isc-util
-
-## https://bugzilla.redhat.com/show_bug.cgi?id=1550246
-%patch42 -p1 -b .options-cve
-%patch43 -p1 -b .refcount-cve
-
-# ISC-Bugs #47353
-# https://bugzilla.redhat.com/1163379
-%patch44 -p1 -b .xid-hwaddr
-
-#ISC Bugs #48110
-%patch45 -p1 -b .noreplay
-%patch46 -p1 -b .bind
 
 
 # DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
@@ -398,11 +237,9 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --with-cli-pid-file=%{_localstatedir}/run/dhclient.pid \
     --with-cli6-pid-file=%{_localstatedir}/run/dhclient6.pid \
     --with-relay-pid-file=%{_localstatedir}/run/dhcrelay.pid \
-    --with-libbind=/usr/bin/isc-export-config.sh \
     --with-ldap \
     --with-ldapcrypto \
     --with-ldap-gssapi \
-    --disable-static \
     --enable-log-pid \
 %if %{sdt}
     --enable-systemtap \
@@ -411,10 +248,11 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --enable-paranoia --enable-early-chroot \
     --enable-binary-leases \
     --with-systemd
-make %{?_smp_mflags}
+make -j1
+
 %if ! 0%{?_module_build}
 pushd doc
-make %{?_smp_mflags} devel
+make -j1 devel
 popd
 %endif
 
@@ -437,7 +275,7 @@ mkdir -p %{buildroot}%{dhcpconfdir}/dhclient.d
 # NetworkManager dispatcher script
 mkdir -p %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
 install -p -m 0755 %{SOURCE3} %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
-install -p -m 0755 %{SOURCE4} %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
+install -p -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
 
 # pm-utils script to handle suspend/resume and dhclient leases
 install -D -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/pm-utils/sleep.d/56dhclient
@@ -523,8 +361,6 @@ install -D -p -m 0644 contrib/ldap/dhcp.schema %{buildroot}%{_sysconfdir}/openld
 # Don't package libtool *.la files
 find %{buildroot} -type f -name "*.la" -delete -print
 
-rm %{buildroot}%{_includedir}/isc-dhcp/dst.h
-
 %pre server
 # /usr/share/doc/setup/uidgid
 %global gid_uid 177
@@ -582,7 +418,6 @@ exit 0
 # Package upgrade, not uninstall
 %systemd_postun_with_restart dhcrelay.service
 
-%ldconfig_scriptlets libs
 
 %triggerun -- dhcp
 # convert DHC*ARGS from /etc/sysconfig/dhc* to /etc/systemd/system/dhc*.service
@@ -665,16 +500,14 @@ done
 %attr(0644,root,root) %{_mandir}/man5/dhcp-options.5.gz
 %attr(0644,root,root) %{_mandir}/man5/dhcp-eval.5.gz
 
-%files libs
-%{_libdir}/libdhcpctl.so.*
-%{_libdir}/libomapi.so.*
+%files libs-static
+%{_libdir}/libdhcp*.a
+%{_libdir}/libomapi.a
 
 %files devel
 %doc doc/IANA-arp-parameters doc/api+protocol
 %{_includedir}/dhcpctl
 %{_includedir}/omapip
-%{_libdir}/libdhcpctl.so
-%{_libdir}/libomapi.so
 %attr(0644,root,root) %{_mandir}/man3/dhcpctl.3.gz
 %attr(0644,root,root) %{_mandir}/man3/omapi.3.gz
 
@@ -684,17 +517,11 @@ done
 %endif
 
 %changelog
-* Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 12:4.3.6-32
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
-
-* Tue Jan 29 2019 Kalev Lember <klember@redhat.com> - 12:4.3.6-31
-- Rebuild once more now that BIND 9.11.5 is in the build root
-
-* Tue Nov 06 2018 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-30
-- Compile on BIND 9.11.5
+* Thu Feb 28 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-3
+- New version 4.4.1
 
 * Mon Sep 24 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-29
-- Resolves: 1632246 - Do not fail if iface has no hwaddr 
+- Resolves: 1632246 - Do not fail if iface has no hwaddr
 
 * Thu Aug 30 2018 Pavel Zhukov <pzhukov@redhat.com> - 12:4.3.6-28
 - Do not try to map leases file in memory if not in replay mode
@@ -1204,14 +1031,14 @@ done
 
 * Fri Aug 24 2012 Tomas Hozza <thozza@redhat.com> - 12:4.2.4-14.P1
 - SystemD unit files don't use Environment files any more (#850558)
-- NetworkManager dispatcher script doesn't use DHCPDARGS any more 
+- NetworkManager dispatcher script doesn't use DHCPDARGS any more
 
 * Wed Aug 22 2012 Tomas Hozza <thozza@redhat.com> - 12:4.2.4-13.P1
 - fixed SPEC file so it comply with new systemd-rpm macros guidelines (#850089)
 
 * Mon Aug 20 2012 Tomas Hozza <thozza@redhat.com> - 12:4.2.4-12.P1
 - dhclient-script: fixed CONFIG variable value passed to need_config (#848858)
-- dhclient-script: calling dhclient-up-hooks after setting up route, gateways 
+- dhclient-script: calling dhclient-up-hooks after setting up route, gateways
                    & interface alias (#848869)
 
 * Fri Aug 17 2012 Jiri Popelka <jpopelka@redhat.com> - 12:4.2.4-11.P1
@@ -1224,7 +1051,7 @@ done
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
 * Wed Jul 25 2012 Tomas Hozza <thozza@redhat.com> - 12:4.2.4-8.P1
-- Dhclient does not correctly parse zero-length options in 
+- Dhclient does not correctly parse zero-length options in
   dhclient6.leases (#633318)
 
 * Wed Jul 25 2012 Tomas Hozza <thozza@redhat.com> - 12:4.2.4-7.P1
@@ -2272,7 +2099,7 @@ done
 - add a '-R <request option list>' dhclient argument
 
 * Fri May 26 2006 Jason Vas Dias <jvdias@redhat.com> - 12:3.0.4-8.1
-- fix a libdhcp4client memory leak (1 strdup) and 
+- fix a libdhcp4client memory leak (1 strdup) and
   fill in client->packet.siaddr before bind_lease() for pump
   nextServer option.
 
@@ -2283,12 +2110,12 @@ done
 - Enable libdhcp4client build
 
 * Tue May 16 2006 Jason Vas Dias <jvdias@redhat.com> - 12:3.0.4-2
-- Fix bug 191470: prevent dhcpd writing 8 byte dhcp-lease-time 
+- Fix bug 191470: prevent dhcpd writing 8 byte dhcp-lease-time
                   option in packets on 64-bit platforms
 
 * Sun May 14 2006 Jason Vas Dias <jvdias@redhat.com> - 12:3.0.4-2
-- Add the libdhcp4client library package for use by the new libdhcp 
-  package, which enables dhclient to be invoked by programs in a 
+- Add the libdhcp4client library package for use by the new libdhcp
+  package, which enables dhclient to be invoked by programs in a
   single process from the library. The normal dhclient code is
   unmodified by this.
 
@@ -2328,8 +2155,8 @@ done
   binaries are in /bin rather than /usr/bin
 
 * Mon Jan 16 2006 Jason Vas Dias <jvdias@redhat.com> - 11:3.0.3-20
-- fix bug 177845: allow client ip-address as default router 
-- fix bug 176615: fix DDNS update when Windows-NT client sends 
+- fix bug 177845: allow client ip-address as default router
+- fix bug 176615: fix DDNS update when Windows-NT client sends
                   host-name with trailing nul
 
 * Tue Dec 20 2005 Jason Vas Dias <jvdias@redhat.com> - 11:3.0.3-18
@@ -2342,7 +2169,7 @@ done
 - fix gcc 4.1 compile warnings (-Werror)
 
 * Fri Nov 18 2005 Jason Vas Dias <jvdias@redhat.com> - 11:3.0.3-12
-- fix bug 173619: dhclient-script should reconfig on RENEW if 
+- fix bug 173619: dhclient-script should reconfig on RENEW if
                   subnet-mask, broadcast-address, mtu, routers, etc.
                   have changed
 - apply upstream improvements to trailing nul options fix of bug 160655
@@ -2357,13 +2184,13 @@ done
 * Tue Oct 18 2005 Jason Vas Dias <jvdias@redhat.com> - 11:3.0.3-10
 - Allow dhclient route metrics to be specified with DHCP options:
   The dhcp-options(5) man-page states:
-  'option routers ... Routers should be listed in order of preference' 
+  'option routers ... Routers should be listed in order of preference'
   and
   'option static-routes ... are listed in descending order of priority' .
   No preference / priority could be set with previous dhclient-script .
-  Now, dhclient-script provides: 
+  Now, dhclient-script provides:
   Default Gateway (option 'routers') metrics:
-    Instead of allowing only one default gateway, if more than one router 
+    Instead of allowing only one default gateway, if more than one router
     is specified in the routers option, routers following the first router
     will have a 'metric' of their position in the list (1,...N>1).
   Option static-routes metrics:
@@ -2381,7 +2208,7 @@ done
 - fix bug 169164: separate /var/lib/{dhcpd,dhclient} directories
 - fix bug 167292: update failover port info in dhcpd.conf.5; give
                   failover ports default values in server/confpars.c
- 
+
 * Mon Sep 12 2005 Jason Vas Dias <jvdias@redhat.com> - 11:3.0.3-6
 - fix bug 167273: time-offset should not set timezone by default
                   tzdata's Etc/* files are named with reverse sign
@@ -2404,17 +2231,17 @@ done
 - don't explicitly require 2.2 era kernel, it's fairly overkill at this point
 
 * Fri Jul 29 2005 Jason Vas Dias <jvdias@redhat.com> 11:3.0.3-1
-- Upgrade to upstream version 3.0.3 
+- Upgrade to upstream version 3.0.3
 - Don't apply the 'default boot file server' patch: legacy
   dhcp behaviour broke RFC 2131, which requires that the siaddr
   field only be non-zero if the next-server or tftp-server-name
   options are specified.
 - Try removing the 1-5 second wait on dhclient startup altogether.
 - fix bug 163367: supply default configuration file for dhcpd
- 
+
 * Thu Jul 14 2005 Jason Vas Dias <jvdias@redhat.com> 10:3.0.3rc1-1
 - Upgrade to upstream version 3.0.3rc1
-- fix bug 163203: silence ISC blurb on configtest 
+- fix bug 163203: silence ISC blurb on configtest
 - fix default 'boot file server' value (packet->siaddr):
   In dhcp-3.0.2(-), this was defaulted to the server address;
   now it defaults to 0.0.0.0 (a rather silly default!) and
@@ -2443,17 +2270,17 @@ done
 - this is now corrected.
 
 * Mon Apr 25 2005 Jason Vas Dias <jvdias@redhat.com> 10:3.0.2-10
-- dhclient-script dhcdbd extensions. 
+- dhclient-script dhcdbd extensions.
 - Tested to have no effect unless dhcdbd invokes dhclient.
 
 * Thu Apr 21 2005 Jason Vas Dias <jvdias@redhat.com> 10:3.0.2-9
-- bugs 153244 & 155143 are now fixed with SELinux policy; 
+- bugs 153244 & 155143 are now fixed with SELinux policy;
   autotrans now works for dhcpc_t, so restorecons are not required,
   and dhclient runs OK under dhcpc_t with SELinux enforcing.
 - fix bug 155506: 'predhclien' typo (emacs!).
 
 * Mon Apr 18 2005 Jason Vas Dias <jvdias@redhat.com> 10:3.0.2-8
-- Fix bugs 153244 & 155143: 
+- Fix bugs 153244 & 155143:
       o restore dhclient-script 'restorecon's
       o give dhclient and dhclient-script an exec context of
         'system_u:object_r:sbin_t' that allows them to run
@@ -2468,7 +2295,7 @@ done
 -    about user or vendor defined option space options to environment.
 -
 - fix bug 153244: dhclient should not use restorecon
-- fix bug 151023: dhclient no 'headers & libraries' 
+- fix bug 151023: dhclient no 'headers & libraries'
 - fix bug 149780: add 'DHCLIENT_IGNORE_GATEWAY' variable
 - remove all usage of /sbin/route from dhclient-script
 
@@ -2550,7 +2377,7 @@ done
 - clean-up last patch: new-host.patch adds host_reference(host)
 - without host_dereference(host) before returns in ack_lease
 - (dhcp-3.0.1-host_dereference.patch)
- 
+
 * Mon Sep 27 2004 Jason Vas Dias <jvdias@redhat.com> 7:3.0.1-9
 - Fix bug 133522:
 - PXE Boot clients with static leases not given 'file' option
@@ -2562,7 +2389,7 @@ done
 - If "deny booting" is defined for some group of hosts,
 - then after one of those hosts is denied booting, all
 - hosts are denied booting, because of a pointer not being
-- cleared in the lease record. 
+- cleared in the lease record.
 - An upstream patch was obtained which will be in dhcp-3.0.2.
 
 * Mon Aug 16 2004 Jason Vas Dias <jvdias@redhat.com> 7:3.0.1-7
@@ -2894,7 +2721,7 @@ done
 * Mon Apr 05 1999 Cristian Gafton <gafton@redhat.com>
 - copy the source file in prep, not move
 
-* Sun Mar 21 1999 Cristian Gafton <gafton@redhat.com> 
+* Sun Mar 21 1999 Cristian Gafton <gafton@redhat.com>
 - auto rebuild in the new build environment (release 4)
 
 * Mon Jan 11 1999 Erik Troan <ewt@redhat.com>

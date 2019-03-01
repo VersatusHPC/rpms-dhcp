@@ -1,5 +1,9 @@
 #!/bin/bash
 
+## this script is disabled by default
+## if you want one to be executed  on NM up events
+## please make it executable. See chmod(1) for more details
+
 INTERFACE=$1 # The interface which is brought up or down
 STATUS=$2 # The new state of the interface
 

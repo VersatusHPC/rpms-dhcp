@@ -1,7 +1,18 @@
-diff -up dhcp-4.3.0a1/client/dhclient.c.ifup dhcp-4.3.0a1/client/dhclient.c
---- dhcp-4.3.0a1/client/dhclient.c.ifup	2013-12-19 14:53:08.817760677 +0100
-+++ dhcp-4.3.0a1/client/dhclient.c	2013-12-19 15:05:16.290518574 +0100
-@@ -521,9 +521,81 @@ main(int argc, char **argv) {
+From 692fd8b16ef6f12a57596351e930c65c68597bac Mon Sep 17 00:00:00 2001
+From: Pavel Zhukov <pzhukov@redhat.com>
+Date: Thu, 21 Feb 2019 10:21:14 +0100
+Subject: [PATCH 03/21] Handle releasing interfaces requested by /sbin/ifup
+Cc: pzhukov@redhat.com
+
+---
+ client/dhclient.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
+
+diff --git a/client/dhclient.c b/client/dhclient.c
+index 26a333c..2a2e9e6 100644
+--- a/client/dhclient.c
++++ b/client/dhclient.c
+@@ -787,9 +787,81 @@ main(int argc, char **argv) {
  				}
  			}
  			fclose(pidfd);
@@ -83,3 +94,6 @@ diff -up dhcp-4.3.0a1/client/dhclient.c.ifup dhcp-4.3.0a1/client/dhclient.c
  	if (!quiet) {
  		log_info("%s %s", message, PACKAGE_VERSION);
  		log_info(copyright);
+-- 
+2.14.5
+

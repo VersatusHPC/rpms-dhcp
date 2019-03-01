@@ -1,6 +1,19 @@
-diff -up dhcp-4.3.4/client/clparse.c.requested dhcp-4.3.4/client/clparse.c
---- dhcp-4.3.4/client/clparse.c.requested	2016-04-29 12:18:50.157151352 +0200
-+++ dhcp-4.3.4/client/clparse.c	2016-04-29 12:19:22.235137243 +0200
+From ac21c8b966620cbe79be3508c024ae30f93d6266 Mon Sep 17 00:00:00 2001
+From: Pavel Zhukov <pzhukov@redhat.com>
+Date: Thu, 21 Feb 2019 10:24:24 +0100
+Subject: [PATCH 05/21] Change default requested options
+Cc: pzhukov@redhat.com
+
+Add NIS domain, NIS servers, NTP servers, interface-mtu and domain-search
+to the list of default requested DHCP options
+---
+ client/clparse.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/client/clparse.c b/client/clparse.c
+index 7212e3a..39b95a0 100644
+--- a/client/clparse.c
++++ b/client/clparse.c
 @@ -31,7 +31,7 @@
  
  struct client_config top_level_config;
@@ -42,3 +55,6 @@ diff -up dhcp-4.3.4/client/clparse.c.requested dhcp-4.3.4/client/clparse.c
  	for (code = 0 ; code < NUM_DEFAULT_REQUESTED_OPTS ; code++) {
  		if (default_requested_options[code] == NULL)
  			log_fatal("Unable to find option definition for "
+-- 
+2.14.5
+
