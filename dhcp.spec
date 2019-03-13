@@ -12,11 +12,10 @@
 #global patchver P1
 %global DHCPVERSION %{version}%{?prever}%{?patchver:-%{patchver}}
 
-
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  3%{?dist}
+Release:  5%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -87,7 +86,6 @@ DHCP (Dynamic Host Configuration Protocol)
 %package server
 Summary: Provides the ISC DHCP server
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Requires(pre): shadow-utils
 Requires(post): coreutils grep sed
 Requires(post): systemd
@@ -106,7 +104,6 @@ This package provides the ISC DHCP server.
 %package relay
 Summary: Provides the ISC DHCP relay agent
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Requires(post): grep sed
 Requires(post): systemd
 Requires(preun): systemd
@@ -141,7 +138,6 @@ Obsoletes: dhclient < %{epoch}:%{version}-%{release}
 # dhclient-script requires:
 Requires: coreutils gawk grep ipcalc iproute iputils sed systemd
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description client
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows
@@ -169,7 +165,7 @@ This package provides common files used by dhcp and dhclient package.
 Summary: Shared libraries used by ISC dhcp client and server
 Provides: %{name}-libs%{?_isa}
 Provides: bundled(bind-export-libs)
-Provides: bundled(bind-libs)
+Provides: bundled(bind)
 
 %description libs-static
 This package contains shared libraries used by ISC dhcp client and server
@@ -198,12 +194,6 @@ This package contains doxygen-generated documentation.
 %prep
 %autosetup -p1 -n dhcp-%{DHCPVERSION}
 
-
-
-# DHCLIENT_DEFAULT_PREFIX_LEN  64 -> 128
-# https://bugzilla.gnome.org/show_bug.cgi?id=656610
-sed -i -e 's|DHCLIENT_DEFAULT_PREFIX_LEN 64|DHCLIENT_DEFAULT_PREFIX_LEN 128|g' includes/site.h
-
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
             client/dhclient-script.8 client/dhclient.8 ; do
@@ -221,6 +211,8 @@ for page in server/dhcpd.conf.5 server/dhcpd.leases.5 server/dhcpd.8 ; do
 done
 
 sed -i -e 's|/var/db/|%{_localstatedir}/lib/dhcpd/|g' contrib/dhcp-lease-list.pl
+
+## FIXME drop unused bind components 
 
 %build
 #libtoolize --copy --force
@@ -517,6 +509,9 @@ done
 %endif
 
 %changelog
+* Wed Mar 13 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-5
+- Do not require static libs for non devel installations
+
 * Thu Feb 28 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-3
 - New version 4.4.1
 
