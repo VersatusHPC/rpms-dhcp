@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  8%{?dist}
+Release:  9%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -56,7 +56,7 @@ Patch20: 0020-Discover-all-hwaddress-for-xid-uniqueness.patch
 Patch21: 0021-Load-leases-DB-in-non-replay-mode-only.patch
 Patch22: 0022-Backport-sd-notify-patch-for-systemd-support-1687040.patch
 
-Obsoletes: dhcp-libs < 4.4
+
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -154,6 +154,8 @@ This package provides the ISC DHCP client.
 %package common
 Summary: Common files used by ISC dhcp client, server and relay agent
 BuildArch: noarch
+Obsoletes: dhcp-libs < 4.4
+
 
 %description common
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows
@@ -512,6 +514,9 @@ done
 %endif
 
 %changelog
+* Tue Apr  2 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-9
+- Move obsolete to common section
+
 * Wed Mar 27 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-8
 - Add sd_notify patch to support systemd notify (1687040)
 
