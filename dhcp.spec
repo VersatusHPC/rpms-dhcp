@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  10%{?dist}
+Release:  11%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -154,7 +154,8 @@ This package provides the ISC DHCP client.
 %package common
 Summary: Common files used by ISC dhcp client, server and relay agent
 BuildArch: noarch
-Obsoletes: dhcp-libs < 4.4
+Obsoletes: dhcp-libs < %{epoch}:%{version}
+
 
 
 %description common
@@ -514,6 +515,9 @@ done
 %endif
 
 %changelog
+* Tue Apr  2 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-11
+- Specify epoch for obsolete
+
 * Tue Apr  2 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-10
 - Cherry-pick 00b7f9a Specify architecture for provides -
 
