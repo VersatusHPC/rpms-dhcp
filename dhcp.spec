@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  9%{?dist}
+Release:  10%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -168,7 +168,7 @@ This package provides common files used by dhcp and dhclient package.
 
 %package libs-static
 Summary: Shared libraries used by ISC dhcp client and server
-Provides: %{name}-libs =  %{epoch}:%{version}-%{release}
+Provides: %{name}-libs%{?_isa} =  %{epoch}:%{version}-%{release}
 Provides: bundled(bind-export-libs)
 Provides: bundled(bind)
 
@@ -514,6 +514,9 @@ done
 %endif
 
 %changelog
+* Tue Apr  2 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-10
+- Cherry-pick 00b7f9a Specify architecture for provides -
+
 * Tue Apr  2 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-9
 - Move obsolete to common section
 
