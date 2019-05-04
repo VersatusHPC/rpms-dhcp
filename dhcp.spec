@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  11%{?dist}
+Release:  12%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -515,6 +515,9 @@ done
 %endif
 
 %changelog
+* Sat May 04 2019 Björn Esser <besser82@fedoraproject.org> - 12:4.4.1-12
+- rebuilt (bind)
+
 * Tue Apr  2 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-11
 - Specify epoch for obsolete
 
