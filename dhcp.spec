@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  12%{?dist}
+Release:  13%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -170,6 +170,7 @@ This package provides common files used by dhcp and dhclient package.
 %package libs-static
 Summary: Shared libraries used by ISC dhcp client and server
 Provides: %{name}-libs%{?_isa} =  %{epoch}:%{version}-%{release}
+Provides: %{name}-libs =  %{epoch}:%{version}-%{release}
 Provides: bundled(bind-export-libs)
 Provides: bundled(bind)
 
@@ -198,7 +199,12 @@ This package contains doxygen-generated documentation.
 %endif
 
 %prep
-%autosetup -p1 -n dhcp-%{DHCPVERSION}
+%setup -n dhcp-%{DHCPVERSION}
+pushd bind
+tar -xvf bind.tar.gz
+ln -s bind-9* bind-sources
+popd
+%autopatch -p1 
 
 # Update paths in all man pages
 for page in client/dhclient.conf.5 client/dhclient.leases.5 \
@@ -515,6 +521,10 @@ done
 %endif
 
 %changelog
+* Mon May 20 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-13
+- Unpack bind prior to patching
+- Provide noarch libs
+
 * Sat May 04 2019 Björn Esser <besser82@fedoraproject.org> - 12:4.4.1-12
 - rebuilt (bind)
 
