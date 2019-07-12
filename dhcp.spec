@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  13%{?dist}
+Release:  14%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -55,6 +55,8 @@ Patch19: 0019-dhclient-write-DUID_LLT-even-in-stateless-mode-11563.patch
 Patch20: 0020-Discover-all-hwaddress-for-xid-uniqueness.patch
 Patch21: 0021-Load-leases-DB-in-non-replay-mode-only.patch
 Patch22: 0022-Backport-sd-notify-patch-for-systemd-support-1687040.patch
+
+Patch999: 0023-Detect-system-time-jumps.patch
 
 
 
@@ -256,7 +258,7 @@ make -j1
 
 %if ! 0%{?_module_build}
 pushd doc
-make -j1 devel
+make %{?_smp_mflags} devel
 popd
 %endif
 
@@ -521,6 +523,9 @@ done
 %endif
 
 %changelog
+* Thu Jul 11 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-14
+- Detect time change and request lease renewal
+
 * Mon May 20 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-13
 - Unpack bind prior to patching
 - Provide noarch libs

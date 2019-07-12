@@ -1,0 +1,284 @@
+From 32a891273f44ee1ca202c65c40beb508d1b2aa80 Mon Sep 17 00:00:00 2001
+From: Pavel Zhukov <pzhukov@redhat.com>
+Date: Thu, 11 Jul 2019 17:43:00 +0200
+Subject: [PATCH] Detect system time jumps
+Cc: pzhukov@redhat.com
+
+In case if system time was changed backward it's possible to have ip
+address dropped by the kernel due to lifetime expirity. Try to detect
+this situation using either monotonic time or saved timestamp and execute
+go_reboot() procedure to request lease extention
+---
+ bind/bind-9.11.2-P1/lib/isc/include/isc/result.h   |  4 +--
+ bind/bind-9.11.2-P1/lib/isc/include/isc/util.h     |  4 +++
+ bind/bind-9.11.2-P1/lib/isc/result.c               |  2 ++
+ bind/bind-9.11.2-P1/lib/isc/unix/app.c             | 41 ++++++++++++++++++++--
+ .../bind-9.11.2-P1/lib/isc/unix/include/isc/time.h | 20 +++++++++++
+ bind/bind-9.11.2-P1/lib/isc/unix/time.c            | 22 ++++++++++++
+ client/dhclient.c                                  |  6 ++++
+ common/dispatch.c                                  | 11 +++++-
+ includes/dhcpd.h                                   |  3 +-
+ server/dhcpd.c                                     |  6 ++++
+ 10 files changed, 113 insertions(+), 6 deletions(-)
+
+diff --git a/bind/bind-9.11.2-P1/lib/isc/include/isc/result.h b/bind/bind-9.11.2-P1/lib/isc/include/isc/result.h
+index 6f7ecf2..c7ef53c 100644
+--- a/bind/bind-9.11.2-P1/lib/isc/include/isc/result.h
++++ b/bind/bind-9.11.2-P1/lib/isc/include/isc/result.h
+@@ -81,9 +81,9 @@
+ #define ISC_R_UNSET			61	/*%< unset */
+ #define ISC_R_MULTIPLE			62	/*%< multiple */
+ #define ISC_R_WOULDBLOCK		63	/*%< would block */
+-
++#define ISC_R_TIMESHIFTED               64      /*%< system time changed */
+ /*% Not a result code: the number of results. */
+-#define ISC_R_NRESULTS 			64
++#define ISC_R_NRESULTS 			66
+ 
+ ISC_LANG_BEGINDECLS
+ 
+diff --git a/bind/bind-9.11.2-P1/lib/isc/include/isc/util.h b/bind/bind-9.11.2-P1/lib/isc/include/isc/util.h
+index f2cda26..9d54396 100644
+--- a/bind/bind-9.11.2-P1/lib/isc/include/isc/util.h
++++ b/bind/bind-9.11.2-P1/lib/isc/include/isc/util.h
+@@ -238,6 +238,10 @@
+  * Time
+  */
+ #define TIME_NOW(tp) 	RUNTIME_CHECK(isc_time_now((tp)) == ISC_R_SUCCESS)
++#ifdef CLOCK_BOOTTIME
++#define TIME_MONOTONIC(tp) 	RUNTIME_CHECK(isc_time_boottime((tp)) == ISC_R_SUCCESS)
++#endif
++
+ 
+ /*%
+  * Misc.
+diff --git a/bind/bind-9.11.2-P1/lib/isc/result.c b/bind/bind-9.11.2-P1/lib/isc/result.c
+index 071dac0..e362735 100644
+--- a/bind/bind-9.11.2-P1/lib/isc/result.c
++++ b/bind/bind-9.11.2-P1/lib/isc/result.c
+@@ -96,6 +96,7 @@ static const char *description[ISC_R_NRESULTS] = {
+ 	"unset",				/*%< 61 */
+ 	"multiple",				/*%< 62 */
+ 	"would block",				/*%< 63 */
++        "time changed",                         /*%< 64 */
+ };
+ 
+ static const char *identifier[ISC_R_NRESULTS] = {
+@@ -163,6 +164,7 @@ static const char *identifier[ISC_R_NRESULTS] = {
+ 	"ISC_R_UNSET",
+ 	"ISC_R_MULTIPLE",
+ 	"ISC_R_WOULDBLOCK",
++        "ISC_R_TIMESHIFTED",
+ };
+ 
+ #define ISC_RESULT_RESULTSET			2
+diff --git a/bind/bind-9.11.2-P1/lib/isc/unix/app.c b/bind/bind-9.11.2-P1/lib/isc/unix/app.c
+index 5546922..7d95ad5 100644
+--- a/bind/bind-9.11.2-P1/lib/isc/unix/app.c
++++ b/bind/bind-9.11.2-P1/lib/isc/unix/app.c
+@@ -438,15 +438,51 @@ isc__app_ctxonrun(isc_appctx_t *ctx0, isc_mem_t *mctx, isc_task_t *task,
+ static isc_result_t
+ evloop(isc__appctx_t *ctx) {
+ 	isc_result_t result;
++        isc_time_t now;
++#ifdef CLOCK_BOOTTIME
++        isc_time_t monotonic;
++        isc_uint64_t diff  = 0;
++#else
++        isc_time_t prev;
++        TIME_NOW(&prev);
++#endif
++
++
++
+ 
+ 	while (!ctx->want_shutdown) {
+ 		int n;
+-		isc_time_t when, now;
++		isc_time_t when;
++                
+ 		struct timeval tv, *tvp;
+ 		isc_socketwait_t *swait;
+ 		isc_boolean_t readytasks;
+ 		isc_boolean_t call_timer_dispatch = ISC_FALSE;
+ 
++                isc_uint64_t us; 
++
++#ifdef CLOCK_BOOTTIME
++                // TBD macros for following three lines
++                TIME_NOW(&now);
++                TIME_MONOTONIC(&monotonic);
++                INSIST(now.seconds > monotonic.seconds)
++                us = isc_time_microdiff (&now, &monotonic);
++                if (us < diff){ 
++                  us = diff - us;
++                  if (us > 1000000){ // ignoring shifts less than one second
++                    return ISC_R_TIMESHIFTED;
++                  };
++                  diff = isc_time_microdiff (&now, &monotonic);
++                } else {
++                  diff = isc_time_microdiff (&now, &monotonic);
++                  // not implemented
++                }
++#else
++                TIME_NOW(&now);
++                if (isc_time_compare (&now, &prev) < 0)
++                  return ISC_R_TIMESHIFTED;
++                TIME_NOW(&prev);
++#endif                
+ 		/*
+ 		 * Check the reload (or suspend) case first for exiting the
+ 		 * loop as fast as possible in case:
+@@ -471,9 +507,10 @@ evloop(isc__appctx_t *ctx) {
+ 			if (result != ISC_R_SUCCESS)
+ 				tvp = NULL;
+ 			else {
+-				isc_uint64_t us;
++
+ 
+ 				TIME_NOW(&now);
++
+ 				us = isc_time_microdiff(&when, &now);
+ 				if (us == 0)
+ 					call_timer_dispatch = ISC_TRUE;
+diff --git a/bind/bind-9.11.2-P1/lib/isc/unix/include/isc/time.h b/bind/bind-9.11.2-P1/lib/isc/unix/include/isc/time.h
+index 939db5d..e798ee6 100644
+--- a/bind/bind-9.11.2-P1/lib/isc/unix/include/isc/time.h
++++ b/bind/bind-9.11.2-P1/lib/isc/unix/include/isc/time.h
+@@ -127,6 +127,26 @@ isc_time_isepoch(const isc_time_t *t);
+  *\li	't' is a valid pointer.
+  */
+ 
++#ifdef CLOCK_BOOTTIME
++isc_result_t
++isc_time_boottime(isc_time_t *t);
++/*%<
++ * Set 't' to monotonic time from previous boot
++ * it's not affected by system time change. It also
++ * includes the time system was suspended
++ *
++ * Requires:
++ *\li	't' is a valid pointer.
++ *
++ * Returns:
++ *
++ *\li	Success
++ *\li	Unexpected error
++ *		Getting the time from the system failed.
++ */
++#endif /* CLOCK_BOOTTIME */
++ 
++
+ isc_result_t
+ isc_time_now(isc_time_t *t);
+ /*%<
+diff --git a/bind/bind-9.11.2-P1/lib/isc/unix/time.c b/bind/bind-9.11.2-P1/lib/isc/unix/time.c
+index 5900846..1197337 100644
+--- a/bind/bind-9.11.2-P1/lib/isc/unix/time.c
++++ b/bind/bind-9.11.2-P1/lib/isc/unix/time.c
+@@ -452,3 +452,25 @@ isc_time_formatISO8601ms(const isc_time_t *t, char *buf, unsigned int len) {
+ 			 t->nanoseconds / NS_PER_MS);
+ 	}
+ }
++
++
++#ifdef CLOCK_BOOTTIME
++isc_result_t
++isc_time_boottime(isc_time_t *t) {
++  struct timespec ts;
++  
++  char strbuf[ISC_STRERRORSIZE];
++
++  if (clock_gettime (CLOCK_BOOTTIME, &ts) != 0){
++    isc__strerror(errno, strbuf, sizeof(strbuf));
++    UNEXPECTED_ERROR(__FILE__, __LINE__, "%s", strbuf);
++    return (ISC_R_UNEXPECTED);    
++  }
++
++  t->seconds = ts.tv_sec;
++  t->nanoseconds = ts.tv_nsec;
++
++  return (ISC_R_SUCCESS);
++  
++};
++#endif
+diff --git a/client/dhclient.c b/client/dhclient.c
+index 4e5546a..6085b8e 100644
+--- a/client/dhclient.c
++++ b/client/dhclient.c
+@@ -5398,6 +5398,12 @@ isc_result_t dhcp_set_control_state (control_object_state_t oldstate,
+ 		  case server_awaken:
+ 		    state_reboot (client);
+ 		    break;
++
++                  case server_time_changed:
++                    if (client->active){
++                      state_reboot (client);
++                    }
++                    break;
+ 		}
+ 	    }
+ 	}
+diff --git a/common/dispatch.c b/common/dispatch.c
+index d7fe200..8a24499 100644
+--- a/common/dispatch.c
++++ b/common/dispatch.c
+@@ -118,7 +118,6 @@ dispatch(void)
+ 		 * signal. It will return ISC_R_RELOAD in that
+ 		 * case. That is a normal behavior.
+ 		 */
+-
+ 		if (status == ISC_R_RELOAD) {
+ 			/*
+ 			 * dhcp_set_control_state() will do the job.
+@@ -129,6 +128,16 @@ dispatch(void)
+ 			if (status == ISC_R_SUCCESS)
+ 				status = ISC_R_RELOAD;
+ 		}
++
++                
++                if (status == ISC_R_TIMESHIFTED){
++                  status = dhcp_set_control_state(server_time_changed,
++                                                  server_time_changed);
++                  status = ISC_R_RELOAD;
++                  log_info ("System time has been changed. Unable to use existing leases. Restarting");
++                  // do nothing, restart context
++                };
++
+ 	} while (status == ISC_R_RELOAD);
+ 
+ 	log_fatal ("Dispatch routine failed: %s -- exiting",
+diff --git a/includes/dhcpd.h b/includes/dhcpd.h
+index 635c510..ec6c227 100644
+--- a/includes/dhcpd.h
++++ b/includes/dhcpd.h
+@@ -524,7 +524,8 @@ typedef enum {
+ 	server_running = 1,
+ 	server_shutdown = 2,
+ 	server_hibernate = 3,
+-	server_awaken = 4
++	server_awaken = 4,
++        server_time_changed = 5
+ } control_object_state_t;
+ 
+ typedef struct {
+diff --git a/server/dhcpd.c b/server/dhcpd.c
+index e06f6b4..778ef8d 100644
+--- a/server/dhcpd.c
++++ b/server/dhcpd.c
+@@ -1779,6 +1779,12 @@ isc_result_t dhcp_set_control_state (control_object_state_t oldstate,
+ {
+ 	struct timeval tv;
+ 
++        if (newstate == server_time_changed){
++          log_error ("System time has been changed. Leases information unreliable!");
++          return ISC_R_SUCCESS;
++        }
++
++                
+ 	if (newstate != server_shutdown)
+ 		return DHCP_R_INVALIDARG;
+ 	/* Re-entry. */
+-- 
+2.14.5
+
