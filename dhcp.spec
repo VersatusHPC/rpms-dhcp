@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  15%{?dist}
+Release:  16%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -56,7 +56,8 @@ Patch20: 0020-Discover-all-hwaddress-for-xid-uniqueness.patch
 Patch21: 0021-Load-leases-DB-in-non-replay-mode-only.patch
 Patch22: 0022-Backport-sd-notify-patch-for-systemd-support-1687040.patch
 
-Patch999: 0023-Detect-system-time-jumps.patch
+Patch23: 0023-Detect-system-time-jumps.patch
+Patch24: 0024-bind-Detect-system-time-jumps.patch
 
 
 
@@ -523,6 +524,9 @@ done
 %endif
 
 %changelog
+* Thu Jul 25 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-16
+- Split timers patch to bind and dhcp parts
+
 * Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 12:4.4.1-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
