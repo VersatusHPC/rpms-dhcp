@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  16%{?dist}
+Release:  17%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -97,6 +97,8 @@ Requires(post): coreutils grep sed
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
+# Old NetworkManager expects the dispatcher scripts in a different place
+Conflicts: NetworkManager < 1.20
 
 %description server
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows
@@ -144,6 +146,8 @@ Obsoletes: dhclient < %{epoch}:%{version}-%{release}
 # dhclient-script requires:
 Requires: coreutils gawk grep ipcalc iproute iputils sed systemd
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
+# Old NetworkManager expects the dispatcher scripts in a different place
+Conflicts: NetworkManager < 1.20
 
 %description client
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows
@@ -280,9 +284,9 @@ install -p -m 0644 %{SOURCE2} .
 mkdir -p %{buildroot}%{dhcpconfdir}/dhclient.d
 
 # NetworkManager dispatcher script
-mkdir -p %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
-install -p -m 0755 %{SOURCE3} %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
-install -p -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d
+mkdir -p %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d
+install -p -m 0755 %{SOURCE3} %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d
+install -p -m 0644 %{SOURCE4} %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d
 
 # pm-utils script to handle suspend/resume and dhclient leases
 install -D -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/pm-utils/sleep.d/56dhclient
@@ -461,9 +465,9 @@ done
 %config(noreplace) %{dhcpconfdir}/dhcpd6.conf
 %dir %{_sysconfdir}/openldap/schema
 %config(noreplace) %{_sysconfdir}/openldap/schema/dhcp.schema
-%dir %{_sysconfdir}/NetworkManager
-%dir %{_sysconfdir}/NetworkManager/dispatcher.d
-%{_sysconfdir}/NetworkManager/dispatcher.d/12-dhcpd
+%dir %{_prefix}/lib/NetworkManager
+%dir %{_prefix}/lib/NetworkManager/dispatcher.d
+%{_prefix}/lib/NetworkManager/dispatcher.d/12-dhcpd
 %attr(0644,root,root)   %{_unitdir}/dhcpd.service
 %attr(0644,root,root)   %{_unitdir}/dhcpd6.service
 %{_sbindir}/dhcpd
@@ -489,9 +493,9 @@ done
 %attr(0750,root,root) %dir %{dhcpconfdir}
 %dir %{dhcpconfdir}/dhclient.d
 %dir %{_localstatedir}/lib/dhclient
-%dir %{_sysconfdir}/NetworkManager
-%dir %{_sysconfdir}/NetworkManager/dispatcher.d
-%{_sysconfdir}/NetworkManager/dispatcher.d/11-dhclient
+%dir %{_prefix}/lib/NetworkManager
+%dir %{_prefix}/lib/NetworkManager/dispatcher.d
+%{_prefix}/lib/NetworkManager/dispatcher.d/11-dhclient
 %{_sbindir}/dhclient
 %{_sbindir}/dhclient-script
 %attr(0755,root,root) %{_libdir}/pm-utils/sleep.d/56dhclient
@@ -524,6 +528,9 @@ done
 %endif
 
 %changelog
+* Thu Aug 22 2019 Lubomir Rintel <lkundrak@v3.sk> - 12:4.4.1-17
+- Move the NetworkManager dispatcher script out of /etc
+
 * Thu Jul 25 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-16
 - Split timers patch to bind and dhcp parts
 
