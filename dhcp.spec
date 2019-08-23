@@ -286,7 +286,7 @@ mkdir -p %{buildroot}%{dhcpconfdir}/dhclient.d
 # NetworkManager dispatcher script
 mkdir -p %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d
 install -p -m 0755 %{SOURCE3} %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d
-install -p -m 0644 %{SOURCE4} %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d
+install -p -m 0755 %{SOURCE4} %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d
 
 # pm-utils script to handle suspend/resume and dhclient leases
 install -D -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/pm-utils/sleep.d/56dhclient
@@ -530,6 +530,7 @@ done
 %changelog
 * Thu Aug 22 2019 Lubomir Rintel <lkundrak@v3.sk> - 12:4.4.1-17
 - Move the NetworkManager dispatcher script out of /etc
+- Make the dispatcher script actually executable
 
 * Thu Jul 25 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-16
 - Split timers patch to bind and dhcp parts
