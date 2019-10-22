@@ -1,7 +1,7 @@
-From de8468cf16c0fa9d01412446fcf1d44ccd0fd411 Mon Sep 17 00:00:00 2001
+From 6d74c2d0ceadef2eb1c43c2da47f1d5b732adf8c Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:34:21 +0100
-Subject: [PATCH 14/21] IPoIB support (#660681)
+Subject: [PATCH 14/26] IPoIB support (#660681)
 Cc: pzhukov@redhat.com
 
 (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24249])

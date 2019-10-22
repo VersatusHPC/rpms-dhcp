@@ -1,8 +1,21 @@
+From 41c6032ace65119e6a400365f7e90283c930afd4 Mon Sep 17 00:00:00 2001
+From: Pavel Zhukov <pzhukov@redhat.com>
+Date: Tue, 22 Oct 2019 16:23:01 +0200
+Subject: [PATCH 24/26] Detect system time changes
+Cc: pzhukov@redhat.com
+
+---
+ client/dhclient.c |  6 ++++++
+ common/dispatch.c | 11 ++++++++++-
+ includes/dhcpd.h  |  3 ++-
+ server/dhcpd.c    |  6 ++++++
+ 4 files changed, 24 insertions(+), 2 deletions(-)
+
 diff --git a/client/dhclient.c b/client/dhclient.c
-index 4e5546a..6085b8e 100644
+index 9b65438..44d508a 100644
 --- a/client/dhclient.c
 +++ b/client/dhclient.c
-@@ -5398,6 +5398,12 @@ isc_result_t dhcp_set_control_state (control_object_state_t oldstate,
+@@ -5408,6 +5408,12 @@ isc_result_t dhcp_set_control_state (control_object_state_t oldstate,
  		  case server_awaken:
  		    state_reboot (client);
  		    break;
@@ -59,10 +72,10 @@ index 635c510..ec6c227 100644
  
  typedef struct {
 diff --git a/server/dhcpd.c b/server/dhcpd.c
-index e06f6b4..778ef8d 100644
+index 530a923..4aef16b 100644
 --- a/server/dhcpd.c
 +++ b/server/dhcpd.c
-@@ -1779,6 +1779,12 @@ isc_result_t dhcp_set_control_state (control_object_state_t oldstate,
+@@ -1767,6 +1767,12 @@ isc_result_t dhcp_set_control_state (control_object_state_t oldstate,
  {
  	struct timeval tv;
  

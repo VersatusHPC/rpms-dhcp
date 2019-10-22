@@ -1,7 +1,7 @@
-From dd3053e6f45ac1f149869b7ded3f539d6c046114 Mon Sep 17 00:00:00 2001
+From 846779467f7393b19e8d206405116e1e26e16efc Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:25:53 +0100
-Subject: [PATCH 06/21] Various man-page-only fixes
+Subject: [PATCH 06/26] Various man-page-only fixes
 Cc: pzhukov@redhat.com
 
 ---

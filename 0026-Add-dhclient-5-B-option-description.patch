@@ -1,0 +1,33 @@
+From 7cae2da1c50c6680b92ca58eb03f9d59315010ba Mon Sep 17 00:00:00 2001
+From: Pavel Zhukov <pzhukov@redhat.com>
+Date: Tue, 22 Oct 2019 16:28:04 +0200
+Subject: [PATCH 26/26] Add dhclient(5) -B option description
+Cc: pzhukov@redhat.com
+
+Bug-Url: https://bugzilla.redhat.com/1764088
+---
+ client/dhclient.8 | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/client/dhclient.8 b/client/dhclient.8
+index 0145b9f..b466ac7 100644
+--- a/client/dhclient.8
++++ b/client/dhclient.8
+@@ -552,6 +552,14 @@ Path to the network configuration script invoked by
+ when it gets a lease.  If unspecified, the default
+ .B CLIENTBINDIR/dhclient-script
+ is used.  See \fBdhclient-script(8)\fR for a description of this file.
++.TP
++.BI \-B
++statement instructs dhclient to always set the bootp broadcast flag in
++request packets, so that servers will always broadcast replies.
++This is equivalent to supplying the dhclient -B argument, and has
++the same effect as specifying 'always-broadcast' in the server's dhcpd.conf.
++This option is provided as an extension to enable dhclient to work
++on IBM s390 Linux guests.
+ .PP
+ .SH PORTS
+ During operations the client may use multiple UDP ports
+-- 
+2.14.5
+

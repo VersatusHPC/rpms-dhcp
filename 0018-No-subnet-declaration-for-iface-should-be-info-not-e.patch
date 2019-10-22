@@ -1,7 +1,7 @@
-From 588ead2d9a9cfe70f14569a8e950c6c42f15c1e3 Mon Sep 17 00:00:00 2001
+From 2277d041692b8ebdf6b86d41e3a0bc0381cd1e47 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:40:51 +0100
-Subject: [PATCH 18/21] No subnet declaration for <iface>' should be info, not
+Subject: [PATCH 18/26] No subnet declaration for <iface>' should be info, not
  error.
 Cc: pzhukov@redhat.com
 

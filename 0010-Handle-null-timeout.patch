@@ -1,7 +1,7 @@
-From e269e137c3b7d25a2d089be508e6769731618d54 Mon Sep 17 00:00:00 2001
+From ed7610cdb2e8ebdbaee618e477879e7e008d4f29 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:29:08 +0100
-Subject: [PATCH 10/21] Handle null timeout
+Subject: [PATCH 10/26] Handle null timeout
 Cc: pzhukov@redhat.com
 
 Handle cases in add_timeout() where the function is called with a NULL

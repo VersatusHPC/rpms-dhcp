@@ -1,7 +1,7 @@
-From 1f0473939bcb17095bbef48cd9a81105a3de9846 Mon Sep 17 00:00:00 2001
+From 2f6b827e89305adcff45288c632785ac054adb8e Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:36:30 +0100
-Subject: [PATCH 16/21] Turn on creating/sending of DUID
+Subject: [PATCH 16/26] Turn on creating/sending of DUID
 Cc: pzhukov@redhat.com
 
 as client identifier with DHCPv4 clients (#560361c#40, rfc4361)

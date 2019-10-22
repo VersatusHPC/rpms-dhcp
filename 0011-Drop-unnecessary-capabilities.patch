@@ -1,7 +1,7 @@
-From 291f738f341a78f8c7974a7603d1a2eaa01ebacc Mon Sep 17 00:00:00 2001
+From 3b37f4b7bb3a17f8bd655be919915a1912062ea6 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:30:28 +0100
-Subject: [PATCH 11/21] Drop unnecessary capabilities
+Subject: [PATCH 11/26] Drop unnecessary capabilities
 Cc: pzhukov@redhat.com
 
 dhclient (#517649, #546765), dhcpd/dhcrelay (#699713)

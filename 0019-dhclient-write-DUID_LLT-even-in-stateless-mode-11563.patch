@@ -1,7 +1,7 @@
-From 07b333c48a2fc99d7d502a0c88907b38f61c6230 Mon Sep 17 00:00:00 2001
+From 6ea56e988df1da51f7d0bdd8984b38e40102c17b Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:41:14 +0100
-Subject: [PATCH 19/21] dhclient: write DUID_LLT even in stateless mode
+Subject: [PATCH 19/26] dhclient: write DUID_LLT even in stateless mode
  (#1156356)
 Cc: pzhukov@redhat.com
 

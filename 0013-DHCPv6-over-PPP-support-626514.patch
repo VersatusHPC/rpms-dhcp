@@ -1,7 +1,7 @@
-From 43332b29f0c8fef3ddd225e31f5f2b4ff8273b36 Mon Sep 17 00:00:00 2001
+From 234747fbfd6c6429619ba843713d5b39fb4a513d Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:33:06 +0100
-Subject: [PATCH 13/21] DHCPv6 over PPP support (#626514)
+Subject: [PATCH 13/26] DHCPv6 over PPP support (#626514)
 Cc: pzhukov@redhat.com
 
 ---

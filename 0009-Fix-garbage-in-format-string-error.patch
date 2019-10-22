@@ -1,7 +1,7 @@
-From 9ffd73d22b1337aeedef751afd03822cc0a15014 Mon Sep 17 00:00:00 2001
+From a0a2186ce52a31357d4eb3c32d7d6887e4603814 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:28:13 +0100
-Subject: [PATCH 09/21] Fix 'garbage in format string' error
+Subject: [PATCH 09/26] Fix 'garbage in format string' error
 Cc: pzhukov@redhat.com
 
 RHBZ: 450042

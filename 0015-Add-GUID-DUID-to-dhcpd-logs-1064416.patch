@@ -1,7 +1,7 @@
-From 7ac7d0b00874ee996c7ee75a595c029759368aad Mon Sep 17 00:00:00 2001
+From 3d3e442ed1316930a5360e4d5a56b46a42a29419 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:35:47 +0100
-Subject: [PATCH 15/21] Add GUID/DUID to dhcpd logs (#1064416)
+Subject: [PATCH 15/26] Add GUID/DUID to dhcpd logs (#1064416)
 Cc: pzhukov@redhat.com
 
 ---

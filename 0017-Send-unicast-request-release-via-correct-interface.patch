@@ -1,7 +1,7 @@
-From 8a2b491f79aab1f04feac89586dfab1e55b47adb Mon Sep 17 00:00:00 2001
+From 193c4d7631fd623efa601f52fdab6018bf8be771 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:39:36 +0100
-Subject: [PATCH 17/21] Send unicast request/release via correct interface
+Subject: [PATCH 17/26] Send unicast request/release via correct interface
 Cc: pzhukov@redhat.com
 
 (#800561, #1177351)

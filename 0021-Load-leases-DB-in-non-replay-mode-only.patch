@@ -1,7 +1,7 @@
-From 1c7b876dc558774c40a2a28da53c19c65e123124 Mon Sep 17 00:00:00 2001
+From e2de752020ea51428bbaaa7358f08632c42aa89d Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:44:06 +0100
-Subject: [PATCH 21/21] Load leases DB in non-replay mode only
+Subject: [PATCH 21/26] Load leases DB in non-replay mode only
 Cc: pzhukov@redhat.com
 
 ---

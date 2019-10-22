@@ -1,7 +1,7 @@
-From bf4e3f1d181b5b4e6225fe5726c02420157433cc Mon Sep 17 00:00:00 2001
+From ac65289663532db0bc1de449ca2a0eb4c8c2ca6f Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:26:34 +0100
-Subject: [PATCH 07/21] Change paths to conform to our standards
+Subject: [PATCH 07/26] Change paths to conform to our standards
 Cc: pzhukov@redhat.com
 
 ---

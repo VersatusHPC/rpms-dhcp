@@ -1,7 +1,7 @@
-From ac21c8b966620cbe79be3508c024ae30f93d6266 Mon Sep 17 00:00:00 2001
+From a2a3554ff9e05d1a8e2c8aa843f1b6a33fce87e3 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:24:24 +0100
-Subject: [PATCH 05/21] Change default requested options
+Subject: [PATCH 05/26] Change default requested options
 Cc: pzhukov@redhat.com
 
 Add NIS domain, NIS servers, NTP servers, interface-mtu and domain-search

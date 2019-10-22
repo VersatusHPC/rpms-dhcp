@@ -1,7 +1,7 @@
-From 31ef6eadb15c3773b81256a8617eccc7657fd2fd Mon Sep 17 00:00:00 2001
+From 23dfbc560028bf7429196db1a3826f8b80c19d3e Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:09:57 +0100
-Subject: [PATCH 01/21] change bug url
+Subject: [PATCH 01/26] change bug url
 Cc: pzhukov@redhat.com
 
 ---

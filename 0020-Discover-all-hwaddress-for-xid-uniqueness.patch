@@ -1,7 +1,7 @@
-From f1467835402eee90a350a952f1a411f37475a9df Mon Sep 17 00:00:00 2001
+From 01ce61b8a0331a2f068ca2191bfb897b505c1b9d Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:42:50 +0100
-Subject: [PATCH 20/21] Discover all hwaddress for xid uniqueness
+Subject: [PATCH 20/26] Discover all hwaddress for xid uniqueness
 Cc: pzhukov@redhat.com
 
 ---

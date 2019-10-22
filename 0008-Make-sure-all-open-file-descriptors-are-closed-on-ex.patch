@@ -1,7 +1,7 @@
-From 26d34bc8e55c39ef84d580b6453c65b5cbeab8ff Mon Sep 17 00:00:00 2001
+From d2da34706f140101c34f6a9806c258411806a939 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:27:18 +0100
-Subject: [PATCH 08/21] Make sure all open file descriptors are closed-on-exec
+Subject: [PATCH 08/26] Make sure all open file descriptors are closed-on-exec
  for SELinux
 Cc: pzhukov@redhat.com
 

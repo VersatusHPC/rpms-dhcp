@@ -1,3 +1,18 @@
+From 5917ba14ccf7c7cc2eadf8b6cc666f8be4d2d2a4 Mon Sep 17 00:00:00 2001
+From: Pavel Zhukov <pzhukov@redhat.com>
+Date: Tue, 22 Oct 2019 16:23:24 +0200
+Subject: [PATCH 25/26] bind: Detect system time changes
+Cc: pzhukov@redhat.com
+
+---
+ bind/bind-9.11.2-P1/lib/isc/include/isc/result.h   |  4 +--
+ bind/bind-9.11.2-P1/lib/isc/include/isc/util.h     |  4 +++
+ bind/bind-9.11.2-P1/lib/isc/result.c               |  2 ++
+ bind/bind-9.11.2-P1/lib/isc/unix/app.c             | 41 ++++++++++++++++++++--
+ .../bind-9.11.2-P1/lib/isc/unix/include/isc/time.h | 20 +++++++++++
+ bind/bind-9.11.2-P1/lib/isc/unix/time.c            | 22 ++++++++++++
+ 6 files changed, 89 insertions(+), 4 deletions(-)
+
 diff --git a/bind/bind-9.11.2-P1/lib/isc/include/isc/result.h b/bind/bind-9.11.2-P1/lib/isc/include/isc/result.h
 index 6f7ecf2..c7ef53c 100644
 --- a/bind/bind-9.11.2-P1/lib/isc/include/isc/result.h
@@ -179,3 +194,6 @@ index 5900846..1197337 100644
 +  
 +};
 +#endif
+-- 
+2.14.5
+

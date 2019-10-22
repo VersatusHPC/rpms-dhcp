@@ -1,7 +1,7 @@
-From 3a86bcb58a7c081df22b6f55e973d5e3c99065d8 Mon Sep 17 00:00:00 2001
+From a26161b0fd45cdbeed3038ac63ff04e3b727248f Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:19:47 +0100
-Subject: [PATCH 02/21] additional dhclient options
+Subject: [PATCH 02/26] additional dhclient options
 Cc: pzhukov@redhat.com
 
 ---
