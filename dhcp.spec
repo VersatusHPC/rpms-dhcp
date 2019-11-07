@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  17%{?dist}
+Release:  18%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -63,6 +63,7 @@ Patch23 : 0023-option-97-pxe-client-id.patch
 Patch24 : 0024-Detect-system-time-changes.patch
 Patch25 : 0025-bind-Detect-system-time-changes.patch
 Patch26 : 0026-Add-dhclient-5-B-option-description.patch
+Patch27:  0027-Add-missed-sd-notify-patch-to-manage-dhcpd-with-syst.patch
 
 
 
@@ -533,6 +534,9 @@ done
 %endif
 
 %changelog
+* Thu Nov  7 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-18
+- Readd sd-notify patch
+
 * Thu Aug 22 2019 Lubomir Rintel <lkundrak@v3.sk> - 12:4.4.1-17
 - Move the NetworkManager dispatcher script out of /etc
 
