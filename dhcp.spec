@@ -15,7 +15,8 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  18%{?dist}
+Release:  19%{?dist}
+
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -534,6 +535,9 @@ done
 %endif
 
 %changelog
+* Mon Nov 11 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-19
+- Reword -B option description
+
 * Thu Nov  7 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-18
 - Readd sd-notify patch
 
