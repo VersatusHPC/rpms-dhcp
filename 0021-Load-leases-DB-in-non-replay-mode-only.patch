@@ -1,15 +1,11 @@
-From e2de752020ea51428bbaaa7358f08632c42aa89d Mon Sep 17 00:00:00 2001
-From: Pavel Zhukov <pzhukov@redhat.com>
-Date: Thu, 21 Feb 2019 10:44:06 +0100
-Subject: [PATCH 21/26] Load leases DB in non-replay mode only
-Cc: pzhukov@redhat.com
+commit 50c2b3ba8ce030a47b55dd707bb8a6ab20444a05
+Author: Pavel Zhukov <pzhukov@redhat.com>
+Date:   Thu Feb 21 10:44:06 2019 +0100
 
----
- server/confpars.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+    Load leases DB in non-replay mode only
 
 diff --git a/server/confpars.c b/server/confpars.c
-index 2743979..db21a0b 100644
+index 2743979..6b61964 100644
 --- a/server/confpars.c
 +++ b/server/confpars.c
 @@ -134,6 +134,11 @@ isc_result_t read_conf_file (const char *filename, struct group *group,
@@ -17,35 +13,38 @@ index 2743979..db21a0b 100644
  	cfile = (struct parse *)0;
  #if defined (TRACING)
 +	// No need to dmalloc huge memory region if we're not going to re-play
-+	if (!trace_playback()){
++	if (!trace_record()){
 +		status = new_parse(&cfile, file, NULL, 0, filename, 0);
 +		goto noreplay;
 +	};
  	flen = lseek (file, (off_t)0, SEEK_END);
  	if (flen < 0) {
  	      boom:
-@@ -171,9 +176,11 @@ isc_result_t read_conf_file (const char *filename, struct group *group,
+@@ -165,7 +170,6 @@ isc_result_t read_conf_file (const char *filename, struct group *group,
+ 	if (result != ulen)
+ 		log_fatal ("%s: short read of %d bytes instead of %d.",
+ 			   filename, ulen, result);
+-	close (file);
+       memfile:
+ 	/* If we're recording, write out the filename and file contents. */
  	if (trace_record ())
- 		trace_write_packet (ttype, ulen + tflen + 1, dbuf, MDL);
- 	status = new_parse(&cfile, -1, fbuf, ulen, filename, 0); /* XXX */
-+	dfree(dbuf, MDL);
+@@ -174,6 +178,9 @@ isc_result_t read_conf_file (const char *filename, struct group *group,
  #else
  	status = new_parse(&cfile, file, NULL, 0, filename, 0);
  #endif
 +      noreplay:
++	if (!trace_playback())
++		close (file);
  	if (status != ISC_R_SUCCESS || cfile == NULL)
  		return status;
  
-@@ -182,9 +189,6 @@ isc_result_t read_conf_file (const char *filename, struct group *group,
- 	else
+@@ -183,7 +190,8 @@ isc_result_t read_conf_file (const char *filename, struct group *group,
  		status = conf_file_subparse (cfile, group, group_type);
  	end_parse (&cfile);
--#if defined (TRACING)
+ #if defined (TRACING)
 -	dfree (dbuf, MDL);
--#endif
++	if (trace_record())
++	    dfree (dbuf, MDL);
+ #endif
  	return status;
  }
- 
--- 
-2.14.5
-

@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.1
-Release:  19%{?dist}
+Release:  20%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -535,6 +535,9 @@ done
 %endif
 
 %changelog
+* Wed Nov 27 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-20
+- Fix leak of file descriptors
+
 * Mon Nov 11 2019 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.1-19
 - Reword -B option description
 
