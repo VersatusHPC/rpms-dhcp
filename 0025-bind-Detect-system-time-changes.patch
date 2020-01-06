@@ -1,39 +1,38 @@
-From 5917ba14ccf7c7cc2eadf8b6cc666f8be4d2d2a4 Mon Sep 17 00:00:00 2001
+From ef4f5e80d8a1ea1507829ea6f5214f276478f475 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Tue, 22 Oct 2019 16:23:24 +0200
-Subject: [PATCH 25/26] bind: Detect system time changes
+Subject: [PATCH 25/27] bind: Detect system time changes
 Cc: pzhukov@redhat.com
 
 ---
- bind/bind-9.11.2-P1/lib/isc/include/isc/result.h   |  4 +--
- bind/bind-9.11.2-P1/lib/isc/include/isc/util.h     |  4 +++
- bind/bind-9.11.2-P1/lib/isc/result.c               |  2 ++
- bind/bind-9.11.2-P1/lib/isc/unix/app.c             | 41 ++++++++++++++++++++--
- .../bind-9.11.2-P1/lib/isc/unix/include/isc/time.h | 20 +++++++++++
- bind/bind-9.11.2-P1/lib/isc/unix/time.c            | 22 ++++++++++++
+ bind/bind/lib/isc/include/isc/result.h    |  4 ++-
+ bind/bind/lib/isc/include/isc/util.h      |  4 +++
+ bind/bind/lib/isc/result.c                |  2 ++
+ bind/bind/lib/isc/unix/app.c              | 41 ++++++++++++++++++++++++++++---
+ bind/bind/lib/isc/unix/include/isc/time.h | 20 +++++++++++++++
+ bind/bind/lib/isc/unix/time.c             | 22 +++++++++++++++++
  6 files changed, 89 insertions(+), 4 deletions(-)
 
-diff --git a/bind/bind-9.11.2-P1/lib/isc/include/isc/result.h b/bind/bind-9.11.2-P1/lib/isc/include/isc/result.h
-index 6f7ecf2..c7ef53c 100644
---- a/bind/bind-9.11.2-P1/lib/isc/include/isc/result.h
-+++ b/bind/bind-9.11.2-P1/lib/isc/include/isc/result.h
-@@ -81,9 +81,9 @@
- #define ISC_R_UNSET			61	/*%< unset */
- #define ISC_R_MULTIPLE			62	/*%< multiple */
- #define ISC_R_WOULDBLOCK		63	/*%< would block */
--
-+#define ISC_R_TIMESHIFTED               64      /*%< system time changed */
- /*% Not a result code: the number of results. */
--#define ISC_R_NRESULTS 			64
-+#define ISC_R_NRESULTS 			66
+diff --git a/bind/bind/lib/isc/include/isc/result.h b/bind/bind/lib/isc/include/isc/result.h
+index 0389efa..0e35f98 100644
+--- a/bind/bind/lib/isc/include/isc/result.h
++++ b/bind/bind/lib/isc/include/isc/result.h
+@@ -89,7 +89,9 @@
+ #define ISC_R_DISCFULL			67	/*%< disc full */
+ #define ISC_R_DEFAULT			68	/*%< default */
+ #define ISC_R_IPV4PREFIX		69	/*%< IPv4 prefix */
+-#define ISC_R_NRESULTS 			70
++#define ISC_R_TIMESHIFTED               70      /*%< system time changed */
++/*% Not a result code: the number of results. */
++#define ISC_R_NRESULTS 			71
  
  ISC_LANG_BEGINDECLS
  
-diff --git a/bind/bind-9.11.2-P1/lib/isc/include/isc/util.h b/bind/bind-9.11.2-P1/lib/isc/include/isc/util.h
-index f2cda26..9d54396 100644
---- a/bind/bind-9.11.2-P1/lib/isc/include/isc/util.h
-+++ b/bind/bind-9.11.2-P1/lib/isc/include/isc/util.h
-@@ -238,6 +238,10 @@
+diff --git a/bind/bind/lib/isc/include/isc/util.h b/bind/bind/lib/isc/include/isc/util.h
+index 973c348..cceeb5e 100644
+--- a/bind/bind/lib/isc/include/isc/util.h
++++ b/bind/bind/lib/isc/include/isc/util.h
+@@ -289,6 +289,10 @@ extern void mock_assert(const int result, const char* const expression,
   * Time
   */
  #define TIME_NOW(tp) 	RUNTIME_CHECK(isc_time_now((tp)) == ISC_R_SUCCESS)
@@ -43,39 +42,39 @@ index f2cda26..9d54396 100644
 +
  
  /*%
-  * Misc.
-diff --git a/bind/bind-9.11.2-P1/lib/isc/result.c b/bind/bind-9.11.2-P1/lib/isc/result.c
-index 071dac0..e362735 100644
---- a/bind/bind-9.11.2-P1/lib/isc/result.c
-+++ b/bind/bind-9.11.2-P1/lib/isc/result.c
-@@ -96,6 +96,7 @@ static const char *description[ISC_R_NRESULTS] = {
- 	"unset",				/*%< 61 */
- 	"multiple",				/*%< 62 */
- 	"would block",				/*%< 63 */
-+        "time changed",                         /*%< 64 */
+  * Alignment
+diff --git a/bind/bind/lib/isc/result.c b/bind/bind/lib/isc/result.c
+index a9db132..7c04831 100644
+--- a/bind/bind/lib/isc/result.c
++++ b/bind/bind/lib/isc/result.c
+@@ -105,6 +105,7 @@ static const char *description[ISC_R_NRESULTS] = {
+ 	"disc full",				/*%< 67 */
+ 	"default",				/*%< 68 */
+ 	"IPv4 prefix",				/*%< 69 */
++        "time changed",                         /*%< 70 */
  };
  
  static const char *identifier[ISC_R_NRESULTS] = {
-@@ -163,6 +164,7 @@ static const char *identifier[ISC_R_NRESULTS] = {
- 	"ISC_R_UNSET",
- 	"ISC_R_MULTIPLE",
- 	"ISC_R_WOULDBLOCK",
+@@ -178,6 +179,7 @@ static const char *identifier[ISC_R_NRESULTS] = {
+ 	"ISC_R_DISCFULL",
+ 	"ISC_R_DEFAULT",
+ 	"ISC_R_IPV4PREFIX",
 +        "ISC_R_TIMESHIFTED",
  };
  
  #define ISC_RESULT_RESULTSET			2
-diff --git a/bind/bind-9.11.2-P1/lib/isc/unix/app.c b/bind/bind-9.11.2-P1/lib/isc/unix/app.c
-index 5546922..7d95ad5 100644
---- a/bind/bind-9.11.2-P1/lib/isc/unix/app.c
-+++ b/bind/bind-9.11.2-P1/lib/isc/unix/app.c
-@@ -438,15 +438,51 @@ isc__app_ctxonrun(isc_appctx_t *ctx0, isc_mem_t *mctx, isc_task_t *task,
+diff --git a/bind/bind/lib/isc/unix/app.c b/bind/bind/lib/isc/unix/app.c
+index a6e9882..dbd23f7 100644
+--- a/bind/bind/lib/isc/unix/app.c
++++ b/bind/bind/lib/isc/unix/app.c
+@@ -442,15 +442,51 @@ isc__app_ctxonrun(isc_appctx_t *ctx0, isc_mem_t *mctx, isc_task_t *task,
  static isc_result_t
  evloop(isc__appctx_t *ctx) {
  	isc_result_t result;
 +        isc_time_t now;
 +#ifdef CLOCK_BOOTTIME
 +        isc_time_t monotonic;
-+        isc_uint64_t diff  = 0;
++        uint64_t diff  = 0;
 +#else
 +        isc_time_t prev;
 +        TIME_NOW(&prev);
@@ -91,10 +90,10 @@ index 5546922..7d95ad5 100644
 +                
  		struct timeval tv, *tvp;
  		isc_socketwait_t *swait;
- 		isc_boolean_t readytasks;
- 		isc_boolean_t call_timer_dispatch = ISC_FALSE;
+ 		bool readytasks;
+ 		bool call_timer_dispatch = false;
  
-+                isc_uint64_t us; 
++                uint64_t us; 
 +
 +#ifdef CLOCK_BOOTTIME
 +                // TBD macros for following three lines
@@ -121,23 +120,22 @@ index 5546922..7d95ad5 100644
  		/*
  		 * Check the reload (or suspend) case first for exiting the
  		 * loop as fast as possible in case:
-@@ -471,9 +507,10 @@ evloop(isc__appctx_t *ctx) {
+@@ -475,9 +511,8 @@ evloop(isc__appctx_t *ctx) {
  			if (result != ISC_R_SUCCESS)
  				tvp = NULL;
  			else {
--				isc_uint64_t us;
-+
- 
+-				uint64_t us;
+-
  				TIME_NOW(&now);
 +
  				us = isc_time_microdiff(&when, &now);
  				if (us == 0)
- 					call_timer_dispatch = ISC_TRUE;
-diff --git a/bind/bind-9.11.2-P1/lib/isc/unix/include/isc/time.h b/bind/bind-9.11.2-P1/lib/isc/unix/include/isc/time.h
-index 939db5d..e798ee6 100644
---- a/bind/bind-9.11.2-P1/lib/isc/unix/include/isc/time.h
-+++ b/bind/bind-9.11.2-P1/lib/isc/unix/include/isc/time.h
-@@ -127,6 +127,26 @@ isc_time_isepoch(const isc_time_t *t);
+ 					call_timer_dispatch = true;
+diff --git a/bind/bind/lib/isc/unix/include/isc/time.h b/bind/bind/lib/isc/unix/include/isc/time.h
+index b864c29..5dd43c9 100644
+--- a/bind/bind/lib/isc/unix/include/isc/time.h
++++ b/bind/bind/lib/isc/unix/include/isc/time.h
+@@ -132,6 +132,26 @@ isc_time_isepoch(const isc_time_t *t);
   *\li	't' is a valid pointer.
   */
  
@@ -164,11 +162,11 @@ index 939db5d..e798ee6 100644
  isc_result_t
  isc_time_now(isc_time_t *t);
  /*%<
-diff --git a/bind/bind-9.11.2-P1/lib/isc/unix/time.c b/bind/bind-9.11.2-P1/lib/isc/unix/time.c
-index 5900846..1197337 100644
---- a/bind/bind-9.11.2-P1/lib/isc/unix/time.c
-+++ b/bind/bind-9.11.2-P1/lib/isc/unix/time.c
-@@ -452,3 +452,25 @@ isc_time_formatISO8601ms(const isc_time_t *t, char *buf, unsigned int len) {
+diff --git a/bind/bind/lib/isc/unix/time.c b/bind/bind/lib/isc/unix/time.c
+index 8edc9df..fe0bb91 100644
+--- a/bind/bind/lib/isc/unix/time.c
++++ b/bind/bind/lib/isc/unix/time.c
+@@ -498,3 +498,25 @@ isc_time_formatISO8601ms(const isc_time_t *t, char *buf, unsigned int len) {
  			 t->nanoseconds / NS_PER_MS);
  	}
  }
