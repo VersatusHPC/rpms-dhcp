@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.2
-Release:  2.b1%{?dist}
+Release:  3.b1%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -464,9 +464,6 @@ done
 %config(noreplace) %{dhcpconfdir}/dhcpd6.conf
 %dir %{_sysconfdir}/openldap/schema
 %config(noreplace) %{_sysconfdir}/openldap/schema/dhcp.schema
-%dir %{_prefix}/lib/NetworkManager
-%dir %{_prefix}/lib/NetworkManager/dispatcher.d
-%{_prefix}/lib/NetworkManager/dispatcher.d/12-dhcpd
 %attr(0644,root,root)   %{_unitdir}/dhcpd.service
 %attr(0644,root,root)   %{_unitdir}/dhcpd6.service
 %{_sbindir}/dhcpd
@@ -527,7 +524,7 @@ done
 %endif
 
 %changelog
-* Mon Jan  6 2020 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-2.b1
+* Mon Jan  6 2020 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-3.b1
 - Drop NetworkManager 12-dhcpd script. It's deprecated by wait-online (#1780861) 
 
 * Mon Jan  6 2020 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-1.b1
