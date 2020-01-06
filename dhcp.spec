@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.2
-Release:  1.b1%{?dist}
+Release:  2.b1%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -28,15 +28,10 @@ Source0:  ftp://ftp.isc.org/isc/dhcp/%{DHCPVERSION}/dhcp-%{DHCPVERSION}.tar.gz
 Source1:  dhclient-script
 Source2:  README.dhclient.d
 Source3:  11-dhclient
-Source4:  12-dhcpd
 Source5:  56dhclient
 Source6:  dhcpd.service
 Source7:  dhcpd6.service
 Source8:  dhcrelay.service
-
-
-
-
 
 Patch1 : 0001-change-bug-url.patch
 Patch2 : 0002-additional-dhclient-options.patch
@@ -104,8 +99,6 @@ Requires(post): coreutils grep sed
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
-# Old NetworkManager expects the dispatcher scripts in a different place
-Conflicts: NetworkManager < 1.20
 
 %description server
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows
@@ -293,7 +286,6 @@ mkdir -p %{buildroot}%{dhcpconfdir}/dhclient.d
 # NetworkManager dispatcher script
 mkdir -p %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d
 install -p -m 0755 %{SOURCE3} %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d
-install -p -m 0644 %{SOURCE4} %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d
 
 # pm-utils script to handle suspend/resume and dhclient leases
 install -D -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/pm-utils/sleep.d/56dhclient
@@ -535,6 +527,9 @@ done
 %endif
 
 %changelog
+* Mon Jan  6 2020 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-2.b1
+- Drop NetworkManager 12-dhcpd script. It's deprecated by wait-online (#1780861) 
+
 * Mon Jan  6 2020 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-1.b1
 - Dropped all (pre 4.0.0) changelog
 - New version (4.4.2b1)
