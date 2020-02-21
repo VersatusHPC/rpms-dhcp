@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.2
-Release:  4.b1%{?dist}
+Release:  5.b1%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -60,6 +60,7 @@ Patch24 : 0024-Detect-system-time-changes.patch
 Patch25 : 0025-bind-Detect-system-time-changes.patch
 Patch26 : 0026-Add-dhclient-5-B-option-description.patch
 Patch27:  0027-Add-missed-sd-notify-patch-to-manage-dhcpd-with-syst.patch
+
 
 
 
@@ -237,7 +238,7 @@ sed -i -e 's|/var/db/|%{_localstatedir}/lib/dhcpd/|g' contrib/dhcp-lease-list.pl
 #libtoolize --copy --force
 autoreconf --verbose --force --install
 
-CFLAGS="%{optflags} -fno-strict-aliasing" \
+CFLAGS="%{optflags} -fno-strict-aliasing -fcommon" \
 %configure \
     --with-srv-lease-file=%{_localstatedir}/lib/dhcpd/dhcpd.leases \
     --with-srv6-lease-file=%{_localstatedir}/lib/dhcpd/dhcpd6.leases \
@@ -524,6 +525,9 @@ done
 %endif
 
 %changelog
+* Fri Feb 21 2020 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-5.b1
+- Workarounnd for gcc10
+
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 12:4.4.2-4.b1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
