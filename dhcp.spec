@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.2
-Release:  5.b1%{?dist}
+Release:  6.b1%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -23,7 +23,7 @@ Release:  5.b1%{?dist}
 # So we are stuck with it.
 Epoch:    12
 License:  ISC
-Url:      http://isc.org/products/DHCP/
+Url:      https://www.isc.org/dhcp/
 Source0:  ftp://ftp.isc.org/isc/dhcp/%{DHCPVERSION}/dhcp-%{DHCPVERSION}.tar.gz
 Source1:  dhclient-script
 Source2:  README.dhclient.d
@@ -525,6 +525,9 @@ done
 %endif
 
 %changelog
+* Wed Apr 22 2020 Pavel Zhukov <pavel@desktop.zhukoff.net> - 12:4.4.2-6.b1
+- Change upstream URL
+
 * Fri Feb 21 2020 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-5.b1
 - Workarounnd for gcc10
 
