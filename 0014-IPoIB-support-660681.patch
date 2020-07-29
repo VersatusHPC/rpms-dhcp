@@ -1,18 +1,18 @@
-From 6d74c2d0ceadef2eb1c43c2da47f1d5b732adf8c Mon Sep 17 00:00:00 2001
+From 042082b4410f158ec86ca8478689b34bc12518e6 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:34:21 +0100
-Subject: [PATCH 14/26] IPoIB support (#660681)
+Subject: [PATCH 14/27] IPoIB support (#660681)
 Cc: pzhukov@redhat.com
 
 (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24249])
 ---
- client/dhclient.c |  32 +++++++
- common/bpf.c      |  32 +++++++
+ client/dhclient.c |  32 ++++++
+ common/bpf.c      |  32 ++++++
  common/discover.c |   4 +-
- common/lpf.c      | 262 +++++++++++++++++++++++++++++++++++++++++++++++++-----
+ common/lpf.c      | 276 ++++++++++++++++++++++++++++++++++++++++++----
  common/socket.c   |   8 +-
  includes/dhcpd.h  |   6 +-
- 6 files changed, 315 insertions(+), 29 deletions(-)
+ 6 files changed, 329 insertions(+), 29 deletions(-)
 
 diff --git a/client/dhclient.c b/client/dhclient.c
 index 301132c..dc9080e 100644
@@ -142,7 +142,7 @@ index 6ef8852..65881fc 100644
  				if_register_linklocal6(tmp);
  			}
 diff --git a/common/lpf.c b/common/lpf.c
-index b0ed01c..b732a86 100644
+index b0ed01c..a9e19f4 100644
 --- a/common/lpf.c
 +++ b/common/lpf.c
 @@ -45,6 +45,17 @@
@@ -230,7 +230,35 @@ index b0ed01c..b732a86 100644
  		}
  	}
  	}
-@@ -330,6 +353,54 @@ static void lpf_tr_filter_setup (info)
+@@ -253,6 +276,18 @@ static void lpf_gen_filter_setup (info)
+ 
+ 	memset(&p, 0, sizeof(p));
+ 
++	if (info->hw_address.hbuf[0] == HTYPE_INFINIBAND) {
++		p.len = dhcp_ib_bpf_filter_len;
++		p.filter = dhcp_ib_bpf_filter;
++
++		/* Patch the server port into the LPF program...
++		   XXX
++		   changes to filter program may require changes
++		   to the insn number(s) used below!
++		   XXX */
++		dhcp_ib_bpf_filter[6].k = ntohs (local_port);
++	} else {
++
+ 	/* Set up the bpf filter program structure.    This is defined in
+ 	   bpf.c */
+ 	p.len = dhcp_bpf_filter_len;
+@@ -275,6 +310,8 @@ static void lpf_gen_filter_setup (info)
+ #endif
+ 	dhcp_bpf_filter [8].k = ntohs (local_port);
+ 
++	}
++
+ 	if (setsockopt (info -> rfdesc, SOL_SOCKET, SO_ATTACH_FILTER, &p,
+ 			sizeof p) < 0) {
+ 		if (errno == ENOPROTOOPT || errno == EPROTONOSUPPORT ||
+@@ -330,6 +367,54 @@ static void lpf_tr_filter_setup (info)
  #endif /* USE_LPF_RECEIVE */
  
  #ifdef USE_LPF_SEND
@@ -285,7 +313,7 @@ index b0ed01c..b732a86 100644
  ssize_t send_packet (interface, packet, raw, len, from, to, hto)
  	struct interface_info *interface;
  	struct packet *packet;
-@@ -350,6 +421,11 @@ ssize_t send_packet (interface, packet, raw, len, from, to, hto)
+@@ -350,6 +435,11 @@ ssize_t send_packet (interface, packet, raw, len, from, to, hto)
  		return send_fallback (interface, packet, raw,
  				      len, from, to, hto);
  
@@ -297,7 +325,7 @@ index b0ed01c..b732a86 100644
  	if (hto == NULL && interface->anycast_mac_addr.hlen)
  		hto = &interface->anycast_mac_addr;
  
-@@ -370,6 +446,42 @@ ssize_t send_packet (interface, packet, raw, len, from, to, hto)
+@@ -370,6 +460,42 @@ ssize_t send_packet (interface, packet, raw, len, from, to, hto)
  #endif /* USE_LPF_SEND */
  
  #ifdef USE_LPF_RECEIVE
@@ -340,7 +368,7 @@ index b0ed01c..b732a86 100644
  ssize_t receive_packet (interface, buf, len, from, hfrom)
  	struct interface_info *interface;
  	unsigned char *buf;
-@@ -408,6 +520,10 @@ ssize_t receive_packet (interface, buf, len, from, hfrom)
+@@ -408,6 +534,10 @@ ssize_t receive_packet (interface, buf, len, from, hfrom)
  	};
  #endif /* PACKET_AUXDATA */
  
@@ -351,7 +379,7 @@ index b0ed01c..b732a86 100644
  	length = recvmsg (interface->rfdesc, &msg, 0);
  	if (length <= 0)
  		return length;
-@@ -521,11 +637,33 @@ void maybe_setup_fallback ()
+@@ -521,11 +651,33 @@ void maybe_setup_fallback ()
  #endif
  
  #if defined (USE_LPF_RECEIVE) || defined (USE_LPF_HWADDR)
@@ -388,7 +416,7 @@ index b0ed01c..b732a86 100644
  
  	if (strlen(name) >= sizeof(tmp.ifr_name)) {
  		log_fatal("Device name too long: \"%s\"", name);
-@@ -539,16 +677,61 @@ get_hw_addr(const char *name, struct hardware *hw) {
+@@ -539,16 +691,61 @@ get_hw_addr(const char *name, struct hardware *hw) {
  	memset(&tmp, 0, sizeof(tmp));
  	strcpy(tmp.ifr_name, name);
  	if (ioctl(sock, SIOCGIFHWADDR, &tmp) < 0) {
@@ -453,7 +481,7 @@ index b0ed01c..b732a86 100644
  			break;
  		case ARPHRD_IEEE802:
  #ifdef ARPHRD_IEEE802_TR
-@@ -556,18 +739,50 @@ get_hw_addr(const char *name, struct hardware *hw) {
+@@ -556,18 +753,50 @@ get_hw_addr(const char *name, struct hardware *hw) {
  #endif /* ARPHRD_IEEE802_TR */
  			hw->hlen = 7;
  			hw->hbuf[0] = HTYPE_IEEE802;
@@ -508,7 +536,7 @@ index b0ed01c..b732a86 100644
  			hw->hlen = 0;
  			hw->hbuf[0] = HTYPE_RESERVED;
  			/* 0xdeadbeef should never occur on the wire,
-@@ -580,10 +795,13 @@ get_hw_addr(const char *name, struct hardware *hw) {
+@@ -580,10 +809,13 @@ get_hw_addr(const char *name, struct hardware *hw) {
  			break;
  #endif
  		default:
@@ -597,5 +625,5 @@ index faa9251..0c1a0aa 100644
                     const char *file, int line);
  char *format_lease_id(const unsigned char *s, unsigned len, int format,
 -- 
-2.14.5
+2.26.2
 
