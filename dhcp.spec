@@ -66,6 +66,7 @@ Patch27:  0027-Add-missed-sd-notify-patch-to-manage-dhcpd-with-syst.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
+BuildRequires: make
 BuildRequires: libtool
 BuildRequires: openldap-devel
 # --with-ldap-gssapi
