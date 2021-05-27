@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.2
-Release:  10.b1%{?dist}
+Release:  11.b1%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -61,6 +61,7 @@ Patch25 : 0025-bind-Detect-system-time-changes.patch
 Patch26 : 0026-Add-dhclient-5-B-option-description.patch
 Patch27:  0027-Add-missed-sd-notify-patch-to-manage-dhcpd-with-syst.patch
 
+Patch100: dhcp-statement_parser.patch
 
 
 
@@ -526,6 +527,9 @@ done
 %endif
 
 %changelog
+* Thu May 27 2021 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-11.b1
+- Fix for CVE-2021-25217
+
 * Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 12:4.4.2-10.b1
 - Rebuilt for updated systemd-rpm-macros
   See https://pagure.io/fesco/issue/2583.
