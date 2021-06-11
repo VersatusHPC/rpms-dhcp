@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.2
-Release:  11.b1%{?dist}
+Release:  12.b1%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -129,18 +129,6 @@ easier to administer a large network.
 
 This package provides the ISC DHCP relay agent.
 
-%package compat
-Summary: Utility package to help transition
-Provides:  dhcp = %{epoch}:%{version}-%{release}
-Obsoletes: dhcp < %{epoch}:%{version}-%{release}
-Requires:  %{name}-server = %{epoch}:%{version}-%{release}
-Requires:  %{name}-relay = %{epoch}:%{version}-%{release}
-
-%description compat
-This package only exists to help transition dhcp users to the new
-package split (dhcp -> dhcp & dhcrelay).
-It will be removed after one distribution release cycle, please
-do not reference it or depend on it in any way.
 
 %package client
 Summary: Provides the ISC DHCP client daemon and dhclient-script
@@ -484,8 +472,6 @@ done
 %attr(0644,root,root) %{_unitdir}/dhcrelay.service
 %attr(0644,root,root) %{_mandir}/man8/dhcrelay.8.gz
 
-%files compat
-
 %files client
 %doc README.dhclient.d
 %doc client/dhclient.conf.example client/dhclient6.conf.example client/dhclient-enter-hooks
@@ -527,6 +513,9 @@ done
 %endif
 
 %changelog
+* Fri Jun 11 2021 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-12.b1
+- Drop compat package finally
+
 * Thu May 27 2021 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-11.b1
 - Fix for CVE-2021-25217
 
