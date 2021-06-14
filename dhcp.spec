@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.2
-Release:  12.b1%{?dist}
+Release:  13.b1%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -62,7 +62,7 @@ Patch26 : 0026-Add-dhclient-5-B-option-description.patch
 Patch27:  0027-Add-missed-sd-notify-patch-to-manage-dhcpd-with-syst.patch
 
 Patch100: dhcp-statement_parser.patch
-
+Patch101: bind99-rh1205168.patch
 
 
 BuildRequires: autoconf
@@ -513,6 +513,9 @@ done
 %endif
 
 %changelog
+* Mon Jun 14 2021 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-13.b1
+- Do not use getaddrinfo from rst lib (#1823749)
+
 * Fri Jun 11 2021 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-12.b1
 - Drop compat package finally
 
