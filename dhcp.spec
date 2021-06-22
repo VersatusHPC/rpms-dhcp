@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.2
-Release:  13.b1%{?dist}
+Release:  14.b1%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -511,6 +511,9 @@ done
 %endif
 
 %changelog
+* Tue Jun 22 2021 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-14.b1
+- Reformat patches
+
 * Mon Jun 14 2021 Pavel Zhukov <pzhukov@redhat.com> - 12:4.4.2-13.b1
 - Do not use getaddrinfo from rst lib (#1823749)
 
