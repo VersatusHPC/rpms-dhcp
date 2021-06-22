@@ -1,11 +1,22 @@
-diff --git a/lib/irs/include/irs/netdb.h.in b/lib/irs/include/irs/netdb.h.in
-index 299928b..4f11cea 100644
+From 019021caa791c254a319c71b4f634142dc14b37d Mon Sep 17 00:00:00 2001
+From: Pavel Zhukov <pzhukov@redhat.com>
+Date: Tue, 22 Jun 2021 06:58:40 +0200
+Subject: [PATCH 29/29] Use system getaddrinfo for dhcp
+Cc: pzhukov@redhat.com
+
+---
+ bind/bind/lib/irs/include/irs/netdb.h.in | 94 ++++++++++++++++++++++++
+ 1 file changed, 94 insertions(+)
+
+diff --git a/bind/bind/lib/irs/include/irs/netdb.h.in b/bind/bind/lib/irs/include/irs/netdb.h.in
+index 23dcd37..f36113d 100644
 --- a/bind/bind/lib/irs/include/irs/netdb.h.in
 +++ b/bind/bind/lib/irs/include/irs/netdb.h.in
-@@ -158,6 +158,100 @@ struct addrinfo {
+@@ -149,6 +149,100 @@ struct addrinfo {
+ #define	NI_NUMERICSERV	0x00000008
  #define	NI_DGRAM	0x00000010
  
- /*
++/*
 + * Define to map into irs_ namespace.
 + */
 +
@@ -99,10 +110,9 @@ index 299928b..4f11cea 100644
 +
 +#endif
 +
-+/*
+ /*
   * Tell Emacs to use C mode on this file.
   * Local variables:
-  * mode: c
 -- 
-2.9.5
+2.26.3
 

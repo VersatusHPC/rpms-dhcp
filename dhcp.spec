@@ -60,10 +60,8 @@ Patch24 : 0024-Detect-system-time-changes.patch
 Patch25 : 0025-bind-Detect-system-time-changes.patch
 Patch26 : 0026-Add-dhclient-5-B-option-description.patch
 Patch27:  0027-Add-missed-sd-notify-patch-to-manage-dhcpd-with-syst.patch
-
-Patch100: dhcp-statement_parser.patch
-Patch101: bind99-rh1205168.patch
-
+Patch28:  0028-Fix-for-CVE-2021-25217.patch
+Patch29:  0029-Use-system-getaddrinfo-for-dhcp.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
