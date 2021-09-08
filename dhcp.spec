@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.2
-Release:  15.b1%{?dist}
+Release:  16.b1%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -95,6 +95,7 @@ DHCP (Dynamic Host Configuration Protocol)
 %package server
 Summary: Provides the ISC DHCP server
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
+Obsoletes: %{name}-compat < 12:4.4.2-12.b1
 Requires(pre): shadow-utils
 Requires(post): coreutils grep sed
 Requires(post): systemd
@@ -113,6 +114,7 @@ This package provides the ISC DHCP server.
 %package relay
 Summary: Provides the ISC DHCP relay agent
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
+Obsoletes: %{name}-compat < 12:4.4.2-12.b1
 Requires(post): grep sed
 Requires(post): systemd
 Requires(preun): systemd
@@ -511,6 +513,9 @@ done
 %endif
 
 %changelog
+* Wed Sep 08 2021 Petr Menšík <pemensik@redhat.com> - 12:4.4.2-16.b1
+- Allow uninstallation of dhcp-compat package (#2002163)
+
 * Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 12:4.4.2-15.b1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
