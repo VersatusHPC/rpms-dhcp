@@ -8,23 +8,25 @@
 %global dhcpconfdir %{_sysconfdir}/dhcp
 
 
-%global prever b1
-#global patchver P1
+#global prever b1
+%global patchver P1
 %global DHCPVERSION %{version}%{?prever}%{?patchver:-%{patchver}}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.2
-Release:  16.b1%{?dist}
+Release:  17%{?prever:.%prever}%{?patchver:.%patchver}%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
 # So we are stuck with it.
 Epoch:    12
-License:  ISC
+License:  ISC and MPLv2.0
 Url:      https://www.isc.org/dhcp/
-Source0:  ftp://ftp.isc.org/isc/dhcp/%{DHCPVERSION}/dhcp-%{DHCPVERSION}.tar.gz
+Source0:  https://downloads.isc.org/isc/dhcp/%{DHCPVERSION}/dhcp-%{DHCPVERSION}.tar.gz
+Source9:  https://downloads.isc.org/isc/dhcp/%{DHCPVERSION}/dhcp-%{DHCPVERSION}.tar.gz.asc
+Source10: codesign2021.txt
 Source1:  dhclient-script
 Source2:  README.dhclient.d
 Source3:  11-dhclient
@@ -60,7 +62,6 @@ Patch24 : 0024-Detect-system-time-changes.patch
 Patch25 : 0025-bind-Detect-system-time-changes.patch
 Patch26 : 0026-Add-dhclient-5-B-option-description.patch
 Patch27:  0027-Add-missed-sd-notify-patch-to-manage-dhcpd-with-syst.patch
-Patch28:  0028-Fix-for-CVE-2021-25217.patch
 Patch29:  0029-Use-system-getaddrinfo-for-dhcp.patch
 
 BuildRequires: autoconf
@@ -75,6 +76,7 @@ BuildRequires: libcap-ng-devel
 BuildRequires: systemd systemd-devel
 # dhcp-sd_notify.patch
 BuildRequires: pkgconfig(libsystemd)
+BuildRequires: gnupg2
 %if ! 0%{?_module_build}
 BuildRequires: doxygen
 %endif
@@ -197,6 +199,9 @@ This package contains doxygen-generated documentation.
 %endif
 
 %prep
+%if 0%{?fedora}
+%{gpgverify} --keyring='%{SOURCE10}' --signature='%{SOURCE9}' --data='%{SOURCE0}'
+%endif
 %setup -n dhcp-%{DHCPVERSION}
 pushd bind
 tar -xvf bind.tar.gz
@@ -513,6 +518,11 @@ done
 %endif
 
 %changelog
+* Wed Sep 08 2021 Petr Menšík <pemensik@redhat.com> - 12:4.4.2-17.P1
+- Update to 4.4.2-P1 (#1970903)
+- Add source code signature verification
+- Updated license tag
+
 * Wed Sep 08 2021 Petr Menšík <pemensik@redhat.com> - 12:4.4.2-16.b1
 - Allow uninstallation of dhcp-compat package (#2002163)
 
