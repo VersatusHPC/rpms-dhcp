@@ -15,7 +15,7 @@
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.2
-Release:  17%{?prever:.%prever}%{?patchver:.%patchver}%{?dist}
+Release:  18%{?prever:.%prever}%{?patchver:.%patchver}%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -518,6 +518,9 @@ done
 %endif
 
 %changelog
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 12:4.4.2-18.P1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Wed Sep 08 2021 Petr Menšík <pemensik@redhat.com> - 12:4.4.2-17.P1
 - Update to 4.4.2-P1 (#1970903)
 - Add source code signature verification
