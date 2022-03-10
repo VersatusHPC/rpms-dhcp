@@ -1,8 +1,7 @@
-From 6fd7894ea57791c8eee16c21d19da34b909e016e Mon Sep 17 00:00:00 2001
+From f01a29a90269c98a86accb0923d65aecf5f59b44 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 28 Feb 2019 16:40:38 +0100
-Subject: [PATCH 23/26] option 97 - pxe-client-id
-Cc: pzhukov@redhat.com
+Subject: [PATCH 23/28] option 97 - pxe-client-id
 
 Bug-url: https://bugzilla.redhat.com/1058674
 ISC-Bugs #38110
@@ -18,10 +17,10 @@ ISC-Bugs #38110
  8 files changed, 69 insertions(+), 16 deletions(-)
 
 diff --git a/common/options.c b/common/options.c
-index 3034cf0..686dd12 100644
+index 66433c4..4e26094 100644
 --- a/common/options.c
 +++ b/common/options.c
-@@ -4465,13 +4465,26 @@ int validate_packet(struct packet *packet)
+@@ -4551,13 +4551,26 @@ int validate_packet(struct packet *packet)
  				"a future version of ISC DHCP will reject this");
  		}
  	} else {
@@ -56,10 +55,10 @@ index 3034cf0..686dd12 100644
  	}
  
 diff --git a/common/tables.c b/common/tables.c
-index f1be07d..4419220 100644
+index 96521a6..8034d94 100644
 --- a/common/tables.c
 +++ b/common/tables.c
-@@ -196,8 +196,9 @@ static struct option dhcp_options[] = {
+@@ -200,8 +200,9 @@ static struct option dhcp_options[] = {
  	/* Defined by RFC 4578 */
  	{ "pxe-system-type", "Sa",		&dhcp_universe,  93, 1 },
  	{ "pxe-interface-id", "BBB",		&dhcp_universe,  94, 1 },
@@ -71,7 +70,7 @@ index f1be07d..4419220 100644
  #if defined(RFC4776_OPTIONS)
          { "geoconf-civic", "X",                 &dhcp_universe, 99, 1 },
 diff --git a/includes/dhcp.h b/includes/dhcp.h
-index 4cc547a..4eb9791 100644
+index 7202f1d..4ad3874 100644
 --- a/includes/dhcp.h
 +++ b/includes/dhcp.h
 @@ -158,6 +158,7 @@ struct dhcp_packet {
@@ -79,14 +78,14 @@ index 4cc547a..4eb9791 100644
  #define DHO_CLIENT_LAST_TRANSACTION_TIME	91
  #define DHO_ASSOCIATED_IP			92
 +#define DHO_PXE_CLIENT_ID			97  /* RFC4578 */
+ #define DHO_V6_ONLY_PREFERRED			108 /* RFC8925 */
  #define DHO_SUBNET_SELECTION			118 /* RFC3011! */
  #define DHO_DOMAIN_SEARCH			119 /* RFC3397 */
- #define DHO_CLASSLESS_STATIC_ROUTES		121 /* RFC3442 */
 diff --git a/server/dhcp.c b/server/dhcp.c
-index 0582c4c..4e86262 100644
+index 8363840..29d9c69 100644
 --- a/server/dhcp.c
 +++ b/server/dhcp.c
-@@ -222,6 +222,10 @@ dhcp (struct packet *packet) {
+@@ -228,6 +228,10 @@ dhcp (struct packet *packet) {
  		if (lease -> uid_len) {
  			oc = lookup_option (&dhcp_universe, packet -> options,
  					    DHO_DHCP_CLIENT_IDENTIFIER);
@@ -97,7 +96,7 @@ index 0582c4c..4e86262 100644
  			if (!oc)
  				goto nolease;
  
-@@ -820,6 +824,9 @@ void dhcprelease (packet, ms_nulltp)
+@@ -826,6 +830,9 @@ void dhcprelease (packet, ms_nulltp)
  
  	oc = lookup_option (&dhcp_universe, packet -> options,
  			    DHO_DHCP_CLIENT_IDENTIFIER);
@@ -107,7 +106,7 @@ index 0582c4c..4e86262 100644
  	memset (&data, 0, sizeof data);
  	if (oc &&
  	    evaluate_option_cache (&data, packet, (struct lease *)0,
-@@ -1331,6 +1338,9 @@ void dhcpinform (packet, ms_nulltp)
+@@ -1338,6 +1345,9 @@ void dhcpinform (packet, ms_nulltp)
           */
  	oc = lookup_option(&dhcp_universe, packet->options,
  			   DHO_DHCP_CLIENT_IDENTIFIER);
@@ -117,7 +116,7 @@ index 0582c4c..4e86262 100644
  	memset(&d1, 0, sizeof(d1));
  	if (oc &&
  	    evaluate_option_cache(&d1, packet, NULL, NULL,
-@@ -2441,6 +2451,9 @@ void ack_lease (packet, lease, offer, when, msg, ms_nulltp, hp)
+@@ -2448,6 +2458,9 @@ void ack_lease (packet, lease, offer, when, msg, ms_nulltp, hp)
  		   can be used. */
  		oc = lookup_option (&dhcp_universe, packet -> options,
  				    DHO_DHCP_CLIENT_IDENTIFIER);
@@ -127,7 +126,7 @@ index 0582c4c..4e86262 100644
  		if (oc &&
  		    evaluate_option_cache (&d1, packet, lease,
  					   (struct client_state *)0,
-@@ -3033,6 +3046,9 @@ void ack_lease (packet, lease, offer, when, msg, ms_nulltp, hp)
+@@ -3040,6 +3053,9 @@ void ack_lease (packet, lease, offer, when, msg, ms_nulltp, hp)
  		/* Record the uid, if given... */
  		oc = lookup_option (&dhcp_universe, packet -> options,
  				    DHO_DHCP_CLIENT_IDENTIFIER);
@@ -137,7 +136,7 @@ index 0582c4c..4e86262 100644
  		if (oc &&
  		    evaluate_option_cache(&d1, packet, lease, NULL,
  					  packet->options, state->options,
-@@ -4150,6 +4166,9 @@ int find_lease (struct lease **lp,
+@@ -4258,6 +4274,9 @@ int find_lease (struct lease **lp,
  	   specified unique client identifier. */
  	oc = lookup_option (&dhcp_universe, packet -> options,
  			    DHO_DHCP_CLIENT_IDENTIFIER);
@@ -148,7 +147,7 @@ index 0582c4c..4e86262 100644
  	if (oc &&
  	    evaluate_option_cache (&client_identifier,
 diff --git a/server/dhcpd.conf.5 b/server/dhcpd.conf.5
-index 89b5540..4751a8b 100644
+index b7e79ea..2354b1d 100644
 --- a/server/dhcpd.conf.5
 +++ b/server/dhcpd.conf.5
 @@ -1664,10 +1664,12 @@ should be a name identifying the host.  If a \fIhostname\fR option is
@@ -177,7 +176,7 @@ index 89b5540..4751a8b 100644
  parameter for DHCPv6 servers.  For example, it is not possible to
  match a host declaration to a \fIhost-name\fR option.  This is
 diff --git a/server/dhcpleasequery.c b/server/dhcpleasequery.c
-index 7be0788..2fee698 100644
+index 0f1d4f7..dae4ae7 100644
 --- a/server/dhcpleasequery.c
 +++ b/server/dhcpleasequery.c
 @@ -276,7 +276,7 @@ dhcpleasequery(struct packet *packet, int ms_nulltp) {
@@ -213,7 +212,7 @@ index 7be0788..2fee698 100644
  				 sizeof(dbg_info), 
  				 "client-id %s",
 diff --git a/server/failover.c b/server/failover.c
-index 72f7b00..40fa691 100644
+index 5b36d3a..a641e86 100644
 --- a/server/failover.c
 +++ b/server/failover.c
 @@ -5988,6 +5988,9 @@ int load_balance_mine (struct packet *packet, dhcp_failover_state_t *state)
@@ -227,7 +226,7 @@ index 72f7b00..40fa691 100644
  	if (oc &&
  	    evaluate_option_cache(&ds, packet, NULL, NULL,
 diff --git a/server/mdb.c b/server/mdb.c
-index 052df67..8851366 100644
+index 60a40e1..2cd5605 100644
 --- a/server/mdb.c
 +++ b/server/mdb.c
 @@ -129,8 +129,9 @@ static int find_uid_statement (struct executable_statement *esp,
@@ -243,5 +242,5 @@ index 052df67..8851366 100644
  			log_error ("dhcp client identifier may not be %s",
  				   "specified conditionally.");
 -- 
-2.14.5
+2.35.1
 

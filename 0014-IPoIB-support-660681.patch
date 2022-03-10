@@ -1,24 +1,23 @@
-From 042082b4410f158ec86ca8478689b34bc12518e6 Mon Sep 17 00:00:00 2001
+From 90d64318e17df066c27b8e99ba6ab7f51154917b Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:34:21 +0100
-Subject: [PATCH 14/27] IPoIB support (#660681)
-Cc: pzhukov@redhat.com
+Subject: [PATCH 14/28] IPoIB support (#660681)
 
 (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24249])
 ---
- client/dhclient.c |  32 ++++++
+ client/dhclient.c |  33 ++++++
  common/bpf.c      |  32 ++++++
  common/discover.c |   4 +-
- common/lpf.c      | 276 ++++++++++++++++++++++++++++++++++++++++++----
+ common/lpf.c      | 274 ++++++++++++++++++++++++++++++++++++++++++----
  common/socket.c   |   8 +-
  includes/dhcpd.h  |   6 +-
- 6 files changed, 329 insertions(+), 29 deletions(-)
+ 6 files changed, 329 insertions(+), 28 deletions(-)
 
 diff --git a/client/dhclient.c b/client/dhclient.c
-index 301132c..dc9080e 100644
+index a99e21f..48edddf 100644
 --- a/client/dhclient.c
 +++ b/client/dhclient.c
-@@ -205,6 +205,8 @@ static const char use_v6command[] = "Command not used for DHCPv4: %s";
+@@ -211,6 +211,8 @@ static const char use_v6command[] = "Command not used for DHCPv4: %s";
    
  #define DHCLIENT_USAGEH "{--version|--help|-h}"
  
@@ -27,9 +26,9 @@ index 301132c..dc9080e 100644
  static void
  usage(const char *sfmt, const char *sarg)
  {
-@@ -1191,6 +1193,13 @@ main(int argc, char **argv) {
+@@ -1213,6 +1215,14 @@ main(int argc, char **argv) {
  	}
- 	srandom(seed + cur_time + (unsigned)getpid());
+ 	srandom(seed);
  
 +	/* Setup specific Infiniband options */
 +	for (ip = interfaces; ip; ip = ip->next) {
@@ -38,10 +37,11 @@ index 301132c..dc9080e 100644
 +			setup_ib_interface(ip);
 +		}
 +	}
- 
++
  	/*
  	 * Establish a default DUID.  We always do so for v6 and
-@@ -1486,6 +1495,29 @@ int find_subnet (struct subnet **sp,
+ 	 * do so if desired for v4 via the -D or -i options
+@@ -1507,6 +1517,29 @@ int find_subnet (struct subnet **sp,
  	return 0;
  }
  
@@ -72,7 +72,7 @@ index 301132c..dc9080e 100644
   *
   * Each routine is called from the dhclient_state_machine() in one of
 diff --git a/common/bpf.c b/common/bpf.c
-index ffbd09a..568e3d9 100644
+index aede242..812cac3 100644
 --- a/common/bpf.c
 +++ b/common/bpf.c
 @@ -237,11 +237,43 @@ int dhcp_bpf_relay_filter_len =
@@ -120,10 +120,10 @@ index ffbd09a..568e3d9 100644
  struct bpf_insn dhcp_bpf_tr_filter [] = {
          /* accept all token ring packets due to variable length header */
 diff --git a/common/discover.c b/common/discover.c
-index 6ef8852..65881fc 100644
+index ed338b4..e562225 100644
 --- a/common/discover.c
 +++ b/common/discover.c
-@@ -894,7 +894,7 @@ discover_interfaces(int state) {
+@@ -899,7 +899,7 @@ discover_interfaces(int state) {
  				if_register_send(tmp);
  			} else {
  				/* get_hw_addr() was called by register. */
@@ -132,7 +132,7 @@ index 6ef8852..65881fc 100644
  			}
  			break;
  #ifdef DHCPv6
-@@ -907,7 +907,7 @@ discover_interfaces(int state) {
+@@ -912,7 +912,7 @@ discover_interfaces(int state) {
  				   so now we have to call it explicitly
  				   to not leave the hardware address unknown
  				   (some code expects it cannot be. */
@@ -142,7 +142,7 @@ index 6ef8852..65881fc 100644
  				if_register_linklocal6(tmp);
  			}
 diff --git a/common/lpf.c b/common/lpf.c
-index b0ed01c..a9e19f4 100644
+index bb8822a..fcaa13d 100644
 --- a/common/lpf.c
 +++ b/common/lpf.c
 @@ -45,6 +45,17 @@
@@ -416,12 +416,8 @@ index b0ed01c..a9e19f4 100644
  
  	if (strlen(name) >= sizeof(tmp.ifr_name)) {
  		log_fatal("Device name too long: \"%s\"", name);
-@@ -539,16 +691,61 @@ get_hw_addr(const char *name, struct hardware *hw) {
- 	memset(&tmp, 0, sizeof(tmp));
- 	strcpy(tmp.ifr_name, name);
- 	if (ioctl(sock, SIOCGIFHWADDR, &tmp) < 0) {
--		log_fatal("Error getting hardware address for \"%s\": %m", 
-+		log_fatal("Error getting hardware address for \"%s\": %m",
+@@ -542,13 +694,58 @@ get_hw_addr(const char *name, struct hardware *hw) {
+ 		log_fatal("Error getting hardware address for \"%s\": %m",
  			  name);
  	}
 +	close(sock);
@@ -554,10 +550,10 @@ index b0ed01c..a9e19f4 100644
  }
  #endif
 diff --git a/common/socket.c b/common/socket.c
-index 483eb9c..6e1caac 100644
+index 3953eac..903d034 100644
 --- a/common/socket.c
 +++ b/common/socket.c
-@@ -350,7 +350,7 @@ void if_register_send (info)
+@@ -358,7 +358,7 @@ void if_register_send (info)
  	info->wfdesc = if_register_socket(info, AF_INET, 0, NULL);
  	/* If this is a normal IPv4 address, get the hardware address. */
  	if (strcmp(info->name, "fallback") != 0)
@@ -566,7 +562,7 @@ index 483eb9c..6e1caac 100644
  #if defined (USE_SOCKET_FALLBACK)
  	/* Fallback only registers for send, but may need to receive as
  	   well. */
-@@ -413,7 +413,7 @@ void if_register_receive (info)
+@@ -421,7 +421,7 @@ void if_register_receive (info)
  #endif /* IP_PKTINFO... */
  	/* If this is a normal IPv4 address, get the hardware address. */
  	if (strcmp(info->name, "fallback") != 0)
@@ -575,7 +571,7 @@ index 483eb9c..6e1caac 100644
  
  	if (!quiet_interface_discovery)
  		log_info ("Listening on Socket/%s%s%s",
-@@ -567,7 +567,7 @@ if_register6(struct interface_info *info, int do_multicast) {
+@@ -577,7 +577,7 @@ if_register6(struct interface_info *info, int do_multicast) {
  	if (req_multi)
  		if_register_multicast(info);
  
@@ -584,7 +580,7 @@ index 483eb9c..6e1caac 100644
  
  	if (!quiet_interface_discovery) {
  		if (info->shared_network != NULL) {
-@@ -623,7 +623,7 @@ if_register_linklocal6(struct interface_info *info) {
+@@ -633,7 +633,7 @@ if_register_linklocal6(struct interface_info *info) {
  	info->rfdesc = sock;
  	info->wfdesc = sock;
  
@@ -594,7 +590,7 @@ index 483eb9c..6e1caac 100644
  	if (!quiet_interface_discovery) {
  		if (info->shared_network != NULL) {
 diff --git a/includes/dhcpd.h b/includes/dhcpd.h
-index faa9251..0c1a0aa 100644
+index 4c5e877..e9e52e7 100644
 --- a/includes/dhcpd.h
 +++ b/includes/dhcpd.h
 @@ -485,6 +485,9 @@ struct packet {
@@ -607,7 +603,7 @@ index faa9251..0c1a0aa 100644
  struct hardware {
  	u_int8_t hlen;
  	u_int8_t hbuf[HARDWARE_ADDR_LEN + 1];
-@@ -1365,6 +1368,7 @@ struct interface_info {
+@@ -1380,6 +1383,7 @@ struct interface_info {
  	struct shared_network *shared_network;
  				/* Networks connected to this interface. */
  	struct hardware hw_address;	/* Its physical address. */
@@ -615,7 +611,7 @@ index faa9251..0c1a0aa 100644
  	struct in_addr *addresses;	/* Addresses associated with this
  					 * interface.
  					 */
-@@ -2633,7 +2637,7 @@ void print_dns_status (int, struct dhcp_ddns_cb *, isc_result_t);
+@@ -2649,7 +2653,7 @@ void print_dns_status (int, struct dhcp_ddns_cb *, isc_result_t);
  #endif
  const char *print_time(TIME);
  
@@ -625,5 +621,5 @@ index faa9251..0c1a0aa 100644
                     const char *file, int line);
  char *format_lease_id(const unsigned char *s, unsigned len, int format,
 -- 
-2.26.2
+2.35.1
 

@@ -1,15 +1,14 @@
-From 23dfbc560028bf7429196db1a3826f8b80c19d3e Mon Sep 17 00:00:00 2001
+From 5e9162c5ad7aa98f7f673ac7a7f46905ba2deea4 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:09:57 +0100
-Subject: [PATCH 01/26] change bug url
-Cc: pzhukov@redhat.com
+Subject: [PATCH 01/28] change bug url
 
 ---
  omapip/errwarn.c | 47 ++++++++++++++++++++++++++++++++++++++++++-----
  1 file changed, 42 insertions(+), 5 deletions(-)
 
 diff --git a/omapip/errwarn.c b/omapip/errwarn.c
-index e30f8a0..09a3004 100644
+index 38dd9c5..d88e392 100644
 --- a/omapip/errwarn.c
 +++ b/omapip/errwarn.c
 @@ -48,6 +48,41 @@ void (*log_cleanup) (void);
@@ -74,5 +73,5 @@ index e30f8a0..09a3004 100644
    log_error ("exiting.");
  
 -- 
-2.14.5
+2.35.1
 

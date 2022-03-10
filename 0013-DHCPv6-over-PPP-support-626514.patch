@@ -1,8 +1,7 @@
-From 234747fbfd6c6429619ba843713d5b39fb4a513d Mon Sep 17 00:00:00 2001
+From fe89d58ea8627c66feffa81997daa024834eeb15 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:33:06 +0100
-Subject: [PATCH 13/26] DHCPv6 over PPP support (#626514)
-Cc: pzhukov@redhat.com
+Subject: [PATCH 13/28] DHCPv6 over PPP support (#626514)
 
 ---
  client/dhc6.c     |  3 ++-
@@ -15,10 +14,10 @@ Cc: pzhukov@redhat.com
  7 files changed, 54 insertions(+), 5 deletions(-)
 
 diff --git a/client/dhc6.c b/client/dhc6.c
-index 16a0838..3171828 100644
+index 35cf3d0..88fd07d 100644
 --- a/client/dhc6.c
 +++ b/client/dhc6.c
-@@ -5744,7 +5744,8 @@ make_client6_options(struct client_state *client, struct option_state **op,
+@@ -5737,7 +5737,8 @@ make_client6_options(struct client_state *client, struct option_state **op,
  	 */
  	if ((oc = lookup_option(&dhcpv6_universe, *op,
  				D6O_CLIENTID)) == NULL) {
@@ -29,10 +28,10 @@ index 16a0838..3171828 100644
  			log_fatal("Failure assembling a DUID.");
  
 diff --git a/client/dhclient.c b/client/dhclient.c
-index 5d3f5bc..301132c 100644
+index b49fcb3..a99e21f 100644
 --- a/client/dhclient.c
 +++ b/client/dhclient.c
-@@ -1202,8 +1202,8 @@ main(int argc, char **argv) {
+@@ -1223,8 +1223,8 @@ main(int argc, char **argv) {
  			if (default_duid.buffer != NULL)
  				data_string_forget(&default_duid, MDL);
  
@@ -43,7 +42,7 @@ index 5d3f5bc..301132c 100644
  		}
  	}
  
-@@ -3956,7 +3956,7 @@ write_options(struct client_state *client, struct option_state *options,
+@@ -4202,7 +4202,7 @@ write_options(struct client_state *client, struct option_state *options,
   * is not how it is intended.  Upcoming rearchitecting the client should
   * address this "one daemon model."
   */
@@ -52,7 +51,7 @@ index 5d3f5bc..301132c 100644
  form_duid(struct data_string *duid, const char *file, int line)
  {
  	struct interface_info *ip;
-@@ -3969,6 +3969,15 @@ form_duid(struct data_string *duid, const char *file, int line)
+@@ -4215,6 +4215,15 @@ form_duid(struct data_string *duid, const char *file, int line)
  	if (ip == NULL)
  		log_fatal("Impossible condition at %s:%d.", MDL);
  
@@ -68,7 +67,7 @@ index 5d3f5bc..301132c 100644
  	if ((ip->hw_address.hlen == 0) ||
  	    (ip->hw_address.hlen > sizeof(ip->hw_address.hbuf)))
  		log_fatal("Impossible hardware address length at %s:%d.", MDL);
-@@ -4014,6 +4023,8 @@ form_duid(struct data_string *duid, const char *file, int line)
+@@ -4260,6 +4269,8 @@ form_duid(struct data_string *duid, const char *file, int line)
  		log_info("Created duid %s.", str);
  		dfree(str, MDL);
  	}
@@ -78,7 +77,7 @@ index 5d3f5bc..301132c 100644
  
  /* Write the default DUID to the lease store. */
 diff --git a/common/bpf.c b/common/bpf.c
-index 67b6d64..ffbd09a 100644
+index d2a0549..aede242 100644
 --- a/common/bpf.c
 +++ b/common/bpf.c
 @@ -650,6 +650,22 @@ get_hw_addr(const char *name, struct hardware *hw) {
@@ -105,7 +104,7 @@ index 67b6d64..ffbd09a 100644
                          log_fatal("Unsupported device type %d for \"%s\"",
                                    sa->sdl_type, name);
 diff --git a/common/lpf.c b/common/lpf.c
-index 82a279b..b0ed01c 100644
+index bd20b3f..bb8822a 100644
 --- a/common/lpf.c
 +++ b/common/lpf.c
 @@ -563,6 +563,22 @@ get_hw_addr(const char *name, struct hardware *hw) {
@@ -132,7 +131,7 @@ index 82a279b..b0ed01c 100644
  			log_fatal("Unsupported device type %ld for \"%s\"",
  				  (long int)sa->sa_family, name);
 diff --git a/includes/dhcp.h b/includes/dhcp.h
-index 95bf539..4cc547a 100644
+index 5a73129..7202f1d 100644
 --- a/includes/dhcp.h
 +++ b/includes/dhcp.h
 @@ -80,6 +80,8 @@ struct dhcp_packet {
@@ -145,10 +144,10 @@ index 95bf539..4cc547a 100644
     extensions field). */
  #define DHCP_OPTIONS_COOKIE	"\143\202\123\143"
 diff --git a/includes/dhcpd.h b/includes/dhcpd.h
-index 2ac39ae..faa9251 100644
+index 25e1c72..4c5e877 100644
 --- a/includes/dhcpd.h
 +++ b/includes/dhcpd.h
-@@ -3051,7 +3051,7 @@ void client_dns_remove(struct client_state *client, struct iaddr *addr);
+@@ -3071,7 +3071,7 @@ void client_dns_remove(struct client_state *client, struct iaddr *addr);
  
  void dhcpv4_client_assignments(void);
  void dhcpv6_client_assignments(void);
@@ -158,7 +157,7 @@ index 2ac39ae..faa9251 100644
  void dhcp4o6_start(void);
  
 diff --git a/server/dhcpv6.c b/server/dhcpv6.c
-index a7110f9..c5ce7e8 100644
+index 0ea0532..7d61dc5 100644
 --- a/server/dhcpv6.c
 +++ b/server/dhcpv6.c
 @@ -482,6 +482,9 @@ generate_new_server_duid(void) {
@@ -172,5 +171,5 @@ index a7110f9..c5ce7e8 100644
  	if (p == NULL) {
  		return ISC_R_UNEXPECTED;
 -- 
-2.14.5
+2.35.1
 

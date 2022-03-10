@@ -1,8 +1,7 @@
-From 193c4d7631fd623efa601f52fdab6018bf8be771 Mon Sep 17 00:00:00 2001
+From d45463c2007a78623f2c90c250bb8e2f3e34a852 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:39:36 +0100
-Subject: [PATCH 17/26] Send unicast request/release via correct interface
-Cc: pzhukov@redhat.com
+Subject: [PATCH 17/28] Send unicast request/release via correct interface
 
 (#800561, #1177351)
 (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #30544])
@@ -11,10 +10,10 @@ Cc: pzhukov@redhat.com
  1 file changed, 30 insertions(+)
 
 diff --git a/client/dhclient.c b/client/dhclient.c
-index ccc98e4..27fde69 100644
+index 444d251..d607975 100644
 --- a/client/dhclient.c
 +++ b/client/dhclient.c
-@@ -3171,6 +3171,14 @@ void send_request (cpp)
+@@ -3417,6 +3417,14 @@ void send_request (cpp)
  #endif
  	if (destination.sin_addr.s_addr != INADDR_BROADCAST &&
  	    fallback_interface) {
@@ -29,7 +28,7 @@ index ccc98e4..27fde69 100644
  		result = send_packet(fallback_interface, NULL, &client->packet,
  				     client->packet_length, from, &destination,
  				     NULL);
-@@ -3180,6 +3188,13 @@ void send_request (cpp)
+@@ -3426,6 +3434,13 @@ void send_request (cpp)
  				  client->packet_length,
  				  fallback_interface->name);
  		}
@@ -43,7 +42,7 @@ index ccc98e4..27fde69 100644
          }
  	else {
  		/* Send out a packet. */
-@@ -3297,6 +3312,14 @@ void send_release (cpp)
+@@ -3543,6 +3558,14 @@ void send_release (cpp)
  	} else
  #endif
  	if (fallback_interface) {
@@ -58,7 +57,7 @@ index ccc98e4..27fde69 100644
  		result = send_packet(fallback_interface, NULL, &client->packet,
  				      client->packet_length, from, &destination,
  				      NULL);
-@@ -3306,6 +3329,13 @@ void send_release (cpp)
+@@ -3552,6 +3575,13 @@ void send_release (cpp)
  				  client->packet_length,
  				  fallback_interface->name);
  		}
@@ -73,5 +72,5 @@ index ccc98e4..27fde69 100644
  		/* Send out a packet. */
  		result = send_packet(client->interface, NULL, &client->packet,
 -- 
-2.14.5
+2.35.1
 

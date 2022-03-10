@@ -1,7 +1,7 @@
-From 3863afcdfc5996f25741a41272c1a3bea0476692 Mon Sep 17 00:00:00 2001
+From 7ea2433d716172f160c9380ed0bb852fafe845a2 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:30:28 +0100
-Subject: [PATCH] Drop unnecessary capabilities
+Subject: [PATCH 11/28] Drop unnecessary capabilities
 
 dhclient (#517649, #546765), dhcpd/dhcrelay (#699713)
 ---
@@ -28,10 +28,10 @@ index d177159..0689185 100644
  man_MANS = dhclient.8 dhclient-script.8 dhclient.conf.5 dhclient.leases.5
  EXTRA_DIST = $(man_MANS)
 diff --git a/client/dhclient-script.8 b/client/dhclient-script.8
-index 0db5516..2eddb8f 100644
+index 37ecdc5..1a88e0e 100644
 --- a/client/dhclient-script.8
 +++ b/client/dhclient-script.8
-@@ -243,6 +243,16 @@ repeatedly initialized to the values provided by one server, and then
+@@ -249,6 +249,16 @@ repeatedly initialized to the values provided by one server, and then
  the other.   Assuming the information provided by both servers is
  valid, this shouldn't cause any real problems, but it could be
  confusing.
@@ -49,7 +49,7 @@ index 0db5516..2eddb8f 100644
  dhclient(8), dhcpd(8), dhcrelay(8), dhclient.conf(5) and
  dhclient.leases(5).
 diff --git a/client/dhclient.8 b/client/dhclient.8
-index 7155cc5..9f1e435 100644
+index 5029dac..bacf3bc 100644
 --- a/client/dhclient.8
 +++ b/client/dhclient.8
 @@ -135,6 +135,9 @@ dhclient - Dynamic Host Configuration Protocol Client
@@ -96,7 +96,7 @@ index 7155cc5..9f1e435 100644
  .BI \-n
  Do not configure any interfaces.  This is most likely to be useful in
 diff --git a/client/dhclient.c b/client/dhclient.c
-index adcce50..7f202f9 100644
+index aefc119..b49fcb3 100644
 --- a/client/dhclient.c
 +++ b/client/dhclient.c
 @@ -41,6 +41,10 @@
@@ -110,7 +110,7 @@ index adcce50..7f202f9 100644
  /*
   * Defined in stdio.h when _GNU_SOURCE is set, but we don't want to define
   * that when building ISC code.
-@@ -271,6 +275,9 @@ main(int argc, char **argv) {
+@@ -272,6 +276,9 @@ main(int argc, char **argv) {
  	int timeout_arg = 0;
  	char *arg_conf = NULL;
  	int arg_conf_len = 0;
@@ -120,7 +120,7 @@ index adcce50..7f202f9 100644
  
  	/* Initialize client globals. */
  	memset(&default_duid, 0, sizeof(default_duid));
-@@ -670,6 +677,10 @@ main(int argc, char **argv) {
+@@ -671,6 +678,10 @@ main(int argc, char **argv) {
  
  			dhclient_request_options = argv[i];
  
@@ -131,7 +131,7 @@ index adcce50..7f202f9 100644
  		} else if (argv[i][0] == '-') {
  			usage("Unknown command: %s", argv[i]);
  		} else if (interfaces_requested < 0) {
-@@ -730,6 +741,19 @@ main(int argc, char **argv) {
+@@ -731,6 +742,19 @@ main(int argc, char **argv) {
  		path_dhclient_script = s;
  	}
  
@@ -152,7 +152,7 @@ index adcce50..7f202f9 100644
  	initialize_common_option_spaces();
  
 diff --git a/configure.ac b/configure.ac
-index 2ca53ff..3276888 100644
+index b2c306b..300117f 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -603,6 +603,41 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[void foo() __attribute__((noreturn));
@@ -211,7 +211,7 @@ index 5562b69..4c5cfa6 100644
  man_MANS = dhcrelay.8
  EXTRA_DIST = $(man_MANS)
 diff --git a/relay/dhcrelay.c b/relay/dhcrelay.c
-index 5e4a6a9..4c472a9 100644
+index a7b1286..0dc17d6 100644
 --- a/relay/dhcrelay.c
 +++ b/relay/dhcrelay.c
 @@ -32,6 +32,11 @@
@@ -226,7 +226,7 @@ index 5e4a6a9..4c472a9 100644
  TIME default_lease_time = 43200; /* 12 hours... */
  TIME max_lease_time = 86400; /* 24 hours... */
  struct tree_cache *global_options[256];
-@@ -597,6 +602,10 @@ main(int argc, char **argv) {
+@@ -614,6 +619,10 @@ main(int argc, char **argv) {
  			if (++i == argc)
  				usage(use_noarg, argv[i-1]);
  			dhcrelay_sub_id = argv[i];
@@ -237,7 +237,7 @@ index 5e4a6a9..4c472a9 100644
  #endif
  		} else if (!strcmp(argv[i], "-pf")) {
  			if (++i == argc)
-@@ -667,6 +676,17 @@ main(int argc, char **argv) {
+@@ -684,6 +693,17 @@ main(int argc, char **argv) {
  #endif
  	}
  
@@ -255,7 +255,7 @@ index 5e4a6a9..4c472a9 100644
  	if (!quiet) {
  		log_info("%s %s", message, PACKAGE_VERSION);
  		log_info(copyright);
-@@ -823,6 +843,15 @@ main(int argc, char **argv) {
+@@ -840,6 +860,15 @@ main(int argc, char **argv) {
  	signal(SIGTERM, dhcp_signal_handler);  /* kill */
  #endif
  
@@ -272,5 +272,5 @@ index 5e4a6a9..4c472a9 100644
  	dispatch();
  
 -- 
-2.31.1
+2.35.1
 

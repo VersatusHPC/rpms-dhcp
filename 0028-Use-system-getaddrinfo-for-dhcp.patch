@@ -1,18 +1,17 @@
-From 019021caa791c254a319c71b4f634142dc14b37d Mon Sep 17 00:00:00 2001
+From 9970114f558927564d9c19be969c3c35db3b0edf Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Tue, 22 Jun 2021 06:58:40 +0200
-Subject: [PATCH 29/29] Use system getaddrinfo for dhcp
-Cc: pzhukov@redhat.com
+Subject: [PATCH 28/28] Use system getaddrinfo for dhcp
 
 ---
- bind/bind/lib/irs/include/irs/netdb.h.in | 94 ++++++++++++++++++++++++
+ .../lib/irs/include/irs/netdb.h.in            | 94 +++++++++++++++++++
  1 file changed, 94 insertions(+)
 
-diff --git a/bind/bind/lib/irs/include/irs/netdb.h.in b/bind/bind/lib/irs/include/irs/netdb.h.in
-index 23dcd37..f36113d 100644
---- a/bind/bind/lib/irs/include/irs/netdb.h.in
-+++ b/bind/bind/lib/irs/include/irs/netdb.h.in
-@@ -149,6 +149,100 @@ struct addrinfo {
+diff --git a/bind/bind-9.11.36/lib/irs/include/irs/netdb.h.in b/bind/bind-9.11.36/lib/irs/include/irs/netdb.h.in
+index 427fef8..74069b5 100644
+--- a/bind/bind-9.11.36/lib/irs/include/irs/netdb.h.in
++++ b/bind/bind-9.11.36/lib/irs/include/irs/netdb.h.in
+@@ -150,6 +150,100 @@ struct addrinfo {
  #define	NI_NUMERICSERV	0x00000008
  #define	NI_DGRAM	0x00000010
  
@@ -114,5 +113,5 @@ index 23dcd37..f36113d 100644
   * Tell Emacs to use C mode on this file.
   * Local variables:
 -- 
-2.26.3
+2.35.1
 

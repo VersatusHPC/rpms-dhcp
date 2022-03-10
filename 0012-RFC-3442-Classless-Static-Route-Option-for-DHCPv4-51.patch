@@ -1,25 +1,24 @@
-From 01b1dcfef129a4eccfaf0f63a216774019f82dca Mon Sep 17 00:00:00 2001
+From 7e6299e72feaaf7e8bd499614999ba8a07dd1a8a Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:32:35 +0100
-Subject: [PATCH 12/26] RFC 3442 - Classless Static Route Option for DHCPv4
+Subject: [PATCH 12/28] RFC 3442 - Classless Static Route Option for DHCPv4
  (#516325)
-Cc: pzhukov@redhat.com
 
 (Submitted to dhcp-bugs@isc.org - [ISC-Bugs #24572])
 ---
- client/clparse.c      | 13 ++++++++++--
- common/dhcp-options.5 | 43 +++++++++++++++++++++++++++++++++++++++
- common/inet.c         | 54 +++++++++++++++++++++++++++++++++++++++++++++++++
- common/options.c      | 49 +++++++++++++++++++++++++++++++++++++++++++-
- common/parse.c        | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ client/clparse.c      | 13 ++++++++--
+ common/dhcp-options.5 | 43 +++++++++++++++++++++++++++++++++
+ common/inet.c         | 54 +++++++++++++++++++++++++++++++++++++++++
+ common/options.c      | 49 ++++++++++++++++++++++++++++++++++++-
+ common/parse.c        | 56 ++++++++++++++++++++++++++++++++++++++++++-
  common/tables.c       |  2 ++
  includes/dhcp.h       |  1 +
  includes/dhcpd.h      |  2 ++
- includes/dhctoken.h   |  5 +++--
- 9 files changed, 219 insertions(+), 6 deletions(-)
+ includes/dhctoken.h   |  3 ++-
+ 9 files changed, 218 insertions(+), 5 deletions(-)
 
 diff --git a/client/clparse.c b/client/clparse.c
-index 44387ed..862e4f9 100644
+index 902b523..57f6456 100644
 --- a/client/clparse.c
 +++ b/client/clparse.c
 @@ -31,7 +31,7 @@
@@ -31,7 +30,7 @@ index 44387ed..862e4f9 100644
  /* There can be 2 extra requested options for DHCPv4-over-DHCPv6. */
  struct option *default_requested_options[NUM_DEFAULT_REQUESTED_OPTS + 2 + 1];
  
-@@ -87,7 +87,11 @@ isc_result_t read_client_conf ()
+@@ -90,7 +90,11 @@ isc_result_t read_client_conf ()
  				dhcp_universe.code_hash, &code, 0, MDL);
  
  	/* 4 */
@@ -44,7 +43,7 @@ index 44387ed..862e4f9 100644
  	option_code_hash_lookup(&default_requested_options[3],
  				dhcp_universe.code_hash, &code, 0, MDL);
  
-@@ -141,6 +145,11 @@ isc_result_t read_client_conf ()
+@@ -144,6 +148,11 @@ isc_result_t read_client_conf ()
  	option_code_hash_lookup(&default_requested_options[13],
  				dhcp_universe.code_hash, &code, 0, MDL);
  
@@ -57,10 +56,10 @@ index 44387ed..862e4f9 100644
  		if (default_requested_options[code] == NULL)
  			log_fatal("Unable to find option definition for "
 diff --git a/common/dhcp-options.5 b/common/dhcp-options.5
-index d9e1197..2343b19 100644
+index a784b32..86f04ed 100644
 --- a/common/dhcp-options.5
 +++ b/common/dhcp-options.5
-@@ -110,6 +110,26 @@ hexadecimal, separated by colons.  For example:
+@@ -117,6 +117,26 @@ hexadecimal, separated by colons.  For example:
  or
    option dhcp-client-identifier 43:4c:49:45:54:2d:46:4f:4f;
  .fi
@@ -87,7 +86,7 @@ index d9e1197..2343b19 100644
  .SH SETTING OPTION VALUES USING EXPRESSIONS
  Sometimes it's helpful to be able to set the value of a DHCP option
  based on some value that the client has sent.  To do this, you can
-@@ -1086,6 +1106,29 @@ dhclient-script will create routes:
+@@ -1093,6 +1113,29 @@ dhclient-script will create routes:
  .RE
  .PP
  .nf
@@ -118,7 +117,7 @@ index d9e1197..2343b19 100644
                                             [\fB,\fR \fIip-address\fR...]\fB;\fR
  .fi
 diff --git a/common/inet.c b/common/inet.c
-index c4da73c..981fb92 100644
+index 0f7f168..7c446d4 100644
 --- a/common/inet.c
 +++ b/common/inet.c
 @@ -519,6 +519,60 @@ free_iaddrcidrnetlist(struct iaddrcidrnetlist **result) {
@@ -183,10 +182,10 @@ index c4da73c..981fb92 100644
  /* XXX: should use a const pointer rather than passing the structure */
  const char *
 diff --git a/common/options.c b/common/options.c
-index fc0e088..3034cf0 100644
+index 92c8fee..66433c4 100644
 --- a/common/options.c
 +++ b/common/options.c
-@@ -729,7 +729,11 @@ cons_options(struct packet *inpacket, struct dhcp_packet *outpacket,
+@@ -734,7 +734,11 @@ cons_options(struct packet *inpacket, struct dhcp_packet *outpacket,
  		 * packet.
  		 */
  		priority_list[priority_len++] = DHO_SUBNET_MASK;
@@ -199,7 +198,7 @@ index fc0e088..3034cf0 100644
  		priority_list[priority_len++] = DHO_DOMAIN_NAME_SERVERS;
  		priority_list[priority_len++] = DHO_HOST_NAME;
  		priority_list[priority_len++] = DHO_FQDN;
-@@ -1804,6 +1808,7 @@ const char *pretty_print_option (option, data, len, emit_commas, emit_quotes)
+@@ -1812,6 +1816,7 @@ const char *pretty_print_option (option, data, len, emit_commas, emit_quotes)
  	unsigned long tval;
  	isc_boolean_t a_array = ISC_FALSE;
  	int len_used;
@@ -207,7 +206,7 @@ index fc0e088..3034cf0 100644
  
  	if (emit_commas)
  		comma = ',';
-@@ -1812,6 +1817,7 @@ const char *pretty_print_option (option, data, len, emit_commas, emit_quotes)
+@@ -1820,6 +1825,7 @@ const char *pretty_print_option (option, data, len, emit_commas, emit_quotes)
  
  	memset (enumbuf, 0, sizeof enumbuf);
  
@@ -215,7 +214,7 @@ index fc0e088..3034cf0 100644
  	/* Figure out the size of the data. */
  	for (l = i = 0; option -> format [i]; i++, l++) {
  		if (l >= sizeof(fmtbuf) - 1)
-@@ -2004,6 +2010,33 @@ const char *pretty_print_option (option, data, len, emit_commas, emit_quotes)
+@@ -2029,6 +2035,33 @@ const char *pretty_print_option (option, data, len, emit_commas, emit_quotes)
  	if (numhunk < 0)
  		numhunk = 1;
  
@@ -249,7 +248,7 @@ index fc0e088..3034cf0 100644
  	/* Cycle through the array (or hunk) printing the data. */
  	for (i = 0; i < numhunk; i++) {
  		if ((a_array == ISC_TRUE) && (i != 0) && (numelem > 0)) {
-@@ -2159,6 +2192,20 @@ const char *pretty_print_option (option, data, len, emit_commas, emit_quotes)
+@@ -2197,6 +2230,20 @@ const char *pretty_print_option (option, data, len, emit_commas, emit_quotes)
  				strcpy(op, piaddr(iaddr));
  				dp += 4;
  				break;
@@ -271,12 +270,12 @@ index fc0e088..3034cf0 100644
  				iaddr.len = 16;
  				memcpy(iaddr.iabuf, dp, 16);
 diff --git a/common/parse.c b/common/parse.c
-index 3ac4ebf..f17bc0b 100644
+index b123a6c..7cf4f2a 100644
 --- a/common/parse.c
 +++ b/common/parse.c
 @@ -344,6 +344,39 @@ int parse_ip_addr (cfile, addr)
  	return 0;
- }	
+ }
  
 +/*
 + * destination-descriptor :== NUMBER DOT NUMBER |
@@ -336,7 +335,7 @@ index 3ac4ebf..f17bc0b 100644
  	      case IP6_ADDRESS:
  		type = '6';
  		break;
-@@ -5101,6 +5139,15 @@ int parse_option_token (rv, cfile, fmt, expr, uniform, lookups)
+@@ -5124,6 +5162,15 @@ int parse_option_token (rv, cfile, fmt, expr, uniform, lookups)
  		}
  		break;
  
@@ -352,7 +351,7 @@ index 3ac4ebf..f17bc0b 100644
  	      case '6': /* IPv6 address. */
  		if (!parse_ip6_addr(cfile, &addr)) {
  			return 0;
-@@ -5378,6 +5425,13 @@ int parse_option_decl (oc, cfile)
+@@ -5401,6 +5448,13 @@ int parse_option_decl (oc, cfile)
  					goto exit;
  				len = ip_addr.len;
  				dp = ip_addr.iabuf;
@@ -367,7 +366,7 @@ index 3ac4ebf..f17bc0b 100644
  			      alloc:
  				if (hunkix + len > sizeof hunkbuf) {
 diff --git a/common/tables.c b/common/tables.c
-index d2294c0..f1be07d 100644
+index ce12fcd..96521a6 100644
 --- a/common/tables.c
 +++ b/common/tables.c
 @@ -45,6 +45,7 @@ HASH_FUNCTIONS (option_code, const unsigned *, struct option,
@@ -378,7 +377,7 @@ index d2294c0..f1be07d 100644
     6 - IPv6 address
     l - 32-bit signed integer
     L - 32-bit unsigned integer
-@@ -216,6 +217,7 @@ static struct option dhcp_options[] = {
+@@ -223,6 +224,7 @@ static struct option dhcp_options[] = {
  #endif
  	{ "subnet-selection", "I",		&dhcp_universe, 118, 1 },
  	{ "domain-search", "D",			&dhcp_universe, 119, 1 },
@@ -387,11 +386,11 @@ index d2294c0..f1be07d 100644
  	{ "vivso", "Evendor.",			&dhcp_universe, 125, 1 },
  #if 0
 diff --git a/includes/dhcp.h b/includes/dhcp.h
-index 0a74137..95bf539 100644
+index cafe172..5a73129 100644
 --- a/includes/dhcp.h
 +++ b/includes/dhcp.h
-@@ -158,6 +158,7 @@ struct dhcp_packet {
- #define DHO_ASSOCIATED_IP			92
+@@ -159,6 +159,7 @@ struct dhcp_packet {
+ #define DHO_V6_ONLY_PREFERRED			108 /* RFC8925 */
  #define DHO_SUBNET_SELECTION			118 /* RFC3011! */
  #define DHO_DOMAIN_SEARCH			119 /* RFC3397 */
 +#define DHO_CLASSLESS_STATIC_ROUTES		121 /* RFC3442 */
@@ -399,10 +398,10 @@ index 0a74137..95bf539 100644
  #define DHO_VIVSO_SUBOPTIONS			125
  
 diff --git a/includes/dhcpd.h b/includes/dhcpd.h
-index 3632a6b..2ac39ae 100644
+index 4a57002..25e1c72 100644
 --- a/includes/dhcpd.h
 +++ b/includes/dhcpd.h
-@@ -2951,6 +2951,7 @@ isc_result_t range2cidr(struct iaddrcidrnetlist **result,
+@@ -2967,6 +2967,7 @@ isc_result_t range2cidr(struct iaddrcidrnetlist **result,
  			const struct iaddr *lo, const struct iaddr *hi);
  isc_result_t free_iaddrcidrnetlist(struct iaddrcidrnetlist **result);
  const char *piaddr (struct iaddr);
@@ -410,7 +409,7 @@ index 3632a6b..2ac39ae 100644
  char *piaddrmask(struct iaddr *, struct iaddr *);
  char *piaddrcidr(const struct iaddr *, unsigned int);
  u_int16_t validate_port(char *);
-@@ -3169,6 +3170,7 @@ void parse_client_lease_declaration (struct parse *,
+@@ -3189,6 +3190,7 @@ void parse_client_lease_declaration (struct parse *,
  int parse_option_decl (struct option_cache **, struct parse *);
  void parse_string_list (struct parse *, struct string_list **, int);
  int parse_ip_addr (struct parse *, struct iaddr *);
@@ -419,21 +418,19 @@ index 3632a6b..2ac39ae 100644
  void parse_reject_statement (struct parse *, struct client_config *);
  
 diff --git a/includes/dhctoken.h b/includes/dhctoken.h
-index 7e7215a..b4d93ba 100644
+index 6daa422..3f5334e 100644
 --- a/includes/dhctoken.h
 +++ b/includes/dhctoken.h
-@@ -376,8 +376,9 @@ enum dhcp_token {
- 	LEASE_ID_FORMAT = 676,
- 	TOKEN_HEX = 677,
+@@ -378,7 +378,8 @@ enum dhcp_token {
  	TOKEN_OCTAL = 678,
--	KEY_ALGORITHM = 679
--        BOOTP_BROADCAST_ALWAYS = 680
-+	KEY_ALGORITHM = 679,
-+        BOOTP_BROADCAST_ALWAYS = 680,
-+	DESTINATION_DESCRIPTOR = 681
+ 	KEY_ALGORITHM = 679,
+ 	BOOTP_BROADCAST_ALWAYS = 680,
+-	DISCONNECT = 681
++	DESTINATION_DESCRIPTOR = 681,
++	DISCONNECT = 682
  };
  
  #define is_identifier(x)	((x) >= FIRST_TOKEN &&	\
 -- 
-2.14.5
+2.35.1
 

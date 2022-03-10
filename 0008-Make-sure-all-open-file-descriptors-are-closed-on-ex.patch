@@ -1,9 +1,8 @@
-From d2da34706f140101c34f6a9806c258411806a939 Mon Sep 17 00:00:00 2001
+From 39ce1ca26128f4a5d018a567157320ba1f68f4ea Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:27:18 +0100
-Subject: [PATCH 08/26] Make sure all open file descriptors are closed-on-exec
+Subject: [PATCH 08/28] Make sure all open file descriptors are closed-on-exec
  for SELinux
-Cc: pzhukov@redhat.com
 
 ISC-bug: #19148
 ---
@@ -23,10 +22,10 @@ ISC-bug: #19148
  13 files changed, 40 insertions(+), 40 deletions(-)
 
 diff --git a/client/clparse.c b/client/clparse.c
-index 39b95a0..44387ed 100644
+index e63ea08..902b523 100644
 --- a/client/clparse.c
 +++ b/client/clparse.c
-@@ -288,7 +288,7 @@ int read_client_conf_file (const char *name, struct interface_info *ip,
+@@ -291,7 +291,7 @@ int read_client_conf_file (const char *name, struct interface_info *ip,
  	int token;
  	isc_result_t status;
  
@@ -35,7 +34,7 @@ index 39b95a0..44387ed 100644
  		return uerr2isc (errno);
  
  	cfile = NULL;
-@@ -364,7 +364,7 @@ void read_client_leases ()
+@@ -367,7 +367,7 @@ void read_client_leases ()
  
  	/* Open the lease file.   If we can't open it, just return -
  	   we can safely trust the server to remember our state. */
@@ -45,10 +44,10 @@ index 39b95a0..44387ed 100644
  
  	cfile = NULL;
 diff --git a/client/dhclient.c b/client/dhclient.c
-index 2a2e9e6..a86ab9e 100644
+index 07679a7..aefc119 100644
 --- a/client/dhclient.c
 +++ b/client/dhclient.c
-@@ -273,11 +273,11 @@ main(int argc, char **argv) {
+@@ -279,11 +279,11 @@ main(int argc, char **argv) {
  	/* Make sure that file descriptors 0 (stdin), 1, (stdout), and
  	   2 (stderr) are open. To do this, we assume that when we
  	   open a file the lowest available file descriptor is used. */
@@ -63,7 +62,7 @@ index 2a2e9e6..a86ab9e 100644
  	if (fd == 2)
  		log_perror = 0; /* No sense logging to /dev/null. */
  	else if (fd != -1)
-@@ -765,7 +765,7 @@ main(int argc, char **argv) {
+@@ -771,7 +771,7 @@ main(int argc, char **argv) {
  		long temp;
  		int e;
  
@@ -72,7 +71,7 @@ index 2a2e9e6..a86ab9e 100644
  			e = fscanf(pidfd, "%ld\n", &temp);
  			oldpid = (pid_t)temp;
  
-@@ -820,7 +820,7 @@ main(int argc, char **argv) {
+@@ -826,7 +826,7 @@ main(int argc, char **argv) {
  					strncpy(new_path_dhclient_pid, path_dhclient_pid, pfx);
  					sprintf(new_path_dhclient_pid + pfx, "-%s.pid", ip->name);
  
@@ -81,7 +80,7 @@ index 2a2e9e6..a86ab9e 100644
  						e = fscanf(pidfd, "%ld\n", &temp);
  						oldpid = (pid_t)temp;
  
-@@ -845,7 +845,7 @@ main(int argc, char **argv) {
+@@ -851,7 +851,7 @@ main(int argc, char **argv) {
  		int dhc_running = 0;
  		char procfn[256] = "";
  
@@ -90,7 +89,7 @@ index 2a2e9e6..a86ab9e 100644
  			if ((fscanf(pidfp, "%ld", &temp)==1) && ((dhcpid=(pid_t)temp) > 0)) {
  				snprintf(procfn,256,"/proc/%u",dhcpid);
  				dhc_running = (access(procfn, F_OK) == 0);
-@@ -3808,7 +3808,7 @@ void rewrite_client_leases ()
+@@ -4054,7 +4054,7 @@ void rewrite_client_leases ()
  
  	if (leaseFile != NULL)
  		fclose (leaseFile);
@@ -99,7 +98,7 @@ index 2a2e9e6..a86ab9e 100644
  	if (leaseFile == NULL) {
  		log_error ("can't create %s: %m", path_dhclient_db);
  		return;
-@@ -4003,7 +4003,7 @@ write_duid(struct data_string *duid)
+@@ -4249,7 +4249,7 @@ write_duid(struct data_string *duid)
  		return DHCP_R_INVALIDARG;
  
  	if (leaseFile == NULL) {	/* XXX? */
@@ -108,7 +107,7 @@ index 2a2e9e6..a86ab9e 100644
  		if (leaseFile == NULL) {
  			log_error("can't create %s: %m", path_dhclient_db);
  			return ISC_R_IOERROR;
-@@ -4207,7 +4207,7 @@ int write_client_lease (client, lease, rewrite, makesure)
+@@ -4453,7 +4453,7 @@ int write_client_lease (client, lease, rewrite, makesure)
  		return 1;
  
  	if (leaseFile == NULL) {	/* XXX */
@@ -117,7 +116,7 @@ index 2a2e9e6..a86ab9e 100644
  		if (leaseFile == NULL) {
  			log_error ("can't create %s: %m", path_dhclient_db);
  			return 0;
-@@ -4786,9 +4786,9 @@ void detach ()
+@@ -5039,9 +5039,9 @@ void detach ()
  	(void) close(2);
  
  	/* Reopen them on /dev/null. */
@@ -130,7 +129,7 @@ index 2a2e9e6..a86ab9e 100644
  
  	write_client_pid_file ();
  
-@@ -4806,14 +4806,14 @@ void write_client_pid_file ()
+@@ -5059,14 +5059,14 @@ void write_client_pid_file ()
  		return;
  	}
  
@@ -148,7 +147,7 @@ index 2a2e9e6..a86ab9e 100644
  		close(pfdesc);
  		log_error ("Can't fdopen %s: %m", path_dhclient_pid);
 diff --git a/common/bpf.c b/common/bpf.c
-index 16076fe..67b6d64 100644
+index 0bffcbf..d2a0549 100644
 --- a/common/bpf.c
 +++ b/common/bpf.c
 @@ -94,7 +94,7 @@ int if_register_bpf (info)
@@ -161,20 +160,20 @@ index 16076fe..67b6d64 100644
  			if (errno == EBUSY) {
  				continue;
 diff --git a/common/dlpi.c b/common/dlpi.c
-index 3990bf1..a941258 100644
+index f2332c0..bf6e21f 100644
 --- a/common/dlpi.c
 +++ b/common/dlpi.c
 @@ -817,7 +817,7 @@ dlpiopen(const char *ifname) {
  	}
  	*dp = '\0';
- 	
+ 
 -	return open (devname, O_RDWR, 0);
 +	return open (devname, O_RDWR | O_CLOEXEC, 0);
  }
  
  /*
 diff --git a/common/nit.c b/common/nit.c
-index d822c15..a9132bc 100644
+index ba62488..4ebfa4a 100644
 --- a/common/nit.c
 +++ b/common/nit.c
 @@ -75,7 +75,7 @@ int if_register_nit (info)
@@ -187,7 +186,7 @@ index d822c15..a9132bc 100644
  		log_fatal ("Can't open NIT device for %s: %m", info -> name);
  
 diff --git a/common/resolv.c b/common/resolv.c
-index a01f520..b209e3f 100644
+index 5fd683f..3535f3e 100644
 --- a/common/resolv.c
 +++ b/common/resolv.c
 @@ -43,7 +43,7 @@ void read_resolv_conf (parse_time)
@@ -200,7 +199,7 @@ index a01f520..b209e3f 100644
  		return;
  	}
 diff --git a/common/upf.c b/common/upf.c
-index 9785879..e0a524f 100644
+index 37e5cb2..b7c0649 100644
 --- a/common/upf.c
 +++ b/common/upf.c
 @@ -71,7 +71,7 @@ int if_register_upf (info)
@@ -213,7 +212,7 @@ index 9785879..e0a524f 100644
  			if (errno == EBUSY) {
  				continue;
 diff --git a/omapip/trace.c b/omapip/trace.c
-index 45bd508..5ea7486 100644
+index dc9185f..a605d18 100644
 --- a/omapip/trace.c
 +++ b/omapip/trace.c
 @@ -136,10 +136,10 @@ isc_result_t trace_begin (const char *filename,
@@ -239,10 +238,10 @@ index 45bd508..5ea7486 100644
  		log_error("Can't open tracefile %s: %m", filename);
  		return;
 diff --git a/relay/dhcrelay.c b/relay/dhcrelay.c
-index d8caaaf..ea1be18 100644
+index 946ef1b..a7b1286 100644
 --- a/relay/dhcrelay.c
 +++ b/relay/dhcrelay.c
-@@ -296,11 +296,11 @@ main(int argc, char **argv) {
+@@ -305,11 +305,11 @@ main(int argc, char **argv) {
  	/* Make sure that file descriptors 0(stdin), 1,(stdout), and
  	   2(stderr) are open. To do this, we assume that when we
  	   open a file the lowest available file descriptor is used. */
@@ -257,7 +256,7 @@ index d8caaaf..ea1be18 100644
  	if (fd == 2)
  		log_perror = 0; /* No sense logging to /dev/null. */
  	else if (fd != -1)
-@@ -776,13 +776,13 @@ main(int argc, char **argv) {
+@@ -800,13 +800,13 @@ main(int argc, char **argv) {
  		/* Create the pid file. */
  		if (no_pid_file == ISC_FALSE) {
  			pfdesc = open(path_dhcrelay_pid,
@@ -274,7 +273,7 @@ index d8caaaf..ea1be18 100644
  					log_error("Can't fdopen %s: %m",
  						  path_dhcrelay_pid);
 diff --git a/server/confpars.c b/server/confpars.c
-index d2cedfe..2743979 100644
+index 103af1e..5a6396b 100644
 --- a/server/confpars.c
 +++ b/server/confpars.c
 @@ -118,7 +118,7 @@ isc_result_t read_conf_file (const char *filename, struct group *group,
@@ -287,7 +286,7 @@ index d2cedfe..2743979 100644
  			log_error ("Can't open lease database %s: %m --",
  				   path_dhcpd_db);
 diff --git a/server/db.c b/server/db.c
-index 67e6cc1..6181528 100644
+index cecbf6b..4243a92 100644
 --- a/server/db.c
 +++ b/server/db.c
 @@ -1154,7 +1154,7 @@ int new_lease_file (int test_mode)
@@ -309,7 +308,7 @@ index 67e6cc1..6181528 100644
  		close(db_fd);
  		goto fdfail;
 diff --git a/server/dhcpd.c b/server/dhcpd.c
-index 55ffae7..530a923 100644
+index 3522889..845d0cc 100644
 --- a/server/dhcpd.c
 +++ b/server/dhcpd.c
 @@ -300,11 +300,11 @@ main(int argc, char **argv) {
@@ -350,10 +349,10 @@ index 55ffae7..530a923 100644
  
         		IGNORE_RET (chdir("/"));
 diff --git a/server/ldap.c b/server/ldap.c
-index 5126d24..555545c 100644
+index e3e48f4..1a68936 100644
 --- a/server/ldap.c
 +++ b/server/ldap.c
-@@ -1446,7 +1446,7 @@ ldap_start (void)
+@@ -1447,7 +1447,7 @@ ldap_start (void)
  
    if (ldap_debug_file != NULL && ldap_debug_fd == -1)
      {
@@ -363,5 +362,5 @@ index 5126d24..555545c 100644
          log_error ("Error opening debug LDAP log file %s: %s", ldap_debug_file,
                     strerror (errno));
 -- 
-2.14.5
+2.35.1
 

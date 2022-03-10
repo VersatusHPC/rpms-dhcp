@@ -1,9 +1,8 @@
-From 9975d198a2c02e32c31c3e0f43d2aa79dfa7f508 Mon Sep 17 00:00:00 2001
+From 1f8681acba9ab70fbe17c85e5a1f4ce6a648b55d Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 28 Feb 2019 15:30:21 +0100
-Subject: [PATCH 22/26] dhclient: make sure link-local address is ready in
+Subject: [PATCH 22/28] dhclient: make sure link-local address is ready in
  stateless mode
-Cc: pzhukov@redhat.com
 
 Bug-url: https://bugzilla.redhat.com/1263466
 ---
@@ -11,10 +10,10 @@ Bug-url: https://bugzilla.redhat.com/1263466
  1 file changed, 20 insertions(+), 10 deletions(-)
 
 diff --git a/client/dhclient.c b/client/dhclient.c
-index 4e5546a..9b65438 100644
+index 6bbefc7..60836b4 100644
 --- a/client/dhclient.c
 +++ b/client/dhclient.c
-@@ -937,6 +937,12 @@ main(int argc, char **argv) {
+@@ -943,6 +943,12 @@ main(int argc, char **argv) {
  
  	inaddr_any.s_addr = INADDR_ANY;
  
@@ -27,7 +26,7 @@ index 4e5546a..9b65438 100644
  	/* Stateless special case. */
  	if (stateless) {
  		if (release_mode || (wanted_ia_na > 0) ||
-@@ -953,12 +959,6 @@ main(int argc, char **argv) {
+@@ -959,12 +965,6 @@ main(int argc, char **argv) {
  		finish(0);
  	}
  
@@ -40,7 +39,7 @@ index 4e5546a..9b65438 100644
  	/* Parse any extra command line configuration arguments: */
  	if ((dhcp_client_identifier_arg != NULL) && (*dhcp_client_identifier_arg != '\0')) {
  		arg_conf_len = asprintf(&arg_conf, "send dhcp-client-identifier \"%s\";", dhcp_client_identifier_arg);
-@@ -1413,20 +1413,30 @@ void run_stateless(int exit_mode, u_int16_t port)
+@@ -1433,20 +1433,30 @@ void run_stateless(int exit_mode, u_int16_t port)
  	IGNORE_UNUSED(port);
  #endif
  
@@ -76,5 +75,5 @@ index 4e5546a..9b65438 100644
  	/* Parse the lease database. */
  	read_client_leases();
 -- 
-2.14.5
+2.35.1
 

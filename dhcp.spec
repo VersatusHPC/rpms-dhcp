@@ -9,13 +9,13 @@
 
 
 #global prever b1
-%global patchver P1
+#global patchver P1
 %global DHCPVERSION %{version}%{?prever}%{?patchver:-%{patchver}}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
-Version:  4.4.2
-Release:  18%{?prever:.%prever}%{?patchver:.%patchver}%{?dist}
+Version:  4.4.3
+Release:  1%{?prever:.%prever}%{?patchver:.%patchver}%{?dist}
 
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
@@ -62,7 +62,7 @@ Patch24 : 0024-Detect-system-time-changes.patch
 Patch25 : 0025-bind-Detect-system-time-changes.patch
 Patch26 : 0026-Add-dhclient-5-B-option-description.patch
 Patch27:  0027-Add-missed-sd-notify-patch-to-manage-dhcpd-with-syst.patch
-Patch29:  0029-Use-system-getaddrinfo-for-dhcp.patch
+Patch28:  0028-Use-system-getaddrinfo-for-dhcp.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -131,7 +131,6 @@ easier to administer a large network.
 
 This package provides the ISC DHCP relay agent.
 
-
 %package client
 Summary: Provides the ISC DHCP client daemon and dhclient-script
 Provides: dhclient = %{epoch}:%{version}-%{release}
@@ -156,8 +155,6 @@ Summary: Common files used by ISC dhcp client, server and relay agent
 BuildArch: noarch
 Obsoletes: dhcp-libs < %{epoch}:%{version}
 
-
-
 %description common
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows
 individual devices on an IP network to get their own network
@@ -176,7 +173,6 @@ Provides: bundled(bind)
 
 %description libs-static
 This package contains shared libraries used by ISC dhcp client and server
-
 
 %package devel
 Summary: Development headers and libraries for interfacing to the DHCP server
@@ -197,6 +193,14 @@ This documentation is intended for developers, contributors and other
 programmers that are interested in internal operation of the code.
 This package contains doxygen-generated documentation.
 %endif
+
+%package keama
+Summary: Experimental migration assistant for Kea
+
+%description keama
+The KEA Migration Assistant is an experimental tool which helps to translate
+ISC DHCP configurations to Kea.
+
 
 %prep
 %if 0%{?fedora}
@@ -263,8 +267,16 @@ make %{?_smp_mflags} devel
 popd
 %endif
 
+pushd keama
+make -j1
+popd
+
 %install
 make DESTDIR=%{buildroot} install %{?_smp_mflags}
+
+pushd keama
+make DESTDIR=%{buildroot} install %{?_smp_mflags}
+popd
 
 # We don't want example conf files in /etc
 rm -f %{buildroot}%{_sysconfdir}/dhclient.conf.example
@@ -517,7 +529,15 @@ done
 %doc doc/html/
 %endif
 
+%files keama
+%{_sbindir}/keama
+%attr(0644,root,root) %{_mandir}/man8/keama.8.gz
+
 %changelog
+* Thu Mar 10 2022 Martin Osvald <mosvald@redhat.com> - 12:4.4.3-1
+- New version 4.4.3
+- Add keama migration utility
+
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 12:4.4.2-18.P1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 

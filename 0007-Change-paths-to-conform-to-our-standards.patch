@@ -1,8 +1,7 @@
-From ac65289663532db0bc1de449ca2a0eb4c8c2ca6f Mon Sep 17 00:00:00 2001
+From d8da92991d93a3d1c9fc474696aee25b99623c42 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:26:34 +0100
-Subject: [PATCH 07/26] Change paths to conform to our standards
-Cc: pzhukov@redhat.com
+Subject: [PATCH 07/28] Change paths to conform to our standards
 
 ---
  doc/examples/dhcpd-dhcpv6.conf | 2 +-
@@ -23,10 +22,10 @@ index 448a6a6..2357824 100644
  # Static definition (must be global)
  host myclient {
 diff --git a/includes/dhcpd.h b/includes/dhcpd.h
-index 018fa34..3632a6b 100644
+index 3b2e2ca..4a57002 100644
 --- a/includes/dhcpd.h
 +++ b/includes/dhcpd.h
-@@ -1545,7 +1545,7 @@ typedef unsigned char option_mask [16];
+@@ -1561,7 +1561,7 @@ typedef unsigned char option_mask [16];
  #else /* !DEBUG */
  
  #ifndef _PATH_DHCPD_CONF
@@ -35,7 +34,7 @@ index 018fa34..3632a6b 100644
  #endif /* DEBUG */
  
  #ifndef _PATH_DHCPD_DB
-@@ -1567,11 +1567,11 @@ typedef unsigned char option_mask [16];
+@@ -1583,11 +1583,11 @@ typedef unsigned char option_mask [16];
  #endif /* DEBUG */
  
  #ifndef _PATH_DHCLIENT_CONF
@@ -50,5 +49,5 @@ index 018fa34..3632a6b 100644
  
  #ifndef _PATH_DHCLIENT_PID
 -- 
-2.14.5
+2.35.1
 

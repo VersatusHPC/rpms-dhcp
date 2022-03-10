@@ -1,11 +1,14 @@
-commit 50c2b3ba8ce030a47b55dd707bb8a6ab20444a05
-Author: Pavel Zhukov <pzhukov@redhat.com>
-Date:   Thu Feb 21 10:44:06 2019 +0100
+From bdbbb4be07bb33fe083baef2bd0ef38b91c11120 Mon Sep 17 00:00:00 2001
+From: Pavel Zhukov <pzhukov@redhat.com>
+Date: Thu, 21 Feb 2019 10:44:06 +0100
+Subject: [PATCH 21/28] Load leases DB in non-replay mode only
 
-    Load leases DB in non-replay mode only
+---
+ server/confpars.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/server/confpars.c b/server/confpars.c
-index 2743979..6b61964 100644
+index 5a6396b..6e08ad7 100644
 --- a/server/confpars.c
 +++ b/server/confpars.c
 @@ -134,6 +134,11 @@ isc_result_t read_conf_file (const char *filename, struct group *group,
@@ -48,3 +51,6 @@ index 2743979..6b61964 100644
  #endif
  	return status;
  }
+-- 
+2.35.1
+

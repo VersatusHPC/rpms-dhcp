@@ -1,8 +1,7 @@
-From 846779467f7393b19e8d206405116e1e26e16efc Mon Sep 17 00:00:00 2001
+From d359a7dc30e0423f9b90129291538cad1ee6a6d9 Mon Sep 17 00:00:00 2001
 From: Pavel Zhukov <pzhukov@redhat.com>
 Date: Thu, 21 Feb 2019 10:25:53 +0100
-Subject: [PATCH 06/26] Various man-page-only fixes
-Cc: pzhukov@redhat.com
+Subject: [PATCH 06/28] Various man-page-only fixes
 
 ---
  client/dhclient-script.8 | 22 +++++++++++++++++++++-
@@ -12,7 +11,7 @@ Cc: pzhukov@redhat.com
  4 files changed, 58 insertions(+), 7 deletions(-)
 
 diff --git a/client/dhclient-script.8 b/client/dhclient-script.8
-index 3553afd..0db5516 100644
+index 5e5bd3d..37ecdc5 100644
 --- a/client/dhclient-script.8
 +++ b/client/dhclient-script.8
 @@ -43,7 +43,7 @@ customizations are needed, they should be possible using the enter and
@@ -52,7 +51,7 @@ index 3553afd..0db5516 100644
  When dhclient needs to invoke the client configuration script, it
  defines a set of variables in the environment, and then invokes
 diff --git a/client/dhclient.conf.5 b/client/dhclient.conf.5
-index fa3b908..566a881 100644
+index dbe6f7e..8bac980 100644
 --- a/client/dhclient.conf.5
 +++ b/client/dhclient.conf.5
 @@ -228,7 +228,8 @@ responding to the client send the client its values for the specified
@@ -84,10 +83,10 @@ index fa3b908..566a881 100644
  .SH SAMPLE
  The following configuration file was used on a laptop running NetBSD
 diff --git a/common/dhcp-options.5 b/common/dhcp-options.5
-index 33d4804..d9e1197 100644
+index 51f80f7..a784b32 100644
 --- a/common/dhcp-options.5
 +++ b/common/dhcp-options.5
-@@ -1068,6 +1068,21 @@ classless IP routing - it does not include a subnet mask.  Since
+@@ -1075,6 +1075,21 @@ classless IP routing - it does not include a subnet mask.  Since
  classless IP routing is now the most widely deployed routing standard,
  this option is virtually useless, and is not implemented by any of the
  popular DHCP clients, for example the Microsoft DHCP client.
@@ -110,7 +109,7 @@ index 33d4804..d9e1197 100644
  .PP
  .nf
 diff --git a/server/dhcpd.conf.5 b/server/dhcpd.conf.5
-index 17330d4..89b5540 100644
+index 691e5dd..b7e79ea 100644
 --- a/server/dhcpd.conf.5
 +++ b/server/dhcpd.conf.5
 @@ -527,6 +527,9 @@ pool {
@@ -153,7 +152,7 @@ index 17330d4..89b5540 100644
    secret pRP5FapFoJ95JEL06sv4PQ==;
  };
  
-@@ -2912,7 +2915,8 @@ statement
+@@ -2918,7 +2921,8 @@ statement
  The \fInext-server\fR statement is used to specify the host address of
  the server from which the initial boot file (specified in the
  \fIfilename\fR statement) is to be loaded.  \fIServer-name\fR should
@@ -164,5 +163,5 @@ index 17330d4..89b5540 100644
  .PP
  The
 -- 
-2.14.5
+2.35.1
 
