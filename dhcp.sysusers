@@ -1,0 +1,3 @@
+#Type Name     ID             GECOS                 Home directory Shell
+u     dhcpd    177            "DHCP server"         /              /sbin/nologin
+g     dhcpd    177
