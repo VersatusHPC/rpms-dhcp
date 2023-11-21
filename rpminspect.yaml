@@ -1,0 +1,22 @@
+---
+badfuncs:
+  # Adding waiver for all these functions to stop rpminspec to complain about them.
+  # The DHCP is EOL software so there is no chance to get them replaced
+  # with alternatives upstream.
+  allowed:
+    /usr/bin/omshell:
+      - gethostbyname
+      - inet_ntoa
+    /usr/sbin/dhcpd:
+      - gethostbyaddr
+      - gethostbyname
+      - inet_ntoa
+    /usr/sbin/dhclient:
+      - gethostbyname
+      - inet_ntoa
+    /usr/sbin/dhcrelay:
+      - gethostbyname
+      - inet_ntoa
+    /usr/sbin/keama:
+      - gethostbyname
+
