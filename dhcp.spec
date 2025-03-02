@@ -10,6 +10,8 @@
 #global prever b1
 %global patchver P1
 %global DHCPVERSION %{version}%{?prever}%{?patchver:-%{patchver}}
+# Bundled bind version
+%global BINDVERSION 9.11.36
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
@@ -179,8 +181,8 @@ This package provides common files used by dhcp and dhclient package.
 Summary: Shared libraries used by ISC dhcp client and server
 Provides: %{name}-libs%{?_isa} =  %{epoch}:%{version}-%{release}
 Provides: %{name}-libs =  %{epoch}:%{version}-%{release}
-Provides: bundled(bind-export-libs)
-Provides: bundled(bind)
+Provides: bundled(bind-export-libs) = %{BINDVERSION}
+Provides: bundled(bind) = %{BINDVERSION}
 Provides: deprecated()
 
 %description libs-static
@@ -215,7 +217,9 @@ This package contains doxygen-generated documentation.
 %setup -n dhcp-%{DHCPVERSION}
 pushd bind
 tar -xf bind.tar.gz
-ln -s bind-9* bind
+# Ensure we have correct bundled bind version specified.
+ls -1 bind-%{BINDVERSION}
+ln -s bind-%{BINDVERSION} bind
 popd
 %autopatch -p1 
 
