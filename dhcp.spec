@@ -7,7 +7,6 @@
 # Where dhcp configuration files are stored
 %global dhcpconfdir %{_sysconfdir}/dhcp
 
-
 #global prever b1
 %global patchver P1
 %global DHCPVERSION %{version}%{?prever}%{?patchver:-%{patchver}}
@@ -209,15 +208,6 @@ programmers that are interested in internal operation of the code.
 This package contains doxygen-generated documentation.
 %endif
 
-%package keama
-Summary: Experimental migration assistant for Kea
-Provides: deprecated()
-
-%description keama
-The KEA Migration Assistant is an experimental tool which helps to translate
-ISC DHCP configurations to Kea.
-
-
 %prep
 %if 0%{?fedora}
 %{gpgverify} --keyring='%{SOURCE10}' --signature='%{SOURCE9}' --data='%{SOURCE0}'
@@ -283,16 +273,8 @@ make %{?_smp_mflags} devel
 popd
 %endif
 
-pushd keama
-make -j1
-popd
-
 %install
 make DESTDIR=%{buildroot} install %{?_smp_mflags}
-
-pushd keama
-make DESTDIR=%{buildroot} install %{?_smp_mflags}
-popd
 
 # We don't want example conf files in /etc
 rm -f %{buildroot}%{_sysconfdir}/dhclient.conf.example
@@ -538,10 +520,6 @@ done
 %files devel-doc
 %doc doc/html/
 %endif
-
-%files keama
-%{_sbindir}/keama
-%attr(0644,root,root) %{_mandir}/man8/keama.8.gz
 
 %changelog
 %autochangelog
