@@ -1,13 +1,8 @@
 # SystemTap support is disabled by default
 %{!?sdt:%global sdt 0}
 
-%if 0%{?rhel} >= 10
-%bcond_with dhclient
-%bcond_with dhcpd
-%else
 %bcond_without dhclient
 %bcond_without dhcpd
-%endif
 
 # Where dhcp configuration files are stored
 %global dhcpconfdir %{_sysconfdir}/dhcp
