@@ -13,6 +13,11 @@
 # Bundled bind version
 %global BINDVERSION 9.11.36
 
+%global dhcp_EOL_text DHCP is no longer maintained by ISC. This package is provided to\
+cover functionality that is required for other services and not\ 
+provided by Kea.T his package is provided as is and free of charge\
+by VersatusHPC.
+
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
 Version:  4.4.3
@@ -106,6 +111,8 @@ BuildRequires: systemd-rpm-macros
 %description
 DHCP (Dynamic Host Configuration Protocol)
 
+%{dhcp_EOL_text}
+
 %package server
 Summary: Provides the ISC DHCP server
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
@@ -124,6 +131,8 @@ easier to administer a large network.
 
 This package provides the ISC DHCP server.
 
+%{dhcp_EOL_text}
+
 %package relay
 Summary: Provides the ISC DHCP relay agent
 Requires: %{name}-common = %{epoch}:%{version}-%{release}
@@ -140,6 +149,8 @@ etc.) from a DHCP server. The overall purpose of DHCP is to make it
 easier to administer a large network.
 
 This package provides the ISC DHCP relay agent.
+
+%{dhcp_EOL_text}
 
 %package client
 Summary: Provides the ISC DHCP client daemon and dhclient-script
@@ -161,6 +172,8 @@ easier to administer a large network.
 
 This package provides the ISC DHCP client.
 
+%{dhcp_EOL_text}
+
 %package common
 Summary: Common files used by ISC dhcp client, server and relay agent
 BuildArch: noarch
@@ -176,6 +189,8 @@ easier to administer a large network.
 
 This package provides common files used by dhcp and dhclient package.
 
+%{dhcp_EOL_text}
+
 %package libs-static
 Summary: Shared libraries used by ISC dhcp client and server
 Provides: %{name}-libs%{?_isa} =  %{epoch}:%{version}-%{release}
@@ -187,6 +202,8 @@ Provides: deprecated()
 %description libs-static
 This package contains shared libraries used by ISC dhcp client and server
 
+%{dhcp_EOL_text}
+
 %package devel
 Summary: Development headers and libraries for interfacing to the DHCP server
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
@@ -195,6 +212,8 @@ Provides: deprecated()
 %description devel
 Header files and API documentation for using the ISC DHCP libraries.  The
 libdhcpctl and libomapi static libraries are also included in this package.
+
+%{dhcp_EOL_text}
 
 %if ! 0%{?_module_build}
 %package devel-doc
@@ -208,6 +227,8 @@ This documentation is intended for developers, contributors and other
 programmers that are interested in internal operation of the code.
 This package contains doxygen-generated documentation.
 %endif
+
+%{dhcp_EOL_text}
 
 %prep
 %if 0%{?fedora}
