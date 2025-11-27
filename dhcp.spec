@@ -13,10 +13,11 @@
 # Bundled bind version
 %global BINDVERSION 9.11.36
 
-%global dhcp_EOL_text DHCP is no longer maintained by ISC. This package is provided to\
-cover functionality that is required for other services and not\ 
-provided by Kea.T his package is provided as is and free of charge\
-by VersatusHPC.
+%global dhcp_EOL_text %{expand:\
+DHCP is no longer maintained by ISC. This package is provided to cover \
+functionality that is required for other services and not provided by Kea. \
+This package is provided as-is and free of charge by VersatusHPC.\
+}
 
 Summary:  Dynamic host configuration protocol software
 Name:     dhcp
